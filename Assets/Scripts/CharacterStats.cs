@@ -16,39 +16,76 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     public delegate void OnHealthChanged(float currentHealth, float maxHealth);
     public event OnHealthChanged Event_HealthChanged;
 
-    [SyncVar] public float synchronizedHealth = 0;
+    public delegate void OnStaminaChanged(float currentStam, float maxStam);
+    public event OnStaminaChanged Event_StaminaChanged;
+
+    //[SyncVar] public float synchronizedHealth = 0;
+    [SyncVar(hook = nameof(OnHealthUpdated))]
+    float synchronizedHealth = 0f;
 
     public float Health { get; set; }
     public float HealthMax { get; set; }
 
-    void Awake()
+
+    public override void OnStartServer()
     {
         HealthMax = healthMax;
+        SetHealth(HealthMax);
     }
 
-    public override void OnStartServer() => SetHealth(HealthMax);
-
-    public override void OnStartClient()
+    public override void OnStartAuthority()
     {
-        if (hasAuthority)  
-            CmdSetHealth(HealthMax);
+        base.OnStartAuthority();
+        
+        HealthMax = healthMax;
+        Health = HealthMax;
 
-        // FIGURE OUT SOME WAY TO DISPLAY THE HEALTH OF EACH SERVER OWNED 
-        // OBJECT ALREADY ON THE SERVER W/ CharacterStats TO IT'S CURRENT HEALTH
-        // VALUE WHEN A NEW CLIENT JOINS THE SERVER.
+        SetHealth(HealthMax);
     }
 
-    [Command]
-    void CmdSetHealth(float value) => SetHealth(value);
+    //public override void OnStartClient()
+    //{
+    //    if (!base.hasAuthority) { return; }
 
-    [Server]
-    void SetHealth(float value)
+    //    SetHealth(HealthMax);
+
+    //    // figure out some way to display the health of each server owned 
+    //    // object already on the server w/ characterstats to it's current health
+    //    // value when a new client joins the server.
+    //}
+
+    // Currently using this for testing only
+    [ClientCallback]
+    private void Update()
+    {
+        if (!hasAuthority) { return; }
+
+        if (Keyboard.current.hKey.wasPressedThisFrame)
+        {
+            TakeDamage(10);
+        }
+    }
+
+    #region Health Functions
+    [Command]
+    void CmdSetHealth(float value)
     {
         synchronizedHealth = value;
-        Health = synchronizedHealth;
-
-        this.Event_HealthChanged?.Invoke(Health, HealthMax);
         RpcOnHealthChanged(Health, HealthMax);
+    }
+    
+    void SetHealth(float value)
+    {
+        Health = value;
+        CmdSetHealth(value);
+        
+        //this.Event_HealthChanged?.Invoke(Health, HealthMax);
+        //RpcOnHealthChanged(Health, HealthMax);
+    }
+
+    void OnHealthUpdated(float oldVal, float newVal)
+    {
+        this.Event_HealthChanged?.Invoke(Health, HealthMax);
     }
 
     [ClientRpc]
@@ -59,17 +96,17 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
 
     public virtual void TakeDamage(float attackValue)
     {
+        Debug.Log("TEST");
         attackValue *= -1;
         ModifyHealth(attackValue); 
     }
 
-    [Server]
+    [Command]
     public virtual void ModifyHealth(float amount)
     {
         synchronizedHealth += amount;
         Health = synchronizedHealth;
 
-        this.Event_HealthChanged?.Invoke(Health, HealthMax);
         RpcOnHealthChanged(Health, HealthMax);
         if (Health <= 0)
         {
@@ -81,15 +118,16 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     {
         Debug.Log(charName + " has died!");
     }
+    #endregion
 
-    [ClientCallback]
-    private void Update()
+    #region Stamina Functions
+
+    public virtual void ModifyStamina(float value)
     {
-        if (!hasAuthority) { return; }
+        //currentStamina += value;
 
-        if (Keyboard.current.hKey.wasPressedThisFrame)
-        {
-            TakeDamage(-10);
-        }
+        //this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
     }
+
+    #endregion
 }
