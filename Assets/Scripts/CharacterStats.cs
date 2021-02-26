@@ -19,8 +19,6 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     public delegate void OnStaminaChanged(float currentStam, float maxStam);
     public event OnStaminaChanged Event_StaminaChanged;
 
-    //[SyncVar] public float synchronizedHealth = 0;
-    [SyncVar(hook = nameof(OnHealthUpdated))]
     float synchronizedHealth = 0f;
 
     public float Health { get; set; }
@@ -33,26 +31,28 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
         SetHealth(HealthMax);
     }
 
-    public override void OnStartAuthority()
+    //public override void OnStartAuthority()
+    //{
+    //    base.OnStartAuthority();
+
+    //    HealthMax = healthMax;
+    //    Health = HealthMax;
+
+    //    CmdSetHealth(HealthMax);
+    //}
+
+    public override void OnStartClient()
     {
-        base.OnStartAuthority();
-        
+        if (!base.hasAuthority) { return; }
+
         HealthMax = healthMax;
         Health = HealthMax;
+        CmdSetHealth(HealthMax);
 
-        SetHealth(HealthMax);
+        // figure out some way to display the health of each server owned 
+        // object already on the server w/ characterstats to it's current health
+        // value when a new client joins the server.
     }
-
-    //public override void OnStartClient()
-    //{
-    //    if (!base.hasAuthority) { return; }
-
-    //    SetHealth(HealthMax);
-
-    //    // figure out some way to display the health of each server owned 
-    //    // object already on the server w/ characterstats to it's current health
-    //    // value when a new client joins the server.
-    //}
 
     // Currently using this for testing only
     [ClientCallback]
@@ -70,22 +70,24 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     [Command]
     void CmdSetHealth(float value)
     {
-        synchronizedHealth = value;
-        RpcOnHealthChanged(Health, HealthMax);
-    }
-    
-    void SetHealth(float value)
-    {
-        Health = value;
-        CmdSetHealth(value);
-        
-        //this.Event_HealthChanged?.Invoke(Health, HealthMax);
+        SetHealth(value);
+        //synchronizedHealth = value;
         //RpcOnHealthChanged(Health, HealthMax);
     }
-
-    void OnHealthUpdated(float oldVal, float newVal)
+    
+    [Server]
+    void SetHealth(float value)
     {
-        this.Event_HealthChanged?.Invoke(Health, HealthMax);
+        synchronizedHealth = value;
+        Health = value;
+
+        this.Event_HealthChanged(Health, HealthMax);
+        RpcOnHealthChanged(Health, HealthMax);
+
+        //CmdSetHealth(value);
+
+        //this.Event_HealthChanged?.Invoke(Health, HealthMax);
+        //RpcOnHealthChanged(Health, HealthMax);
     }
 
     [ClientRpc]
@@ -96,7 +98,6 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
 
     public virtual void TakeDamage(float attackValue)
     {
-        Debug.Log("TEST");
         attackValue *= -1;
         ModifyHealth(attackValue); 
     }
@@ -107,6 +108,7 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
         synchronizedHealth += amount;
         Health = synchronizedHealth;
 
+        this.Event_HealthChanged?.Invoke(Health, HealthMax);
         RpcOnHealthChanged(Health, HealthMax);
         if (Health <= 0)
         {
