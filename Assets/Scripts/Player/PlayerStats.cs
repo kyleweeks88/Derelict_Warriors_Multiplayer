@@ -14,17 +14,5 @@ public class PlayerStats : CharacterStats
 
         playerName = GetComponent<PlayerName>();
         base.charName = playerName.synchronizedName;
-        SetHealth(HealthMax);
-    }
-
-    void SetHealth(float value)
-    {
-        CmdSetHealth(value);
-    }
-
-    [Command]
-    void CmdSetHealth(float value)
-    {
-        synchronizedHealth = value;
     }
 }

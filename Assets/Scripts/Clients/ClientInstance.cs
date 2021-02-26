@@ -41,7 +41,7 @@ public class ClientInstance : NetworkBehaviour
     public override void OnStartAuthority()
     {
         base.OnStartAuthority();
-        SetName(PlayerNameInput.DisplayName);
+        //SetName(PlayerNameInput.DisplayName);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class ClientInstance : NetworkBehaviour
     public void InvokeCharacterSpawned(GameObject go)
     {
         currentCharacter = go;
-        SetName(currentName);
+        SetName(PlayerNameInput.DisplayName);
         OnOwnerCharacterSpawned?.Invoke(go);
     }
 

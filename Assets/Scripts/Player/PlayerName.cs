@@ -13,7 +13,9 @@ public class PlayerName : NetworkBehaviour
 
 
     /// <summary>
-    /// Sets the player name for owner client with authority
+    /// Sets the player name for owner client with authority.
+    /// This function is currently called from ClientInstance when
+    /// a new player character object is spawned.
     /// </summary>
     /// <param name="name"></param>
     [Client]
@@ -38,6 +40,9 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     void OnNameUpdated(string oldString, string newString)
     {
+        if (hasAuthority)
+            nameText.gameObject.SetActive(false);
+
         nameText.text = newString;
     }
 }
