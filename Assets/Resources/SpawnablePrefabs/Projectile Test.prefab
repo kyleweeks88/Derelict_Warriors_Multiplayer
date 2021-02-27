@@ -198,7 +198,7 @@ MonoBehaviour:
     m_Bits: 513
   projectileDamage: 10
   speed: 10
-  skinWidth: 0.1
+  skinWidth: 1
 --- !u!135 &8135467360687804657
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -208,7 +208,7 @@ SphereCollider:
   m_GameObject: {fileID: 5501600362227425314}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.25
   m_Center: {x: 0, y: 0, z: 0}
