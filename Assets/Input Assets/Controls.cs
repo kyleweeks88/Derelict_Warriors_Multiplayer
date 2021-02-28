@@ -141,6 +141,60 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Combat"",
+            ""id"": ""be80f206-67ee-4c6e-b2a9-ea0cd5588464"",
+            ""actions"": [
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""ebecd25a-ad3c-440b-baa0-d87bc4d6885a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""89a32af9-8099-4fb8-8056-e5a4649ac59d"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Locomotion"",
+            ""id"": ""8c7fd909-d5ea-4681-818d-059282714ac7"",
+            ""actions"": [
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""93e752e1-8b55-4e1c-9b15-bac5494b856e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""70565ecc-d17c-4d46-a040-32a2e6ae151f"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -168,6 +222,12 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+        // Combat
+        m_Combat = asset.FindActionMap("Combat", throwIfNotFound: true);
+        m_Combat_Shoot = m_Combat.FindAction("Shoot", throwIfNotFound: true);
+        // Locomotion
+        m_Locomotion = asset.FindActionMap("Locomotion", throwIfNotFound: true);
+        m_Locomotion_Sprint = m_Locomotion.FindAction("Sprint", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -270,6 +330,72 @@ public class @Controls : IInputActionCollection, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Combat
+    private readonly InputActionMap m_Combat;
+    private ICombatActions m_CombatActionsCallbackInterface;
+    private readonly InputAction m_Combat_Shoot;
+    public struct CombatActions
+    {
+        private @Controls m_Wrapper;
+        public CombatActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Shoot => m_Wrapper.m_Combat_Shoot;
+        public InputActionMap Get() { return m_Wrapper.m_Combat; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CombatActions set) { return set.Get(); }
+        public void SetCallbacks(ICombatActions instance)
+        {
+            if (m_Wrapper.m_CombatActionsCallbackInterface != null)
+            {
+                @Shoot.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
+                @Shoot.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
+                @Shoot.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
+            }
+            m_Wrapper.m_CombatActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Shoot.started += instance.OnShoot;
+                @Shoot.performed += instance.OnShoot;
+                @Shoot.canceled += instance.OnShoot;
+            }
+        }
+    }
+    public CombatActions @Combat => new CombatActions(this);
+
+    // Locomotion
+    private readonly InputActionMap m_Locomotion;
+    private ILocomotionActions m_LocomotionActionsCallbackInterface;
+    private readonly InputAction m_Locomotion_Sprint;
+    public struct LocomotionActions
+    {
+        private @Controls m_Wrapper;
+        public LocomotionActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Sprint => m_Wrapper.m_Locomotion_Sprint;
+        public InputActionMap Get() { return m_Wrapper.m_Locomotion; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(LocomotionActions set) { return set.Get(); }
+        public void SetCallbacks(ILocomotionActions instance)
+        {
+            if (m_Wrapper.m_LocomotionActionsCallbackInterface != null)
+            {
+                @Sprint.started -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
+                @Sprint.performed -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
+                @Sprint.canceled -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
+            }
+            m_Wrapper.m_LocomotionActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Sprint.started += instance.OnSprint;
+                @Sprint.performed += instance.OnSprint;
+                @Sprint.canceled += instance.OnSprint;
+            }
+        }
+    }
+    public LocomotionActions @Locomotion => new LocomotionActions(this);
     private int m_MKSchemeIndex = -1;
     public InputControlScheme MKScheme
     {
@@ -285,5 +411,13 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
+    }
+    public interface ICombatActions
+    {
+        void OnShoot(InputAction.CallbackContext context);
+    }
+    public interface ILocomotionActions
+    {
+        void OnSprint(InputAction.CallbackContext context);
     }
 }

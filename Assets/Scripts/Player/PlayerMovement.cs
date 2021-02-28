@@ -6,21 +6,35 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    [SerializeField] PlayerStats playerStats = null;
     [SerializeField] CharacterController controller = null;
     [SerializeField] Animator myAnimator;
     [SerializeField] GameObject myCamera;
     [SerializeField] CinemachineFreeLook freeLook;
 
+    [Header("Movement settings")]
     [SerializeField] float moveSpeed = 5f;
+    float currentMoveSpeed = 0f;
+    [SerializeField] float sprintMultiplier = 2f;
     [SerializeField] float turnSpeed = 15f;
+    bool isSprinting = false;
 
     float yVelocity = 0;
     float gravity = -9.81f;
 
+    [Header("Jump settings")]
     bool isJumping;
     [SerializeField] float jumpVelocity = 5f;
 
-    Vector2 previousInput;
+    #region Animator Parameters
+    // My Animator parameters turned from costly Strings to cheap Ints
+    int isSprintingParam = Animator.StringToHash("isSprinting");
+    int isJumpingParam = Animator.StringToHash("isJumping");
+    int isGroundedParam = Animator.StringToHash("isGrounded");
+    int yVelocityParam = Animator.StringToHash("yVelocity");
+    int inputXParam = Animator.StringToHash("InputX");
+    int inputYParam = Animator.StringToHash("InputY");
+    #endregion
 
     Controls controls;
     Controls Controls
@@ -48,6 +62,10 @@ public class PlayerMovement : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         Controls.Player.Jump.performed += ctx => Jump();
+        Controls.Locomotion.Sprint.started += ctx => SprintPressed();
+        Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
+
+        currentMoveSpeed = moveSpeed;
     }
 
     public override void OnStartClient()
@@ -80,10 +98,12 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        myAnimator.SetBool("isJumping", isJumping);
-        myAnimator.SetBool("isGrounded", controller.isGrounded);
-        myAnimator.SetFloat("yVelocity", yVelocity);
+        myAnimator.SetBool(isJumpingParam, isJumping);
+        myAnimator.SetBool(isGroundedParam, controller.isGrounded);
+        myAnimator.SetFloat(yVelocityParam, yVelocity);
+
         Move();
+        UpdateIsSprinting();
     } 
 
 
@@ -118,6 +138,39 @@ public class PlayerMovement : NetworkBehaviour
 
         // MOVES THE PLAYER
         controller.Move((verticalMovement + (rotationMovement * moveSpeed)) * Time.deltaTime);
+    }
+
+    void SprintPressed()
+    {
+        if (playerStats.currentStamina - playerStats.staminaDrainAmount > 0)
+        {
+            currentMoveSpeed *= sprintMultiplier;
+            isSprinting = true;
+        }
+    }
+
+    void SprintReleased()
+    {
+        isSprinting = false;
+        currentMoveSpeed = moveSpeed;
+    }
+
+    void UpdateIsSprinting()
+    {
+        if (isSprinting)
+        {
+            if (playerStats.currentStamina - playerStats.staminaDrainAmount > 0)
+            {
+                playerStats.StaminaDrain();
+            }
+            else
+            {
+                SprintReleased();
+                return;
+            }
+        }
+
+        myAnimator.SetBool(isSprintingParam, isSprinting);
     }
 
     [Client]

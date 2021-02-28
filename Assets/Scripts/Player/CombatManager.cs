@@ -23,6 +23,12 @@ public class CombatManager : NetworkBehaviour
     public bool canRecieveInput;
     public bool inputRecieved;
 
+    [Header("RANGED TESTING")]
+    [SerializeField] Transform projectileSpawn;
+    [SerializeField] GameObject projectile = null;
+    float nextShotTime = 0f;
+    [SerializeField] float msBetweenShots = 0f;
+
     Controls controls;
     Controls Controls
     {
@@ -38,6 +44,7 @@ public class CombatManager : NetworkBehaviour
         enabled = true;
 
         Controls.Player.Attack.performed += ctx => CheckAttack();
+        Controls.Combat.Shoot.performed += ctx => CheckRangedAttack();
         canRecieveInput = true;
     }
 
@@ -61,11 +68,68 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
+    bool ShotTimeMet(bool resetTime = true)
+    {
+        bool result = (Time.time >= nextShotTime);
+
+        if (resetTime)
+            nextShotTime = Time.time + msBetweenShots / 1000f;
+
+        return result;
+    }
+
+    GameObject SpawnProjectile()
+    {
+        GameObject newProjectile = Instantiate(projectile,
+            projectileSpawn.position,
+            projectileSpawn.rotation);
+
+        newProjectile.GetComponent<Projectile>().SetSpeed(25f);
+        return newProjectile;
+    }
+
+    // USING THIS TEMPORARILY FOR TESTING. WILL IMPLEMENT INTO CheckAttack SOMEHOW
+    public void CheckRangedAttack()
+    {
+        if (!base.hasAuthority) { return; }
+        if (!ShotTimeMet()) { return; }
+
+        Debug.Log("Local Client");
+        SpawnProjectile();
+        CmdRangedAttack(transform.position);
+    }
+
+    [Command]
+    void CmdRangedAttack(Vector3 pos)
+    {
+        if (!ShotTimeMet()) { return; }
+
+        float maxPosOffset = 1;
+        if (Vector3.Distance(pos, transform.position) > maxPosOffset)
+        {
+            Vector3 posDir = pos - transform.position;
+            pos = transform.position + (posDir * maxPosOffset);
+        }
+
+        RpcRangedAttack(pos);
+    }
+
+    [ClientRpc]
+    void RpcRangedAttack(Vector3 pos)
+    {
+        if (base.hasAuthority) { return; }
+
+        Debug.Log("RPC");
+        SpawnProjectile();
+    }
+
     /// <summary>
     /// Called by the player's attack input
     /// </summary>
     public void CheckAttack()
     {
+        // CHECK IF ARMED OR UNARMED
+
         if(canRecieveInput)
         {
             inputRecieved = true;

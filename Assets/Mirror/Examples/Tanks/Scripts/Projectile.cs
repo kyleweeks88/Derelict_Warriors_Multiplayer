@@ -32,7 +32,8 @@ namespace Mirror.Examples.Tanks
         [ServerCallback]
         void OnTriggerEnter(Collider co)
         {
-            NetworkServer.Destroy(gameObject);
+            Debug.Log("HIT: " + co.gameObject.name);
+            //NetworkServer.Destroy(gameObject);
         }
     }
 }
