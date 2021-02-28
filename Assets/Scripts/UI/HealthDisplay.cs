@@ -19,22 +19,22 @@ public class HealthDisplay : MonoBehaviour
     private void OnEnable()
     {
         myStats.Event_HealthChanged += HandleHealthChanged;
-        //myStats.Event_StaminaChanged += HandleStaminaChanged;
+        myStats.Event_StaminaChanged += HandleStaminaChanged;
     }
 
     private void OnDisable()
     {
         myStats.Event_HealthChanged -= HandleHealthChanged;
+        myStats.Event_StaminaChanged -= HandleStaminaChanged;
     }
 
     private void HandleHealthChanged(float currentHealth, float maxHealth)
     {
         healthBarImage.fillAmount = currentHealth / maxHealth;
-        Debug.Log("Current Health: "+currentHealth+" Max Health: "+maxHealth);
     }
 
-    //private void HandleStaminaChanged(float currentStam, float maxStam)
-    //{
-
-    //}
+    private void HandleStaminaChanged(float currentStam, float maxStam)
+    {
+        staminaBarImage.fillAmount = currentStam / maxStam;
+    }
 }

@@ -155,6 +155,33 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Locomotion",
+            "id": "8c7fd909-d5ea-4681-818d-059282714ac7",
+            "actions": [
+                {
+                    "name": "Sprint",
+                    "type": "Button",
+                    "id": "93e752e1-8b55-4e1c-9b15-bac5494b856e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "70565ecc-d17c-4d46-a040-32a2e6ae151f",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

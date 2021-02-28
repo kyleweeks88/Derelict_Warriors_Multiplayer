@@ -78,6 +78,9 @@ public class Projectile : NetworkBehaviour
 	[ClientRpc]
 	void RpcCheckCollisions()
     {
+		// Your client has already done this code locally
+        if (base.hasAuthority) { return; }
+
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit hit;
 
@@ -90,43 +93,18 @@ public class Projectile : NetworkBehaviour
 
 	void OnHitObject(RaycastHit hit)
 	{
-		CharacterStats hitTarget = hit.collider.GetComponent<CharacterStats>();
-		if (hitTarget != null)
-		{
-			hitTarget.TakeDamage(projectileDamage);
-		}
+        CharacterStats hitTarget = hit.collider.GetComponent<CharacterStats>();
+        if (hitTarget != null)
+        {
+            hitTarget.TakeDamage(projectileDamage);
+        }
 
-		NetworkIdentity _hit = hit.collider.gameObject.GetComponent<NetworkIdentity>();
-		CmdOnHitObject(_hit);
+        NetworkIdentity _hit = hit.collider.gameObject.GetComponent<NetworkIdentity>();
+
+		// SHOULD I CALL A COMMAND FUNCTION HERE???
+
 		GameObject.Destroy(gameObject);
 		Debug.Log("HIT");
-	}
-
-	[Command]
-	void CmdOnHitObject(NetworkIdentity hit)
-    {
-		CharacterStats hitTarget = hit.gameObject.GetComponent<CharacterStats>();
-		if (hitTarget != null)
-		{
-			hitTarget.TakeDamage(projectileDamage);
-		}
-
-		RpcOnHitObject(hit);
-		GameObject.Destroy(gameObject);
-	}
-
-	[ClientRpc]
-	void RpcOnHitObject(NetworkIdentity hit)
-    {
-        if (base.hasAuthority) { return; }
-
-		CharacterStats hitTarget = hit.gameObject.GetComponent<CharacterStats>();
-		if (hitTarget != null)
-		{
-			hitTarget.TakeDamage(projectileDamage);
-		}
-
-		GameObject.Destroy(gameObject);
 	}
 
 	IEnumerator DestroyAfterLifetime()

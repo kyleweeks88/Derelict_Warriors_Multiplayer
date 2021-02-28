@@ -13,6 +13,12 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     public float healthMax;
     public float baseAttackDamage;
 
+    [Header("Stamina Settings")]
+    public float maxStamina = 100f;
+    public float staminaDrainInterval = 0f;
+    public float staminaDrainAmount = 0f;
+    [HideInInspector] public float currentStamina;
+
     public delegate void OnHealthChanged(float currentHealth, float maxHealth);
     public event OnHealthChanged Event_HealthChanged;
 
@@ -74,7 +80,7 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
         //synchronizedHealth = value;
         //RpcOnHealthChanged(Health, HealthMax);
     }
-    
+
     [Server]
     void SetHealth(float value)
     {
@@ -99,7 +105,7 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     public virtual void TakeDamage(float attackValue)
     {
         attackValue *= -1;
-        ModifyHealth(attackValue); 
+        ModifyHealth(attackValue);
     }
 
     [Command]
@@ -123,13 +129,72 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     #endregion
 
     #region Stamina Functions
-
     public virtual void ModifyStamina(float value)
     {
-        //currentStamina += value;
+        currentStamina += value;
 
-        //this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
+        this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
     }
 
+    #region Drain
+    void UseStamina(float staminaDrain)
+    {
+        if (currentStamina - staminaDrain >= 0)
+        {
+            ModifyStamina(staminaDrain * -1f);
+        }
+    }
+
+    public void StaminaDrain()
+    {
+        if (ShouldDrainStamina())
+        {
+            UseStamina(staminaDrainAmount);
+            staminaDrainInterval = Time.time + 0.1f;
+        }
+    }
+
+    bool ShouldDrainStamina()
+    {
+        bool result = (Time.time >= staminaDrainInterval);
+
+        return result;
+    }
     #endregion
+
+    #region Gain
+    void GainStamina(float staminaGain)
+    {
+        if (currentStamina + staminaGain <= maxStamina)
+        {
+            ModifyStamina(staminaGain);
+        }
+    }
+    #endregion
+
+    #endregion
+
+    void ModifyStat(float value, string key)
+    {
+        if(key == "Stamina")
+        {
+            //synchronizedStamina += value;
+            //currentStamina = synchronizedStamina;
+            
+            this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
+            RpcOnHealthChanged(currentStamina, maxStamina);
+        }
+        else if(key == "Health")
+        {
+            synchronizedHealth += value;
+            Health = synchronizedHealth;
+
+            this.Event_HealthChanged?.Invoke(Health, HealthMax);
+            RpcOnHealthChanged(Health, HealthMax);
+            if (Health <= 0)
+            {
+                Death();
+            }
+        }
+    }
 }
