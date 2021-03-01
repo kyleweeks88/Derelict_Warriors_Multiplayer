@@ -137,12 +137,12 @@ public class PlayerMovement : NetworkBehaviour
         myAnimator.SetFloat("InputY", movement.z);
 
         // MOVES THE PLAYER
-        controller.Move((verticalMovement + (rotationMovement * moveSpeed)) * Time.deltaTime);
+        controller.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
     }
 
     void SprintPressed()
     {
-        if (playerStats.currentStamina - playerStats.staminaDrainAmount > 0)
+        if (playerStats.staminaStat.GetCurrentValue() - playerStats.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
@@ -159,7 +159,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (isSprinting)
         {
-            if (playerStats.currentStamina - playerStats.staminaDrainAmount > 0)
+            if (playerStats.staminaStat.GetCurrentValue() - playerStats.staminaDrainAmount > 0)
             {
                 playerStats.StaminaDrain();
             }

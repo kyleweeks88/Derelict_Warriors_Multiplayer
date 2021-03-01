@@ -1962,6 +1962,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  healthStat:
+    statName: Health
+    currentValue: 0
+  staminaStat:
+    statName: Stamina
+    currentValue: 0
   charName: PLAYER
   healthMax: 100
   baseAttackDamage: 25
