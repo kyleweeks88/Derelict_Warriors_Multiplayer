@@ -1969,12 +1969,12 @@ MonoBehaviour:
     statName: Stamina
     currentValue: 0
   charName: PLAYER
-  healthMax: 100
   baseAttackDamage: 25
+  healthMax: 100
   maxStamina: 100
-  staminaDrainInterval: 0
-  staminaDrainAmount: 1
-  currentStamina: 0
+  staminaDrainAmount: 3
+  staminaGainAmount: 1
+  drainingStamina: 0
 --- !u!1 &7597802290015807635
 GameObject:
   m_ObjectHideFlags: 0

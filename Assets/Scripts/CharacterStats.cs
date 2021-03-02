@@ -22,8 +22,11 @@ public class CharacterStats : NetworkBehaviour
     [Header("Stamina Settings")]
     float synchronizedStamina = 0f;
     public float maxStamina = 100f;
-    public float staminaDrainInterval = 0f;
+    float staminaDrainInterval = 0f;
+    float staminaGainInterval = 0f;
     public float staminaDrainAmount = 0f;
+    public float staminaGainAmount = 0f;
+    public bool drainingStamina = false;
 
     public delegate void OnStatChanged(string key, float currentValue, float maxValue);
     public event OnStatChanged Event_StatChanged;
@@ -31,9 +34,6 @@ public class CharacterStats : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        //HealthMax = healthMax;
-        //SetHealth(healthStat.GetMaxValue());
-
         healthStat.InitializeStat(this, healthMax);
         staminaStat.InitializeStat(this, maxStamina);
 
@@ -67,8 +67,6 @@ public class CharacterStats : NetworkBehaviour
         {
             TakeDamage(10);
         }
-
-        ShouldGainStamina();
     }
 
     [Command]
@@ -96,17 +94,10 @@ public class CharacterStats : NetworkBehaviour
         this.Event_StatChanged?.Invoke(key, currentValue, maxValue);
     }
 
-    public virtual void TakeDamage(float attackValue)
-    {
-        attackValue *= -1;
-
-        ModifyStat(healthStat.statName, attackValue);
-    }
-
     [Command]
     public virtual void ModifyStat(string key, float value)
     {
-        if(key == "Health")
+        if (key == "Health")
         {
             synchronizedHealth += value;
             float modValue = healthStat.ModifyStat(value);
@@ -114,7 +105,7 @@ public class CharacterStats : NetworkBehaviour
             RpcOnStatChanged(key, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
         }
 
-        if(key == "Stamina")
+        if (key == "Stamina")
         {
             synchronizedStamina += value;
             float modValue = staminaStat.ModifyStat(value);
@@ -123,10 +114,19 @@ public class CharacterStats : NetworkBehaviour
         }
     }
 
+    #region Health Functions
+    public virtual void TakeDamage(float attackValue)
+    {
+        attackValue *= -1;
+
+        ModifyStat(healthStat.statName, attackValue);
+    }
+
     public virtual void Death()
     {
         Debug.Log(charName + " has died!");
     }
+    #endregion
 
     #region Stamina Functions
 
@@ -136,7 +136,6 @@ public class CharacterStats : NetworkBehaviour
         if (staminaStat.GetCurrentValue() - staminaDrain >= 0)
         {
             ModifyStat(staminaStat.statName, staminaDrain * -1f);
-            Debug.Log("TEST");
         }
     }
 
@@ -144,8 +143,10 @@ public class CharacterStats : NetworkBehaviour
     {
         if (ShouldDrainStamina())
         {
+            drainingStamina = true;
             UseStamina(staminaDrainAmount);
             staminaDrainInterval = Time.time + 0.1f;
+            StartCoroutine(StaminaGainDelay(staminaStat.GetCurrentValue()));
         }
     }
 
@@ -163,31 +164,44 @@ public class CharacterStats : NetworkBehaviour
         if (staminaStat.GetCurrentValue() + staminaGain <= maxStamina)
         {
             ModifyStat(staminaStat.statName, staminaGain);
+            return;
+        }
+    }
+
+    public void StaminaGain()
+    {
+        if (ShouldGainStamina())
+        {
+            GainStamina(staminaGainAmount);
+            staminaGainInterval = Time.time + 100f / 1000f;
         }
     }
 
     bool ShouldGainStamina()
     {
-        float currentStam = staminaStat.GetCurrentValue();
-        if (currentStam < staminaStat.GetMaxValue())
-        {
-            StartCoroutine(StaminaGainDelay(currentStam));
-        }
-        return false;
+        bool result = (Time.time >= staminaGainInterval);
+
+        return result;
     }
 
     IEnumerator StaminaGainDelay(float oldValue)
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
 
-        if(oldValue != staminaStat.GetCurrentValue())
+        if(oldValue == staminaStat.GetCurrentValue())
         {
+            drainingStamina = false;
+
             WaitForEndOfFrame wait = new WaitForEndOfFrame();
-            while (staminaStat.GetCurrentValue() < staminaStat.GetMaxValue())
+            while (staminaStat.GetCurrentValue() < staminaStat.GetMaxValue() && !drainingStamina)
             {
-                GainStamina(1f);
+                StaminaGain();
                 yield return wait;
             }
+        }
+        else
+        {
+            yield return null;
         }
     }
     #endregion
