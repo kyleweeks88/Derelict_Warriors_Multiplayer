@@ -6,54 +6,51 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class CharacterStats : NetworkBehaviour, IHaveHealth
+public class CharacterStats : NetworkBehaviour
 {
+    public Stat healthStat;
+    public Stat staminaStat;
+
     [Header("Settings")]
     public string charName;
-    public float healthMax;
     public float baseAttackDamage;
 
-    [Header("Stamina Settings")]
-    public float maxStamina = 100f;
-    public float staminaDrainInterval = 0f;
-    public float staminaDrainAmount = 0f;
-    [HideInInspector] public float currentStamina;
-
-    public delegate void OnHealthChanged(float currentHealth, float maxHealth);
-    public event OnHealthChanged Event_HealthChanged;
-
-    public delegate void OnStaminaChanged(float currentStam, float maxStam);
-    public event OnStaminaChanged Event_StaminaChanged;
-
+    [Header("Health Settings")]
     float synchronizedHealth = 0f;
+    public float healthMax;
 
-    public float Health { get; set; }
-    public float HealthMax { get; set; }
+    [Header("Stamina Settings")]
+    float synchronizedStamina = 0f;
+    public float maxStamina = 100f;
+    float staminaDrainInterval = 0f;
+    float staminaGainInterval = 0f;
+    public float staminaDrainAmount = 0f;
+    public float staminaGainAmount = 0f;
+    public bool drainingStamina = false;
+
+    public delegate void OnStatChanged(string key, float currentValue, float maxValue);
+    public event OnStatChanged Event_StatChanged;
 
 
     public override void OnStartServer()
     {
-        HealthMax = healthMax;
-        SetHealth(HealthMax);
+        healthStat.InitializeStat(this, healthMax);
+        staminaStat.InitializeStat(this, maxStamina);
+
+        SetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
+        SetStat(staminaStat.statName, staminaStat.GetMaxValue(), staminaStat.GetMaxValue());
     }
-
-    //public override void OnStartAuthority()
-    //{
-    //    base.OnStartAuthority();
-
-    //    HealthMax = healthMax;
-    //    Health = HealthMax;
-
-    //    CmdSetHealth(HealthMax);
-    //}
 
     public override void OnStartClient()
     {
         if (!base.hasAuthority) { return; }
 
-        HealthMax = healthMax;
-        Health = HealthMax;
-        CmdSetHealth(HealthMax);
+        healthStat.InitializeStat(this, healthMax);
+        staminaStat.InitializeStat(this, maxStamina);
+
+        CmdSetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
+        CmdSetStat(staminaStat.statName, staminaStat.GetMaxValue(), staminaStat.GetMaxValue());
+
 
         // figure out some way to display the health of each server owned 
         // object already on the server w/ characterstats to it's current health
@@ -72,54 +69,57 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
         }
     }
 
-    #region Health Functions
     [Command]
-    void CmdSetHealth(float value)
+    void CmdSetStat(string key, float currentValue, float maxValue)
     {
-        SetHealth(value);
-        //synchronizedHealth = value;
-        //RpcOnHealthChanged(Health, HealthMax);
+        SetStat(key, currentValue, maxValue);
     }
 
     [Server]
-    void SetHealth(float value)
+    void SetStat(string key, float currentValue, float maxValue)
     {
-        synchronizedHealth = value;
-        Health = value;
+        if (key == "Health")
+            synchronizedHealth = currentValue;
 
-        this.Event_HealthChanged(Health, HealthMax);
-        RpcOnHealthChanged(Health, HealthMax);
+        if(key == "Stamina")
+            synchronizedStamina = currentValue;
 
-        //CmdSetHealth(value);
-
-        //this.Event_HealthChanged?.Invoke(Health, HealthMax);
-        //RpcOnHealthChanged(Health, HealthMax);
+        this.Event_StatChanged?.Invoke(key, currentValue, maxValue);
+        RpcOnStatChanged(key, currentValue, maxValue);
     }
 
     [ClientRpc]
-    private void RpcOnHealthChanged(float currentHealth, float maxHealth)
+    private void RpcOnStatChanged(string key, float currentValue, float maxValue)
     {
-        this.Event_HealthChanged?.Invoke(currentHealth, maxHealth);
-    }
-
-    public virtual void TakeDamage(float attackValue)
-    {
-        attackValue *= -1;
-        ModifyHealth(attackValue);
+        this.Event_StatChanged?.Invoke(key, currentValue, maxValue);
     }
 
     [Command]
-    public virtual void ModifyHealth(float amount)
+    public virtual void ModifyStat(string key, float value)
     {
-        synchronizedHealth += amount;
-        Health = synchronizedHealth;
-
-        this.Event_HealthChanged?.Invoke(Health, HealthMax);
-        RpcOnHealthChanged(Health, HealthMax);
-        if (Health <= 0)
+        if (key == "Health")
         {
-            Death();
+            synchronizedHealth += value;
+            float modValue = healthStat.ModifyStat(value);
+            this.Event_StatChanged(key, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
+            RpcOnStatChanged(key, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
         }
+
+        if (key == "Stamina")
+        {
+            synchronizedStamina += value;
+            float modValue = staminaStat.ModifyStat(value);
+            this.Event_StatChanged(key, staminaStat.GetCurrentValue(), staminaStat.GetMaxValue());
+            RpcOnStatChanged(key, staminaStat.GetCurrentValue(), staminaStat.GetMaxValue());
+        }
+    }
+
+    #region Health Functions
+    public virtual void TakeDamage(float attackValue)
+    {
+        attackValue *= -1;
+
+        ModifyStat(healthStat.statName, attackValue);
     }
 
     public virtual void Death()
@@ -129,19 +129,13 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     #endregion
 
     #region Stamina Functions
-    public virtual void ModifyStamina(float value)
-    {
-        currentStamina += value;
-
-        this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
-    }
 
     #region Drain
     void UseStamina(float staminaDrain)
     {
-        if (currentStamina - staminaDrain >= 0)
+        if (staminaStat.GetCurrentValue() - staminaDrain >= 0)
         {
-            ModifyStamina(staminaDrain * -1f);
+            ModifyStat(staminaStat.statName, staminaDrain * -1f);
         }
     }
 
@@ -149,8 +143,10 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     {
         if (ShouldDrainStamina())
         {
+            drainingStamina = true;
             UseStamina(staminaDrainAmount);
             staminaDrainInterval = Time.time + 0.1f;
+            StartCoroutine(StaminaGainDelay(staminaStat.GetCurrentValue()));
         }
     }
 
@@ -165,36 +161,51 @@ public class CharacterStats : NetworkBehaviour, IHaveHealth
     #region Gain
     void GainStamina(float staminaGain)
     {
-        if (currentStamina + staminaGain <= maxStamina)
+        if (staminaStat.GetCurrentValue() + staminaGain <= maxStamina)
         {
-            ModifyStamina(staminaGain);
+            ModifyStat(staminaStat.statName, staminaGain);
+            return;
         }
     }
-    #endregion
 
-    #endregion
-
-    void ModifyStat(float value, string key)
+    public void StaminaGain()
     {
-        if(key == "Stamina")
+        if (ShouldGainStamina())
         {
-            //synchronizedStamina += value;
-            //currentStamina = synchronizedStamina;
-            
-            this.Event_StaminaChanged?.Invoke(currentStamina, maxStamina);
-            RpcOnHealthChanged(currentStamina, maxStamina);
+            GainStamina(staminaGainAmount);
+            staminaGainInterval = Time.time + 100f / 1000f;
         }
-        else if(key == "Health")
-        {
-            synchronizedHealth += value;
-            Health = synchronizedHealth;
+    }
 
-            this.Event_HealthChanged?.Invoke(Health, HealthMax);
-            RpcOnHealthChanged(Health, HealthMax);
-            if (Health <= 0)
+    bool ShouldGainStamina()
+    {
+        bool result = (Time.time >= staminaGainInterval);
+
+        return result;
+    }
+
+    IEnumerator StaminaGainDelay(float oldValue)
+    {
+        yield return new WaitForSeconds(1f);
+
+        if(oldValue == staminaStat.GetCurrentValue())
+        {
+            drainingStamina = false;
+
+            WaitForEndOfFrame wait = new WaitForEndOfFrame();
+            while (staminaStat.GetCurrentValue() < staminaStat.GetMaxValue() && !drainingStamina)
             {
-                Death();
+                StaminaGain();
+                yield return wait;
             }
         }
+        else
+        {
+            yield return null;
+        }
     }
+    #endregion
+
+    #endregion
+
 }
