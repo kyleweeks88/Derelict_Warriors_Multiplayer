@@ -6,8 +6,9 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class CharacterStats : NetworkBehaviour
+public class CharacterStats : NetworkBehaviour, IKillable
 {
+    [SerializeField] HealthManager healthMgmt;
     public Stat healthStat;
     public Stat staminaStat;
 
@@ -34,10 +35,10 @@ public class CharacterStats : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        healthStat.InitializeStat(this, healthMax);
+        //healthStat.InitializeStat(this, healthMax);
         staminaStat.InitializeStat(this, maxStamina);
 
-        SetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
+        //SetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
         SetStat(staminaStat.statName, staminaStat.GetMaxValue(), staminaStat.GetMaxValue());
     }
 
@@ -45,10 +46,10 @@ public class CharacterStats : NetworkBehaviour
     {
         if (!base.hasAuthority) { return; }
 
-        healthStat.InitializeStat(this, healthMax);
+        //healthStat.InitializeStat(this, healthMax);
         staminaStat.InitializeStat(this, maxStamina);
 
-        CmdSetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
+        //CmdSetStat(healthStat.statName, healthStat.GetCurrentValue(), healthStat.GetMaxValue());
         CmdSetStat(staminaStat.statName, staminaStat.GetMaxValue(), staminaStat.GetMaxValue());
 
 
@@ -65,7 +66,7 @@ public class CharacterStats : NetworkBehaviour
 
         if (Keyboard.current.hKey.wasPressedThisFrame)
         {
-            TakeDamage(10);
+            healthMgmt.TakeDamage(baseAttackDamage);
         }
     }
 
@@ -114,19 +115,30 @@ public class CharacterStats : NetworkBehaviour
         }
     }
 
-    #region Health Functions
-    public virtual void TakeDamage(float attackValue)
-    {
-        attackValue *= -1;
-
-        ModifyStat(healthStat.statName, attackValue);
-    }
-
+    [Client]
     public virtual void Death()
     {
         Debug.Log(charName + " has died!");
+        //this.transform.position = Vector3.zero;
+        CmdDeath();
     }
-    #endregion
+
+    [Command]
+    public virtual void CmdDeath()
+    {
+        Debug.Log(charName + " has died!");
+        this.transform.position = Vector3.zero;
+        RpcDeath();
+    }
+
+    [ClientRpc]
+    void RpcDeath()
+    {
+        //if(base.hasAuthority){return;}
+
+        Debug.Log(charName + " has died!");
+        this.transform.position = Vector3.zero;
+    }
 
     #region Stamina Functions
 

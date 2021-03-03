@@ -10,42 +10,32 @@ public class Projectile : NetworkBehaviour
     public float speed = 10f;
 	public float skinWidth = 0.1f;
 
-    private void Awake()
+	void Start()
     {
+        SetSpeed(speed);
 		StartCoroutine(DestroyAfterLifetime());
     }
 
-	//   [ServerCallback]
-	//void Update()
-	//{
-	//	if (speed > 0)
-	//	{
-	//		float moveDistance = speed * Time.deltaTime;
-	//		CheckCollisions(moveDistance);
-
-	//		transform.Translate(Vector3.forward * moveDistance);
-	//	}
-	//}
-
-	public void SetSpeed(float newSpeed)
-	{
-		speed = newSpeed;
-		StartCoroutine(SpawnProjectiles(newSpeed));
-	}
-
-	IEnumerator SpawnProjectiles(float speed)
+    public void SetSpeed(float newSpeed)
     {
-		Vector3 direction = transform.forward;
+    	speed = newSpeed;
+    	StartCoroutine(TranslateProjectile(newSpeed));
+    }
 
-		WaitForEndOfFrame wait = new WaitForEndOfFrame();
-		while(this.gameObject != null)
+    IEnumerator TranslateProjectile(float speed)
+    {
+    	Vector3 direction = transform.forward;
+
+    	WaitForEndOfFrame wait = new WaitForEndOfFrame();
+    	while(this.gameObject != null)
         {
-			this.transform.position += (direction * speed * Time.deltaTime);
-			CheckCollisions();
-			yield return wait;
+    		this.transform.position += (direction * speed * Time.deltaTime);
+    		CheckCollisions();
+    		yield return wait;
         }
     }
 
+	[ServerCallback]
 	void CheckCollisions()
 	{
 		Ray ray = new Ray(transform.position, transform.forward);
@@ -56,55 +46,24 @@ public class Projectile : NetworkBehaviour
 			// Instantiate HitFX here
 			OnHitObject(hit);
 		}
-
-		CmdCheckCollisions();
 	}
 
-	[Command]
-	void CmdCheckCollisions()
-    {
-		Ray ray = new Ray(transform.position, transform.forward);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-		{
-			// Instantiate HitFX here
-			OnHitObject(hit);
-		}
-
-		RpcCheckCollisions();
-	}
-
-	[ClientRpc]
-	void RpcCheckCollisions()
-    {
-		// Your client has already done this code locally
-        if (base.hasAuthority) { return; }
-
-		Ray ray = new Ray(transform.position, transform.forward);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-		{
-			// Instantiate HitFX here
-			OnHitObject(hit);
-		}
-	}
-
+	[ServerCallback]
 	void OnHitObject(RaycastHit hit)
 	{
-        CharacterStats hitTarget = hit.collider.GetComponent<CharacterStats>();
+        HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
         if (hitTarget != null)
         {
             hitTarget.TakeDamage(projectileDamage);
         }
+		GameObject.Destroy(this.gameObject);
+		RpcOnHitObject();
+	}
 
-        NetworkIdentity _hit = hit.collider.gameObject.GetComponent<NetworkIdentity>();
-
-		// SHOULD I CALL A COMMAND FUNCTION HERE???
-
-		GameObject.Destroy(gameObject);
-		Debug.Log("HIT");
+	[ClientRpc]
+	void RpcOnHitObject()
+	{
+		GameObject.Destroy(this.gameObject);
 	}
 
 	IEnumerator DestroyAfterLifetime()
