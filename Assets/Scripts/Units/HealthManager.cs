@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.InputSystem;
 
 public class HealthManager : VitalStat, IDamageable<float>
 {
@@ -10,14 +11,17 @@ public class HealthManager : VitalStat, IDamageable<float>
     public delegate void OnHealthChanged(float curVal, float maxVal);
     public event OnHealthChanged Event_HealthChanged;
 
-    // public override void OnStartServer()
-    // {
-    //     if(!base.isServerOnly) {return;}
+    // Currently using this for testing only
+    [ClientCallback]
+    private void Update()
+    {
+        if (!hasAuthority) { return; }
 
-    //     base.OnStartServer();
-    //     InitializeVital();
-    //     SetVital(maxVital);
-    // }
+        if (Keyboard.current.hKey.wasPressedThisFrame)
+        {
+            TakeDamage(10f);
+        }
+    }
 
     [Client]
     public override void SetVital(float setVal)
@@ -73,11 +77,11 @@ public class HealthManager : VitalStat, IDamageable<float>
 
     public void Die()
     {
-        CharacterStats playerStats = GetComponent<CharacterStats>();
+        CharacterStats characterStats = GetComponent<CharacterStats>();
 
-        if(playerStats != null)
+        if(characterStats != null)
         {
-            playerStats.Death();
+            characterStats.Death();
         }
     }
 }
