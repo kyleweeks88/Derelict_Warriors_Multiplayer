@@ -5,6 +5,7 @@ using Mirror;
 
 public class Projectile : NetworkBehaviour
 {
+	public GameObject hitFxPrefab;
 	public LayerMask collisionsMask;
 	public float projectileDamage = 10f;
     public float speed = 10f;
@@ -43,7 +44,6 @@ public class Projectile : NetworkBehaviour
 
 		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
 		{
-			// Instantiate HitFX here
 			OnHitObject(hit);
 		}
 	}
@@ -56,13 +56,31 @@ public class Projectile : NetworkBehaviour
         {
             hitTarget.TakeDamage(projectileDamage);
         }
+
+		if(base.isClient)
+		{
+			GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
+		}
+		
 		GameObject.Destroy(this.gameObject);
-		RpcOnHitObject();
+
+		NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
+		RpcOnHitObject(hitId, hit.point);
 	}
 
 	[ClientRpc]
-	void RpcOnHitObject()
+	void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
 	{
+		if(hitId != null)
+		{
+			HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
+			if (hitTarget != null)
+			{
+				hitTarget.TakeDamage(projectileDamage);
+			}
+		}
+
+		GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
 		GameObject.Destroy(this.gameObject);
 	}
 

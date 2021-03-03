@@ -206,11 +206,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  hitFxPrefab: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4,
+    type: 3}
   collisionsMask:
     serializedVersion: 2
     m_Bits: 513
   projectileDamage: 10
-  speed: 10
+  speed: 15
   skinWidth: 1
 --- !u!1 &7568320972793102285
 GameObject:

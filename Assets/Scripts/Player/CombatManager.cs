@@ -85,17 +85,18 @@ public class CombatManager : NetworkBehaviour
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
 
-        SpawnProjectile();
+        CmdSpawnProjectile();
         CmdRangedAttack(transform.position);
     }
 
-    void SpawnProjectile()
+    [Command]
+    void CmdSpawnProjectile()
     {
         GameObject newProjectile = Instantiate(projectile,
             projectileSpawn.position,
             projectileSpawn.rotation);
 
-        //newProjectile.GetComponent<Projectile>().SetSpeed(25f); 
+        NetworkServer.Spawn(newProjectile); 
     }
 
     [Command]
@@ -110,9 +111,6 @@ public class CombatManager : NetworkBehaviour
             pos = transform.position + (posDir * maxPosOffset);
         }
 
-        if(base.isClient)
-            SpawnProjectile();
-
         RpcRangedAttack();
     }  
 
@@ -121,7 +119,7 @@ public class CombatManager : NetworkBehaviour
     {
         if(base.hasAuthority){return;}
 
-        SpawnProjectile();
+        CmdSpawnProjectile();
     }
     
     /// <summary>
