@@ -14,17 +14,16 @@ public class VitalStat : NetworkBehaviour
         currentVital = maxVital;
     }
 
+    [Client]
+    public virtual void SetVital(float setVal)
+    {
+        //Generic code here
+    }
+
     [Command]
     public virtual void CmdSetVital(float setVal)
     {
-        //SetVital(setVal);
         synchronizedVital = setVal;
-    }
-
-    //[Server]
-    public virtual void SetVital(float setVal)
-    {
-        //synchronizedVital = setVal;
     }
 
     [Client]
@@ -36,7 +35,7 @@ public class VitalStat : NetworkBehaviour
     [Command]
     public virtual void CmdModifyVital(float modVal)
     {
-        currentVital = Mathf.Clamp((currentVital + modVal), 0 , maxVital);
+        currentVital = Mathf.Clamp((synchronizedVital + modVal), 0 , maxVital);
         synchronizedVital = currentVital;
     }
 }

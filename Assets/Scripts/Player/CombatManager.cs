@@ -95,7 +95,7 @@ public class CombatManager : NetworkBehaviour
             projectileSpawn.position,
             projectileSpawn.rotation);
 
-        newProjectile.GetComponent<Projectile>().SetSpeed(25f); 
+        //newProjectile.GetComponent<Projectile>().SetSpeed(25f); 
     }
 
     [Command]
