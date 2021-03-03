@@ -14,6 +14,11 @@ public class VitalStat : NetworkBehaviour
         currentVital = maxVital;
     }
 
+    public float GetCurrentVital()
+    {
+        return currentVital;
+    }
+
     [Client]
     public virtual void SetVital(float setVal)
     {

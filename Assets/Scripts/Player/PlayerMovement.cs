@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [SerializeField] PlayerStats playerStats = null;
+    //[SerializeField] PlayerStats playerStats = null;
+    [SerializeField] StaminaManager staminaMgmt = null;
     [SerializeField] CharacterController controller = null;
     [SerializeField] Animator myAnimator;
     [SerializeField] GameObject myCamera;
@@ -142,7 +143,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void SprintPressed()
     {
-        if (playerStats.staminaStat.GetCurrentValue() - playerStats.staminaDrainAmount > 0)
+        if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
@@ -159,9 +160,9 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (isSprinting)
         {
-            if (playerStats.staminaStat.GetCurrentValue() - playerStats.staminaDrainAmount > 0)
+            if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
             {
-                playerStats.StaminaDrain();
+                staminaMgmt.StaminaDrain();
             }
             else
             {
@@ -178,9 +179,13 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!isJumping)
         {
-            isJumping = true;
+            if (staminaMgmt.GetCurrentVital() - 10f > 0)
+            {
+                staminaMgmt.TakeDamage(10f);
+                isJumping = true;
 
-            yVelocity += jumpVelocity;
+                yVelocity += jumpVelocity;
+            }
         }
     }
 }
