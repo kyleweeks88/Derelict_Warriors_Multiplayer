@@ -7,37 +7,33 @@ using Mirror;
 public class HealthDisplay : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] HealthManager healthManager = null;
     [SerializeField] private CharacterStats myStats = null;
 
     [Header("Health Ref")]
     [SerializeField] private Image healthBarImage = null;
 
-    [Header("Stamina Ref")]
-    [SerializeField] Image staminaBarImage = null;
+    //[Header("Stamina Ref")]
+    //[SerializeField] Image staminaBarImage = null;
 
 
     private void OnEnable()
     {
-        myStats.Event_StatChanged += HandleStatChanged;
+        healthManager.Event_HealthChanged += HandleHealthChanged;
     }
 
     private void OnDisable()
     {
-        myStats.Event_StatChanged -= HandleStatChanged;
-
+        healthManager.Event_HealthChanged -= HandleHealthChanged;
     }
 
-    void HandleStatChanged(string key, float currentValue, float maxValue)
+    void HandleHealthChanged(float curVal, float maxVal)
     {
-        if(key == "Health")
-        {
-            healthBarImage.fillAmount = currentValue / maxValue;
-            //Debug.Log(stat.GetCurrentValue()+" / "+ stat.GetMaxValue());
-        }
-
-        if(key == "Stamina")
-        {
-            staminaBarImage.fillAmount = currentValue / maxValue;
-        }
+        healthBarImage.fillAmount = curVal / maxVal;
     }
+
+    // void HandleStaminaChanged(float curVal, float maxVal)
+    // {
+    //     staminaBarImage.fillAmount = curVal / maxVal;
+    // }
 }

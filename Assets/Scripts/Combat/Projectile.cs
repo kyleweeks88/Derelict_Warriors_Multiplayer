@@ -15,25 +15,13 @@ public class Projectile : NetworkBehaviour
 		StartCoroutine(DestroyAfterLifetime());
     }
 
-	//   [ServerCallback]
-	//void Update()
-	//{
-	//	if (speed > 0)
-	//	{
-	//		float moveDistance = speed * Time.deltaTime;
-	//		CheckCollisions(moveDistance);
-
-	//		transform.Translate(Vector3.forward * moveDistance);
-	//	}
-	//}
-
 	public void SetSpeed(float newSpeed)
 	{
 		speed = newSpeed;
-		StartCoroutine(SpawnProjectiles(newSpeed));
+		StartCoroutine(TranslateProjectile(newSpeed));
 	}
 
-	IEnumerator SpawnProjectiles(float speed)
+	IEnumerator TranslateProjectile(float speed)
     {
 		Vector3 direction = transform.forward;
 
@@ -46,6 +34,7 @@ public class Projectile : NetworkBehaviour
         }
     }
 
+	[Client]
 	void CheckCollisions()
 	{
 		Ray ray = new Ray(transform.position, transform.forward);
@@ -69,7 +58,7 @@ public class Projectile : NetworkBehaviour
 		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
 		{
 			// Instantiate HitFX here
-			OnHitObject(hit);
+			//OnHitObject(hit);
 		}
 
 		RpcCheckCollisions();
@@ -87,24 +76,22 @@ public class Projectile : NetworkBehaviour
 		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
 		{
 			// Instantiate HitFX here
-			OnHitObject(hit);
+			//OnHitObject(hit);
 		}
 	}
 
 	void OnHitObject(RaycastHit hit)
 	{
-        CharacterStats hitTarget = hit.collider.GetComponent<CharacterStats>();
+        HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
         if (hitTarget != null)
         {
             hitTarget.TakeDamage(projectileDamage);
         }
 
-        NetworkIdentity _hit = hit.collider.gameObject.GetComponent<NetworkIdentity>();
-
 		// SHOULD I CALL A COMMAND FUNCTION HERE???
 
-		GameObject.Destroy(gameObject);
 		Debug.Log("HIT");
+		GameObject.Destroy(this.gameObject);
 	}
 
 	IEnumerator DestroyAfterLifetime()

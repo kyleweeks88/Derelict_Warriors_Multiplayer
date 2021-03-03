@@ -28,20 +28,12 @@ public class ClientInstance : NetworkBehaviour
     /// </summary>
     private GameObject currentCharacter = null;
 
-    private string currentName = string.Empty;
-
 
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
         Instance = this;
         CmdRequestSpawn();
-    }
-
-    public override void OnStartAuthority()
-    {
-        base.OnStartAuthority();
-        //SetName(PlayerNameInput.DisplayName);
     }
 
     /// <summary>
@@ -67,6 +59,7 @@ public class ClientInstance : NetworkBehaviour
     {
         currentCharacter = go;
         SetName(PlayerNameInput.DisplayName);
+        SetHealth();
         OnOwnerCharacterSpawned?.Invoke(go);
     }
 
@@ -77,12 +70,19 @@ public class ClientInstance : NetworkBehaviour
     /// <param name="name"></param>
     public void SetName(string name)
     {
-        currentName = name;
-
         if (currentCharacter != null)
         {
             PlayerName playerName = currentCharacter.GetComponent<PlayerName>();
             playerName.SetName(name);
+        }
+    }
+
+    public void SetHealth()
+    {
+        if(currentCharacter != null)
+        {
+            HealthManager healthMgmt = currentCharacter.GetComponent<HealthManager>();
+            healthMgmt.SetVital(healthMgmt.maxVital);
         }
     }
 

@@ -78,23 +78,22 @@ public class CombatManager : NetworkBehaviour
         return result;
     }
 
-    GameObject SpawnProjectile()
+    void SpawnProjectile()
     {
         GameObject newProjectile = Instantiate(projectile,
             projectileSpawn.position,
             projectileSpawn.rotation);
 
         newProjectile.GetComponent<Projectile>().SetSpeed(25f);
-        return newProjectile;
     }
 
     // USING THIS TEMPORARILY FOR TESTING. WILL IMPLEMENT INTO CheckAttack SOMEHOW
+    [Client]
     public void CheckRangedAttack()
     {
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
 
-        Debug.Log("Local Client");
         SpawnProjectile();
         CmdRangedAttack(transform.position);
     }
@@ -119,7 +118,6 @@ public class CombatManager : NetworkBehaviour
     {
         if (base.hasAuthority) { return; }
 
-        Debug.Log("RPC");
         SpawnProjectile();
     }
 
