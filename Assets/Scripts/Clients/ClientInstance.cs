@@ -59,7 +59,7 @@ public class ClientInstance : NetworkBehaviour
     {
         currentCharacter = go;
         SetName(PlayerNameInput.DisplayName);
-        SetHealth();
+        InitializeVitals();
         OnOwnerCharacterSpawned?.Invoke(go);
     }
 
@@ -77,12 +77,15 @@ public class ClientInstance : NetworkBehaviour
         }
     }
 
-    public void SetHealth()
+    public void InitializeVitals()
     {
         if(currentCharacter != null)
         {
             HealthManager healthMgmt = currentCharacter.GetComponent<HealthManager>();
             healthMgmt.SetVital(healthMgmt.maxVital);
+
+            StaminaManager staminaMgmt = currentCharacter.GetComponent<StaminaManager>();
+            staminaMgmt.SetVital(staminaMgmt.maxVital);
         }
     }
 
