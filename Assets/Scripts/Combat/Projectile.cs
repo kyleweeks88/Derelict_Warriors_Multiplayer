@@ -36,7 +36,7 @@ public class Projectile : NetworkBehaviour
         }
     }
 
-	[ServerCallback]
+	
 	void CheckCollisions()
 	{
 		Ray ray = new Ray(transform.position, transform.forward);
@@ -46,9 +46,38 @@ public class Projectile : NetworkBehaviour
 		{
 			OnHitObject(hit);
 		}
+
+		//CmdCheckCollisions();
 	}
 
-	[ServerCallback]
+	//[Command]
+	//void CmdCheckCollisions()
+ //   {
+ //       if (!base.isClient) { return; }
+
+	//	Ray ray = new Ray(transform.position, transform.forward);
+	//	RaycastHit hit;
+
+	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
+	//	{
+	//		OnHitObject(hit);
+	//	}
+
+	//	RpcCheckCollisions();
+	//}
+
+	//[ClientRpc]
+	//void RpcCheckCollisions()
+ //   {
+	//	Ray ray = new Ray(transform.position, transform.forward);
+	//	RaycastHit hit;
+
+	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
+	//	{
+	//		OnHitObject(hit);
+	//	}
+	//}
+	
 	void OnHitObject(RaycastHit hit)
 	{
         HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
@@ -57,21 +86,18 @@ public class Projectile : NetworkBehaviour
             hitTarget.TakeDamage(projectileDamage);
         }
 
-		if(base.isClient)
-		{
-			GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
-		}
-		
+		GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
 		GameObject.Destroy(this.gameObject);
 
 		NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
-		RpcOnHitObject(hitId, hit.point);
+		//RpcOnHitObject(hitId, hit.point);
+		CmdOnHitObject(hitId, hit.point);
 	}
 
-	[ClientRpc]
-	void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
-	{
-		if(hitId != null)
+	[Command]
+	void CmdOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
+    {
+		if (hitId != null)
 		{
 			HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
 			if (hitTarget != null)
@@ -80,9 +106,30 @@ public class Projectile : NetworkBehaviour
 			}
 		}
 
-		GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
+		if (base.isClient)
+		{
+			GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
+		}
+
 		GameObject.Destroy(this.gameObject);
+		//RpcOnHitObject(hitId, hitPoint);
 	}
+
+	//[ClientRpc]
+	//void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
+	//{
+	//	if(hitId != null)
+	//	{
+	//		HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
+	//		if (hitTarget != null)
+	//		{
+	//			hitTarget.TakeDamage(projectileDamage);
+	//		}
+	//	}
+
+	//	GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
+	//	GameObject.Destroy(this.gameObject);
+	//}
 
 	IEnumerator DestroyAfterLifetime()
 	{

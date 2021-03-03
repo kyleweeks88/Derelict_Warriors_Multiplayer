@@ -5,7 +5,6 @@ using UnityEngine;
 public class AnimationEventListender : MonoBehaviour
 {
     [SerializeField] CombatManager combatManager;
-    
 
     public void ActivateImpact(int handInt)
     {
