@@ -35,6 +35,7 @@ public class Projectile : NetworkBehaviour
         }
     }
 
+	[ServerCallback]
 	void CheckCollisions()
 	{
 		Ray ray = new Ray(transform.position, transform.forward);
@@ -47,6 +48,7 @@ public class Projectile : NetworkBehaviour
 		}
 	}
 
+	[ServerCallback]
 	void OnHitObject(RaycastHit hit)
 	{
         HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
@@ -54,6 +56,13 @@ public class Projectile : NetworkBehaviour
         {
             hitTarget.TakeDamage(projectileDamage);
         }
+		GameObject.Destroy(this.gameObject);
+		RpcOnHitObject();
+	}
+
+	[ClientRpc]
+	void RpcOnHitObject()
+	{
 		GameObject.Destroy(this.gameObject);
 	}
 

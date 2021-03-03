@@ -2368,6 +2368,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Character_Male_01
       objectReference: {fileID: 0}
+    - target: {fileID: 1045401375514670, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1957412144152276, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
       propertyPath: m_IsActive
       value: 0

@@ -119,7 +119,7 @@ public class CharacterStats : NetworkBehaviour, IKillable
     public virtual void Death()
     {
         Debug.Log(charName + " has died!");
-        this.transform.position = Vector3.zero;
+        //this.transform.position = Vector3.zero;
         CmdDeath();
     }
 
@@ -134,7 +134,7 @@ public class CharacterStats : NetworkBehaviour, IKillable
     [ClientRpc]
     void RpcDeath()
     {
-        if(base.hasAuthority){return;}
+        //if(base.hasAuthority){return;}
 
         Debug.Log(charName + " has died!");
         this.transform.position = Vector3.zero;
