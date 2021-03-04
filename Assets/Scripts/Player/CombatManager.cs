@@ -68,6 +68,7 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
+    #region Ranged
     bool ShotTimeMet(bool resetTime = true)
     {
         bool result = (Time.time >= nextShotTime);
@@ -85,43 +86,69 @@ public class CombatManager : NetworkBehaviour
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
 
-        CmdSpawnProjectile();
-        CmdRangedAttack(transform.position);
+        if (canRecieveInput)
+        {
+            inputRecieved = true;
+            canRecieveInput = false;
+            inCombat = true;
+        }
+        else
+        {
+            return;
+        }
+
+        // Spawn projectile locally w/auth
+        SpawnProjectile(projectileSpawn.position, projectileSpawn.rotation);
+        // Ask the server to check your pos, and spawn a projectile for the server
+        CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation);
     }
 
-    [Command]
-    void CmdSpawnProjectile()
+    void SpawnProjectile(Vector3 pos, Quaternion rot)
     {
         GameObject newProjectile = Instantiate(projectile,
-            projectileSpawn.position,
-            projectileSpawn.rotation);
-
-        NetworkServer.Spawn(newProjectile); 
+            pos,
+            rot);
     }
 
     [Command]
-    void CmdRangedAttack(Vector3 pos)
+    void CmdRangedAttack(Vector3 pos, Quaternion rot)
     {
         if (!ShotTimeMet()) { return; }
 
         float maxPosOffset = 1;
-        if (Vector3.Distance(pos, transform.position) > maxPosOffset)
+        if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
         {
-            Vector3 posDir = pos - transform.position;
-            pos = transform.position + (posDir * maxPosOffset);
+            Vector3 posDir = pos - projectileSpawn.position;
+            pos = projectileSpawn.position + (posDir * maxPosOffset);
         }
 
-        RpcRangedAttack();
+        // This is for the client/host to spawn a projectile
+        //if (base.isClient)
+        //    SpawnProjectile();
+
+        // Tells observing clients to also spawn the projectile
+        RpcRangedAttack(pos, rot);
     }  
 
     [ClientRpc]
-    void RpcRangedAttack()
+    void RpcRangedAttack(Vector3 pos, Quaternion rot)
     {
+        //if (base.isServer) { return; }
         if(base.hasAuthority){return;}
+        if (!ShotTimeMet()) { return; }
 
-        CmdSpawnProjectile();
+        float maxPosOffset = 1;
+        if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
+        {
+            Vector3 posDir = pos - projectileSpawn.position;
+            pos = projectileSpawn.position + (posDir * maxPosOffset);
+        }
+
+        SpawnProjectile(pos, rot);
     }
-    
+    #endregion
+
+    #region Melee
     /// <summary>
     /// Called by the player's attack input
     /// </summary>
@@ -250,4 +277,5 @@ public class CombatManager : NetworkBehaviour
         IHaveHealth entity = target.GetComponentInParent<IHaveHealth>();
         entity.TakeDamage(myStats.baseAttackDamage);
     }
+    #endregion
 }

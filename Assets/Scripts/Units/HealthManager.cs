@@ -26,7 +26,8 @@ public class HealthManager : VitalStat, IDamageable<float>
     [Client]
     public override void SetVital(float setVal)
     {
-        myUI.SetActive(true);
+        if(myUI != null)
+            myUI.SetActive(true);
 
         InitializeVital();
         this.Event_HealthChanged?.Invoke(currentVital, maxVital);

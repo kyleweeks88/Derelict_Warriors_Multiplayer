@@ -1981,20 +1981,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  healthMgmt: {fileID: 3469177221623152036}
-  healthStat:
-    statName: Health
-    currentValue: 0
-  staminaStat:
-    statName: Stamina
-    currentValue: 0
   charName: PLAYER
   baseAttackDamage: 25
-  healthMax: 100
-  maxStamina: 100
-  staminaDrainAmount: 3
-  staminaGainAmount: 1
-  drainingStamina: 0
 --- !u!114 &3469177221623152036
 MonoBehaviour:
   m_ObjectHideFlags: 0
