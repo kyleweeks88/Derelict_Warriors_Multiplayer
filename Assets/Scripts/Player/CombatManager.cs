@@ -6,22 +6,27 @@ using Mirror;
 public class CombatManager : NetworkBehaviour
 {
     public LayerMask whatIsDamageable;
+
+    [Header("Component Reference")]
+    [SerializeField] PlayerManager playerMgmt;
     [SerializeField] CharacterStats myStats = null;
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
-    [SerializeField] Transform impactOrigin;
-    [SerializeField] Transform impactEnd;
-    [SerializeField] float impactRadius =1f;
-    public bool impactActivated;
-
     [SerializeField] Animator myAnimator;
     [SerializeField] NetworkAnimator myNetworkAnimator = null;
+    InputManager inputMgmt;
+    Transform impactOrigin;
+    Transform impactEnd;
 
-    public float currentCombatTimer;
+    [Tooltip("Determines how long the player stays in combat mode")]
     public float combatTimer = 10f;
-    public bool inCombat;
-    public bool canRecieveInput;
-    public bool inputRecieved;
+    [HideInInspector] public float currentCombatTimer;
+    [HideInInspector] public bool inCombat;
+
+    [HideInInspector] public bool canRecieveAttackInput;
+    [HideInInspector] public bool attackInputRecieved;
+    [SerializeField] float impactRadius = 1f;
+    public bool impactActivated;
 
     [Header("RANGED TESTING")]
     [SerializeField] Transform projectileSpawn;
@@ -29,29 +34,15 @@ public class CombatManager : NetworkBehaviour
     float nextShotTime = 0f;
     [SerializeField] float msBetweenShots = 0f;
 
-    Controls controls;
-    Controls Controls
-    {
-        get
-        {
-            if (controls != null) { return controls; }
-            return controls = new Controls();
-        }
-    }
 
     public override void OnStartAuthority()
     {
         enabled = true;
+        inputMgmt = GetComponent<InputManager>();
 
-        Controls.Player.Attack.performed += ctx => CheckAttack();
-        Controls.Combat.Shoot.performed += ctx => CheckRangedAttack();
-        canRecieveInput = true;
+        inputMgmt.Controls.Player.Attack.performed += ctx => CheckAttack();
+        inputMgmt.Controls.Combat.Shoot.performed += ctx => CheckRangedAttack();
     }
-
-    [ClientCallback]
-    void OnEnable() => Controls.Enable();
-    [ClientCallback]
-    void OnDisable() => Controls.Disable();
 
 
     [Client]
@@ -86,10 +77,10 @@ public class CombatManager : NetworkBehaviour
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
 
-        if (canRecieveInput)
+        if (canRecieveAttackInput)
         {
-            inputRecieved = true;
-            canRecieveInput = false;
+            attackInputRecieved = true;
+            canRecieveAttackInput = false;
             inCombat = true;
         }
         else
@@ -154,19 +145,25 @@ public class CombatManager : NetworkBehaviour
     /// </summary>
     public void CheckAttack()
     {
-        // CHECK IF ARMED OR UNARMED
+        // If player is locked into an "interacting" animation then don't let this happen.
+        if(playerMgmt.isInteracting) { return; }
 
-        if(canRecieveInput)
-        {
-            inputRecieved = true;
-            canRecieveInput = false;
-            inCombat = true;
-        }
-        else
-        {
-            return;
-        }
 
+        // CHECK IF ARMED OR UNARMED //
+
+        //if(canRecieveAttackInput)
+        //{
+        //    attackInputRecieved = true;
+        //    canRecieveAttackInput = false;
+        //    inCombat = true;
+        //}
+        //else
+        //{
+        //    return;
+        //}
+
+        inputMgmt.RecieveAttackInput();
+        inCombat = true;
         CmdAttack(transform.position);
     }
 
@@ -186,16 +183,18 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
-    public void InputManager()
+    public void InvertAttackBool()
     {
-        if(!canRecieveInput)
-        {
-            canRecieveInput = true;
-        }
-        else
-        {
-            canRecieveInput = false;
-        }
+        canRecieveAttackInput = !canRecieveAttackInput;
+
+        //if(!canRecieveInput)
+        //{
+        //    canRecieveInput = true;
+        //}
+        //else
+        //{
+        //    canRecieveInput = false;
+        //}
     }
 
     /// <summary>
