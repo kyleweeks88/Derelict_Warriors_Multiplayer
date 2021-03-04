@@ -11,6 +11,11 @@ public class HealthManager : VitalStat, IDamageable<float>
     public delegate void OnHealthChanged(float curVal, float maxVal);
     public event OnHealthChanged Event_HealthChanged;
 
+    public override void OnStartAuthority()
+    {
+        enabled = true;
+    }
+
     // Currently using this for testing only
     [ClientCallback]
     private void Update()

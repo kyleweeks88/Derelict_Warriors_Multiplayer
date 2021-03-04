@@ -13,18 +13,18 @@ public class TransitionOne : StateMachineBehaviour
     {
         combatManager = animator.transform.GetComponentInParent<CombatManager>();
         myNetworkAnimator = animator.transform.GetComponentInParent<NetworkAnimator>();
-        combatManager.canRecieveInput = true;
+        combatManager.canRecieveAttackInput = true;
     }
 
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if(combatManager.inputRecieved)
+        if(combatManager.attackInputRecieved)
         {
             myNetworkAnimator.SetTrigger(attackName);
             // SWITCHES canRecieveInput FROM TRUE TO FALSE
-            combatManager.InputManager();
-            combatManager.inputRecieved = false;
+            combatManager.InvertAttackBool();
+            combatManager.attackInputRecieved = false;
         }
     }
 
