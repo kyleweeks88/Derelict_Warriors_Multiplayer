@@ -476,6 +476,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI_MainMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 3609536129940102521, guid: 001815f809c34aa40815345ce69fe212,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3609536129940102522, guid: 001815f809c34aa40815345ce69fe212,
         type: 3}
       propertyPath: m_RootOrder
