@@ -15,4 +15,9 @@ public class AnimationEventListender : MonoBehaviour
     {
         combatManager.impactActivated = false;
     }
+
+    public void CheckRangedAttack()
+    {
+        combatManager.CheckRangedAttack();
+    }
 }

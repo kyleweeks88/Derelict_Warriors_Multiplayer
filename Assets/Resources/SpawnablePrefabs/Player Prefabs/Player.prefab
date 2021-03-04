@@ -2014,10 +2014,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  attackAnim: rangedAttack
   whatIsDamageable:
     serializedVersion: 2
     m_Bits: 512
-  playerMgmt: {fileID: 3467262495813199297}
   myStats: {fileID: 2684214008263218707}
   leftHand: {fileID: 2288533030411638327}
   rightHand: {fileID: 2288697096786165153}
@@ -2142,6 +2142,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  playerMgmt: {fileID: 3467262495813199297}
+  combatMgmt: {fileID: -2486189703782248511}
+  canRecieveAttackInput: 0
+  attackInputRecieved: 0
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,10 +5,10 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
+    public string attackAnim = string.Empty;
     public LayerMask whatIsDamageable;
 
     [Header("Component Reference")]
-    [SerializeField] PlayerManager playerMgmt;
     [SerializeField] CharacterStats myStats = null;
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
@@ -39,13 +39,10 @@ public class CombatManager : NetworkBehaviour
     {
         enabled = true;
         inputMgmt = GetComponent<InputManager>();
-
-        inputMgmt.Controls.Player.Attack.performed += ctx => CheckAttack();
-        inputMgmt.Controls.Combat.Shoot.performed += ctx => CheckRangedAttack();
     }
 
 
-    [Client]
+    [ClientCallback]
     private void Update()
     {
         if (!hasAuthority) { return; }
@@ -70,23 +67,12 @@ public class CombatManager : NetworkBehaviour
         return result;
     }
 
-    // USING THIS TEMPORARILY FOR TESTING. WILL IMPLEMENT INTO CheckAttack SOMEHOW
+    // THIS WILL BE CALLED FROM AN ANIMATION EVENT????
     [Client]
     public void CheckRangedAttack()
     {
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
-
-        if (canRecieveAttackInput)
-        {
-            attackInputRecieved = true;
-            canRecieveAttackInput = false;
-            inCombat = true;
-        }
-        else
-        {
-            return;
-        }
 
         // Spawn projectile locally w/auth
         SpawnProjectile(projectileSpawn.position, projectileSpawn.rotation);
@@ -145,24 +131,23 @@ public class CombatManager : NetworkBehaviour
     /// </summary>
     public void CheckAttack()
     {
-        // If player is locked into an "interacting" animation then don't let this happen.
-        if(playerMgmt.isInteracting) { return; }
-
-
+        //string animString = string.Empty;
+        // RUN LOGIC TO DETERMINE THE MEANS OF THE ATTACK //
         // CHECK IF ARMED OR UNARMED //
+        // CHECK IF STUNNED //
+        // OTHER IMPORTANT STUFF //
 
-        //if(canRecieveAttackInput)
-        //{
-        //    attackInputRecieved = true;
-        //    canRecieveAttackInput = false;
-        //    inCombat = true;
-        //}
-        //else
-        //{
-        //    return;
-        //}
+        // If unarmed: animString = "unarmedAttack"
 
-        inputMgmt.RecieveAttackInput();
+        // If 1H melee weapon: animString = "meleeAttack_1H"
+
+        // If weaponMgmt.currentWeapon.Type == RangedWeapon: animString = "rangedAttack"
+
+        // Etc...
+
+        // Plays the appropriate attack animation
+        myNetworkAnimator.SetTrigger(attackAnim);
+
         inCombat = true;
         CmdAttack(transform.position);
     }
@@ -183,48 +168,44 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
-    public void InvertAttackBool()
-    {
-        canRecieveAttackInput = !canRecieveAttackInput;
-
-        //if(!canRecieveInput)
-        //{
-        //    canRecieveInput = true;
-        //}
-        //else
-        //{
-        //    canRecieveInput = false;
-        //}
-    }
-
     /// <summary>
     /// Called by an Animation Event from the player checks an int
     /// to determine the means of the attack
     /// </summary>
     /// <param name="handInt"></param>
-    public void ActivateImpact(int handInt)
+    public void ActivateImpact(int impactID)
     {
-        // IF UNARMED
-        if (handInt == 0)
+        // Only activate the impact if you have auth over this object
+        if(!base.hasAuthority) { return; }
+
+        // You have no weapon equipped
+        // Left hand
+        if (impactID == 1)
         {
             impactOrigin = leftHand.transform;
             impactEnd = leftHand.transform;
-            impactRadius = .5f;
+            impactRadius = 0.5f;
         }
-        else if (handInt == 1)
+        // Right hand
+        else if (impactID == 2)
         {
-            // RIGHT HAND
+            impactOrigin = rightHand.transform;
+            impactEnd = rightHand.transform;
+            impactRadius = 0.5f;
         }
-        else if (handInt == 2)
-        {
-            // LEFT OR RIGHT FOOT?
-            // SINGLE FEET ATTACK POS?
-        }
-        else if (handInt == 3)
-        {
-            // IF WEAPON EQUIPPED
-            // impactActivate = true;
-        }
+        //else if (impactID == 3)
+        //{
+        //    // LEFT OR RIGHT FOOT?
+        //    // SINGLE FEET ATTACK POS?
+        //}
+
+        // You have a weapon equipped
+        //if(impactID == 0)
+        //{
+        //    impactOrigin = weaponMgmt.currentWeapon.startPos;
+        //    impactEnd = weaponMgmt.currentWeapon.endPos;
+        //    impactRadius = weaponMgmt.currentWeapon.impactRadius;
+        //}
 
         impactActivated = true;
     }

@@ -6,27 +6,28 @@ using Mirror;
 public class TransitionOne : StateMachineBehaviour
 {
     NetworkAnimator myNetworkAnimator = null;
-    CombatManager combatManager = null;
+    InputManager inputMgmt = null;
     [SerializeField] string attackName = string.Empty;
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        combatManager = animator.transform.GetComponentInParent<CombatManager>();
         myNetworkAnimator = animator.transform.GetComponentInParent<NetworkAnimator>();
-        combatManager.canRecieveAttackInput = true;
+        inputMgmt = animator.transform.GetComponentInParent<InputManager>();
+
+        inputMgmt.canRecieveAttackInput = true;
     }
 
 
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if(combatManager.attackInputRecieved)
-        {
-            myNetworkAnimator.SetTrigger(attackName);
-            // SWITCHES canRecieveInput FROM TRUE TO FALSE
-            combatManager.InvertAttackBool();
-            combatManager.attackInputRecieved = false;
-        }
-    }
+    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
+    //    if(inputMgmt.attackInputRecieved)
+    //    {
+    //        inputMgmt.InvertAttackBool();
+    //        inputMgmt.attackInputRecieved = false;
+
+    //        myNetworkAnimator.SetTrigger(attackName);
+    //    }
+    //}
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

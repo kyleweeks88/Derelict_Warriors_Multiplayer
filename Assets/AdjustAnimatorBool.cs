@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class AdjustAnimatorBool : StateMachineBehaviour
 {
+    InputManager inputMgmt = null;
     public string animatorBool;
     public bool boolStatus;
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //Set
+        inputMgmt = animator.transform.GetComponentInParent<InputManager>();
+
+        inputMgmt.canRecieveAttackInput = boolStatus;
     }
 }
