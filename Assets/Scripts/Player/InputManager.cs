@@ -5,6 +5,10 @@ using Mirror;
 
 public class InputManager : NetworkBehaviour
 {
+    [Header("Component Ref")]
+    [SerializeField] PlayerManager playerMgmt = null;
+    [SerializeField] CombatManager combatMgmt = null;
+
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
 
@@ -27,30 +31,21 @@ public class InputManager : NetworkBehaviour
     {
         enabled = true;
         canRecieveAttackInput = true;
+
+        Controls.Player.Attack.performed += ctx => RecieveAttackInput();
     }
 
     public void RecieveAttackInput()
     {
+        // If player is locked into an "interacting" state then don't let this happen.
+        if (playerMgmt.isInteracting) { return; }
+
         if (!canRecieveAttackInput) { return; }
 
         if (canRecieveAttackInput)
         {
-            attackInputRecieved = true;
-            canRecieveAttackInput = false;
+            // Tells CombatManager to determine the means of the attack
+            combatMgmt.CheckAttack();
         }
-    }
-
-    public void InvertAttackBool()
-    {
-        canRecieveAttackInput = !canRecieveAttackInput;
-
-        //if(!canRecieveInput)
-        //{
-        //    canRecieveInput = true;
-        //}
-        //else
-        //{
-        //    canRecieveInput = false;
-        //}
     }
 }
