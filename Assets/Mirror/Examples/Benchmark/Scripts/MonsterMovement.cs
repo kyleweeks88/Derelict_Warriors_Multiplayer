@@ -7,6 +7,7 @@ namespace Mirror.Examples.Benchmark
         public float speed = 1;
         public float movementProbability = 0.5f;
         public float movementDistance = 20;
+        public float travelRange = 1f;
 
         bool moving;
         Vector3 start;
@@ -36,7 +37,7 @@ namespace Mirror.Examples.Benchmark
                 float r = Random.value;
                 if (r < movementProbability * Time.deltaTime)
                 {
-                    Vector2 circlePos = Random.insideUnitCircle;
+                    Vector2 circlePos = Random.insideUnitCircle * travelRange;
 
                     // Raycast down to check for ground layer
                     // if ray hits obstacle then create a new random circlePos
