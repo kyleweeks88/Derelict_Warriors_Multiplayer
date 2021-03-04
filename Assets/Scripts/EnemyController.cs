@@ -21,13 +21,27 @@ public class EnemyController : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        if(!isServer) { return; }
+        //if(!isServer) { return; }
 
         GameObject[] newObjects = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (GameObject target in newObjects)
         {
             if(!targetObjects.Contains(target))
+            {
+                targetObjects.Add(target);
+            }
+        }
+    }
+
+    // Call when a new player joins???
+    void InitializePlayer()
+    {
+        GameObject[] newObjects = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject target in newObjects)
+        {
+            if (!targetObjects.Contains(target))
             {
                 targetObjects.Add(target);
             }
