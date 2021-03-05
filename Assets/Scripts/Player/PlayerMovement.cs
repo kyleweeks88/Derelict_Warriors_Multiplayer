@@ -35,22 +35,22 @@ public class PlayerMovement : NetworkBehaviour
     int inputYParam = Animator.StringToHash("InputY");
     #endregion
 
-    #region Initialize Input
-    Controls controls;
-    Controls Controls
-    {
-        get
-        {
-            if(controls != null) { return controls; }
-            return controls = new Controls();
-        }
-    }
-    #endregion
+    //#region Initialize Input
+    //Controls controls;
+    //Controls Controls
+    //{
+    //    get
+    //    {
+    //        if(controls != null) { return controls; }
+    //        return controls = new Controls();
+    //    }
+    //}
+    //#endregion
 
-    [ClientCallback]
-    void OnEnable() => Controls.Enable();
-    [ClientCallback]
-    void OnDisable() => Controls.Disable();
+    //[ClientCallback]
+    //void OnEnable() => Controls.Enable();
+    //[ClientCallback]
+    //void OnDisable() => Controls.Disable();
 
     public override void OnStartAuthority()
     {
@@ -60,9 +60,9 @@ public class PlayerMovement : NetworkBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        Controls.Player.Jump.performed += ctx => Jump();
-        Controls.Locomotion.Sprint.started += ctx => SprintPressed();
-        Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
+        //playerMgmt.inputMgmt.Controls.Player.Jump.performed += ctx => Jump();
+        //playerMgmt.inputMgmt.Controls.Locomotion.Sprint.started += ctx => SprintPressed();
+        //playerMgmt.inputMgmt.Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
 
         currentMoveSpeed = moveSpeed;
     }
@@ -104,7 +104,7 @@ public class PlayerMovement : NetworkBehaviour
     void Move()
     {
         // READS THE INPUT SYSTEMS ACTION
-        var movementInput = Controls.Player.Move.ReadValue<Vector2>();
+        var movementInput = playerMgmt.inputMgmt.Controls.Player.Move.ReadValue<Vector2>();
 
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
         var movement = new Vector3
@@ -134,25 +134,21 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     #region Sprinting
-    void SprintPressed()
+    public void SprintPressed()
     {
         if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
-            //playerMgmt.freeLook.SetActive(false);
-            //playerMgmt.sprintCamera.SetActive(true);
 
             playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 11;
         }
     }
 
-    void SprintReleased()
+    public void SprintReleased()
     {
         isSprinting = false;
         currentMoveSpeed = moveSpeed;
-        //playerMgmt.freeLook.SetActive(true);
-        //playerMgmt.sprintCamera.SetActive(false);
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
@@ -177,7 +173,7 @@ public class PlayerMovement : NetworkBehaviour
     #endregion
 
     [Client]
-    void Jump()
+    public void Jump()
     {
         if(!isJumping)
         {
