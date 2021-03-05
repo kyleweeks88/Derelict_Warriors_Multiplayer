@@ -48,11 +48,17 @@ public class CombatManager : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         myAnimator.SetBool("inCombat", inCombat);
+        myAnimator.SetBool("attackOneHold", inputMgmt.attackInputHeld);
 
         if (impactActivated)
         {
             CheckCreateImpactCollider(impactOrigin.position,
                 impactEnd.position, impactRadius, whatIsDamageable);
+        }
+
+        if(inputMgmt.attackInputHeld)
+        {
+            ChargingAttack();
         }
     }
 
@@ -146,10 +152,16 @@ public class CombatManager : NetworkBehaviour
         // Etc...
 
         // Plays the appropriate attack animation
+        inputMgmt.attackInputHeld = true;
         myNetworkAnimator.SetTrigger(attackAnim);
 
         inCombat = true;
         CmdAttack(transform.position);
+    }
+
+    public void ChargingAttack()
+    {
+        Debug.Log("CHARGING!");
     }
 
     /// <summary>

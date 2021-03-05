@@ -11,6 +11,7 @@ public class InputManager : NetworkBehaviour
 
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
+    public bool attackInputHeld;
 
     Controls controls;
     public Controls Controls
@@ -33,6 +34,8 @@ public class InputManager : NetworkBehaviour
         canRecieveAttackInput = true;
 
         Controls.Player.Attack.performed += ctx => RecieveAttackInput();
+        Controls.Player.Attack.started += ctx => RecieveAttackInput();
+        Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
     }
 
     public void RecieveAttackInput()
@@ -44,8 +47,14 @@ public class InputManager : NetworkBehaviour
 
         if (canRecieveAttackInput)
         {
+            //attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
             combatMgmt.CheckAttack();
         }
+    }
+
+    public void ReleaseAttackInput()
+    {
+        attackInputHeld = false;
     }
 }
