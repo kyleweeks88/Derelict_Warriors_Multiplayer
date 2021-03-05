@@ -6,14 +6,11 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    [Header("Component Ref")]
+    [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] StaminaManager staminaMgmt = null;
     [SerializeField] CharacterController controller = null;
     [SerializeField] Animator myAnimator;
-
-    [Header("Camera Ref")]
-    [SerializeField] GameObject myCamera;
-    [SerializeField] GameObject freeLook;
-    [SerializeField] GameObject sprintCamera;
 
     [Header("Movement settings")]
     [SerializeField] float moveSpeed = 5f;
@@ -57,9 +54,6 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-        myCamera.SetActive(true);
-        freeLook.gameObject.SetActive(true);
-
         enabled = true;
         controller.enabled = true;
 
@@ -120,11 +114,11 @@ public class PlayerMovement : NetworkBehaviour
         }.normalized;
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
-        Vector3 rotationMovement = Quaternion.Euler(0, myCamera.transform.rotation.eulerAngles.y, 0) * movement;
+        Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
         Vector3 verticalMovement = Vector3.up * yVelocity;
 
         // MAKES THE CHARACTER MODEL TURN TOWARDS THE CAMERA'S FORWARD AXIS
-        float cameraYaw = myCamera.transform.rotation.eulerAngles.y;
+        float cameraYaw = playerMgmt.myCamera.transform.rotation.eulerAngles.y;
         // ... ONLY IF THE PLAYER IS MOVING
         if (movement.sqrMagnitude > 0)
         {
@@ -146,8 +140,10 @@ public class PlayerMovement : NetworkBehaviour
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
-            freeLook.SetActive(false);
-            sprintCamera.SetActive(true);
+            //playerMgmt.freeLook.SetActive(false);
+            //playerMgmt.sprintCamera.SetActive(true);
+
+            playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 11;
         }
     }
 
@@ -155,8 +151,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         isSprinting = false;
         currentMoveSpeed = moveSpeed;
-        freeLook.SetActive(true);
-        sprintCamera.SetActive(false);
+        //playerMgmt.freeLook.SetActive(true);
+        //playerMgmt.sprintCamera.SetActive(false);
+
+        playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
 
     void UpdateIsSprinting()

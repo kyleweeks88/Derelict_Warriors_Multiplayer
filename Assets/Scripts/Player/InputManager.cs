@@ -33,7 +33,6 @@ public class InputManager : NetworkBehaviour
         enabled = true;
         canRecieveAttackInput = true;
 
-        Controls.Player.Attack.performed += ctx => RecieveAttackInput();
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
     }
@@ -47,7 +46,6 @@ public class InputManager : NetworkBehaviour
 
         if (canRecieveAttackInput)
         {
-            //attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
             combatMgmt.CheckAttack();
         }
