@@ -1,33 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 
-public class TransitionOne : StateMachineBehaviour
+public class AttackWindupBehavior : StateMachineBehaviour
 {
-    NetworkAnimator myNetworkAnimator = null;
-    InputManager inputMgmt = null;
-    [SerializeField] string attackName = string.Empty;
+    InputManager inputMgmt;
 
+    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        myNetworkAnimator = animator.transform.GetComponentInParent<NetworkAnimator>();
         inputMgmt = animator.transform.GetComponentInParent<InputManager>();
-
-        inputMgmt.canRecieveAttackInput = true;
     }
 
-
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    if(inputMgmt.attackInputRecieved)
-    //    {
-    //        inputMgmt.InvertAttackBool();
-    //        inputMgmt.attackInputRecieved = false;
-
-    //        myNetworkAnimator.SetTrigger(attackName);
-    //    }
-    //}
+    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        //if (!inputMgmt.attackInputHeld)
+          //  animator.SetBool("attackOneReleased");
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

@@ -6,12 +6,11 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    //[SerializeField] PlayerStats playerStats = null;
+    [Header("Component Ref")]
+    [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] StaminaManager staminaMgmt = null;
     [SerializeField] CharacterController controller = null;
     [SerializeField] Animator myAnimator;
-    [SerializeField] GameObject myCamera;
-    [SerializeField] CinemachineFreeLook freeLook;
 
     [Header("Movement settings")]
     [SerializeField] float moveSpeed = 5f;
@@ -20,12 +19,11 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float turnSpeed = 15f;
     bool isSprinting = false;
 
+    [Header("Jump settings")]
+    [SerializeField] float jumpVelocity = 5f;
+    bool isJumping;
     float yVelocity = 0;
     float gravity = -9.81f;
-
-    [Header("Jump settings")]
-    bool isJumping;
-    [SerializeField] float jumpVelocity = 5f;
 
     #region Animator Parameters
     // My Animator parameters turned from costly Strings to cheap Ints
@@ -37,6 +35,7 @@ public class PlayerMovement : NetworkBehaviour
     int inputYParam = Animator.StringToHash("InputY");
     #endregion
 
+    #region Initialize Input
     Controls controls;
     Controls Controls
     {
@@ -46,6 +45,7 @@ public class PlayerMovement : NetworkBehaviour
             return controls = new Controls();
         }
     }
+    #endregion
 
     [ClientCallback]
     void OnEnable() => Controls.Enable();
@@ -54,10 +54,8 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-        myCamera.SetActive(true);
-        freeLook.gameObject.SetActive(true);
-
         enabled = true;
+        controller.enabled = true;
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -67,12 +65,6 @@ public class PlayerMovement : NetworkBehaviour
         Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
 
         currentMoveSpeed = moveSpeed;
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        controller.enabled = base.hasAuthority;
     }
 
     [ClientCallback]
@@ -120,33 +112,38 @@ public class PlayerMovement : NetworkBehaviour
             x = movementInput.x,
             z = movementInput.y
         }.normalized;
-        
+
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
-        Vector3 rotationMovement = Quaternion.Euler(0,myCamera.transform.rotation.eulerAngles.y, 0)  * movement;
+        Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
         Vector3 verticalMovement = Vector3.up * yVelocity;
 
         // MAKES THE CHARACTER MODEL TURN TOWARDS THE CAMERA'S FORWARD AXIS
-        float cameraYaw = myCamera.transform.rotation.eulerAngles.y;
+        float cameraYaw = playerMgmt.myCamera.transform.rotation.eulerAngles.y;
         // ... ONLY IF THE PLAYER IS MOVING
-        if(movement.sqrMagnitude > 0)
+        if (movement.sqrMagnitude > 0)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0,cameraYaw,0), turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, cameraYaw, 0), turnSpeed * Time.deltaTime);
         }
 
         // HANDLES ANIMATIONS
-        myAnimator.SetFloat("InputX", movement.x);
-        myAnimator.SetFloat("InputY", movement.z);
+        myAnimator.SetFloat(inputXParam, movement.x);
+        myAnimator.SetFloat(inputYParam, movement.z);
 
         // MOVES THE PLAYER
         controller.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
     }
 
+    #region Sprinting
     void SprintPressed()
     {
         if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
+            //playerMgmt.freeLook.SetActive(false);
+            //playerMgmt.sprintCamera.SetActive(true);
+
+            playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 11;
         }
     }
 
@@ -154,6 +151,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         isSprinting = false;
         currentMoveSpeed = moveSpeed;
+        //playerMgmt.freeLook.SetActive(true);
+        //playerMgmt.sprintCamera.SetActive(false);
+
+        playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
 
     void UpdateIsSprinting()
@@ -173,6 +174,7 @@ public class PlayerMovement : NetworkBehaviour
 
         myAnimator.SetBool(isSprintingParam, isSprinting);
     }
+    #endregion
 
     [Client]
     void Jump()
