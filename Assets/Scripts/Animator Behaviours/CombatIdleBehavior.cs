@@ -12,7 +12,7 @@ public class CombatIdleBehavior : StateMachineBehaviour
     {
         combatManager = animator.transform.GetComponentInParent<CombatManager>();
 
-        combatManager.currentCombatTimer = combatManager.combatTimer;
+        //combatManager.currentCombatTimer = combatManager.combatTimer;
     }
 
 
