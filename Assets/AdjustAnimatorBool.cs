@@ -10,8 +10,9 @@ public class AdjustAnimatorBool : StateMachineBehaviour
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        inputMgmt = animator.transform.GetComponentInParent<InputManager>();
+        inputMgmt = animator.transform.GetComponentInParent<PlayerManager>().inputMgmt;
 
-        inputMgmt.canRecieveAttackInput = boolStatus;
+        if(inputMgmt != null)
+            inputMgmt.canRecieveAttackInput = boolStatus;
     }
 }

@@ -8,6 +8,7 @@ public class InputManager : NetworkBehaviour
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] CombatManager combatMgmt = null;
+    [SerializeField] PlayerMovement playerMovement = null;
 
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
@@ -33,8 +34,22 @@ public class InputManager : NetworkBehaviour
         enabled = true;
         canRecieveAttackInput = true;
 
+        ClientInstance.OnOwnerCharacterSpawned += InitializeComponents;
+
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
+
+        // Player Locomotion
+        Controls.Player.Jump.performed += ctx => Jump();
+        Controls.Locomotion.Sprint.started += ctx => SprintPressed();
+        Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
+    }
+
+    void InitializeComponents(GameObject go)
+    {
+        playerMgmt = go.GetComponent<PlayerManager>();
+        combatMgmt = go.GetComponent<CombatManager>();
+        playerMovement = go.GetComponent<PlayerMovement>();
     }
 
     public void RecieveAttackInput()
@@ -46,6 +61,7 @@ public class InputManager : NetworkBehaviour
 
         if (canRecieveAttackInput)
         {
+            attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
             combatMgmt.CheckAttack();
         }
@@ -54,5 +70,20 @@ public class InputManager : NetworkBehaviour
     public void ReleaseAttackInput()
     {
         attackInputHeld = false;
+    }
+
+    void Jump()
+    {
+        playerMovement.Jump();
+    }
+
+    void SprintPressed()
+    {
+        playerMovement.SprintPressed();
+    }
+
+    void SprintReleased()
+    {
+        playerMovement.SprintReleased();
     }
 }

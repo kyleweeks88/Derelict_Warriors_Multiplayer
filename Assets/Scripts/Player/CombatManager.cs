@@ -5,6 +5,7 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
+    [SerializeField] EquipmentManager equipmentManager;
     [SerializeField] GameObject hitFX = null;
     public string attackAnim = string.Empty;
     public LayerMask whatIsDamageable;
@@ -15,7 +16,6 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] GameObject rightHand;
     [SerializeField] Animator myAnimator;
     [SerializeField] NetworkAnimator myNetworkAnimator = null;
-    InputManager inputMgmt;
     PlayerManager playerMgmt;
     Transform impactOrigin;
     Transform impactEnd;
@@ -40,7 +40,6 @@ public class CombatManager : NetworkBehaviour
     public override void OnStartAuthority()
     {
         enabled = true;
-        inputMgmt = GetComponent<InputManager>();
         playerMgmt = GetComponent<PlayerManager>();
     }
 
@@ -51,7 +50,9 @@ public class CombatManager : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         myAnimator.SetBool("inCombat", inCombat);
-        myAnimator.SetBool("attackOneHold", inputMgmt.attackInputHeld);
+
+        if(attackAnim != null)
+            myAnimator.SetBool(attackAnim, playerMgmt.inputMgmt.attackInputHeld);
 
         if (impactActivated)
         {
@@ -59,7 +60,7 @@ public class CombatManager : NetworkBehaviour
                 impactEnd.position, impactRadius, whatIsDamageable);
         }
 
-        if(inputMgmt.attackInputHeld)
+        if(playerMgmt.inputMgmt.attackInputHeld)
         {
             ChargingAttack();
         }
@@ -153,63 +154,33 @@ public class CombatManager : NetworkBehaviour
         // If weaponMgmt.currentWeapon.Type == RangedWeapon: animString = "rangedAttack"
 
         // Etc...
+        if(equipmentManager.currentlyEquippedWeapon != null)
+        {
+            Weapon newWeapon = equipmentManager.currentlyEquippedWeapon;
+
+            if (newWeapon.weaponData.wieldStyle ==
+            WeaponData.WieldStyle.OneHanded)
+            {
+                attackAnim = "attackOneHold";
+            }
+        }
+        else
+        {
+            //attackAnim = "unarmedAttack";
+        }
 
         // Plays the appropriate attack animation
-        inputMgmt.attackInputHeld = true;
-        myNetworkAnimator.SetTrigger(attackAnim);
-        float cameraYaw = playerMgmt.myCamera.transform.rotation.eulerAngles.y;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, cameraYaw, 0), 100 * Time.deltaTime);
+
+        if(playerMgmt.inputMgmt.attackInputHeld)
+            myAnimator.SetBool(attackAnim, true);
 
         inCombat = true;
         currentCombatTimer = combatTimer;
-        CmdAttack(transform.position);
     }
 
     public void ChargingAttack()
     {
         Debug.Log("CHARGING!");
-    }
-
-    /// <summary>
-    /// Adjust's the players position to a clamped distance based on the server
-    /// from where the player attacked to the actualy position on the server
-    /// </summary>
-    /// <param name="pos"></param>
-    [Command]
-    void CmdAttack(Vector3 pos)
-    {
-        float maxPosOffset = 1;
-        if(Vector3.Distance(pos, transform.position) > maxPosOffset)
-        {
-            Vector3 posDir = pos - transform.position;
-            pos = transform.position + (posDir * maxPosOffset);
-        }
-
-        //inputMgmt.attackInputHeld = true;
-
-        inCombat = true;
-        currentCombatTimer = combatTimer;
-
-        RpcAttack(pos);
-    }
-
-    [ClientRpc]
-    void RpcAttack(Vector3 pos)
-    {
-        if (hasAuthority) { return; }
-
-        float maxPosOffset = 1;
-        if (Vector3.Distance(pos, transform.position) > maxPosOffset)
-        {
-            Vector3 posDir = pos - transform.position;
-            pos = transform.position + (posDir * maxPosOffset);
-        }
-
-        //inputMgmt.attackInputHeld = true;
-        //myNetworkAnimator.SetTrigger(attackAnim);
-
-        inCombat = true;
-        currentCombatTimer = combatTimer;
     }
 
     /// <summary>

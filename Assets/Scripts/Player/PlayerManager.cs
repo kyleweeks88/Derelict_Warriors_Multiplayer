@@ -5,6 +5,10 @@ using Mirror;
 
 public class PlayerManager : NetworkBehaviour
 {
+    [Header("Component Ref")]
+    public ClientInstance ci;
+    public InputManager inputMgmt;
+
     [Header("Camera Ref")]
     public GameObject myCamera = null;
     public GameObject freeLook;
@@ -14,6 +18,12 @@ public class PlayerManager : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
+        ci = ClientInstance.ReturnClientInstance();
+        if (ci != null)
+        {
+            inputMgmt = ci.GetComponent<InputManager>();
+        }
+
         myCamera.SetActive(true);
         freeLook.SetActive(true);
         sprintCamera.SetActive(true);
