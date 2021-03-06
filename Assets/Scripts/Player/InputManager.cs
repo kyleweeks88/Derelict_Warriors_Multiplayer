@@ -61,6 +61,7 @@ public class InputManager : NetworkBehaviour
 
         if (canRecieveAttackInput)
         {
+            attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
             combatMgmt.CheckAttack();
         }

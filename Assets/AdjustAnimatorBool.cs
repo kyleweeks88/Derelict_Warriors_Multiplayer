@@ -12,6 +12,7 @@ public class AdjustAnimatorBool : StateMachineBehaviour
     {
         inputMgmt = animator.transform.GetComponentInParent<PlayerManager>().inputMgmt;
 
-        inputMgmt.canRecieveAttackInput = boolStatus;
+        if(inputMgmt != null)
+            inputMgmt.canRecieveAttackInput = boolStatus;
     }
 }

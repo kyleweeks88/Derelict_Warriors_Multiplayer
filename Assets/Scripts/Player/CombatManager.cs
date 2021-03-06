@@ -5,6 +5,7 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
+    [SerializeField] EquipmentManager equipmentManager;
     [SerializeField] GameObject hitFX = null;
     public string attackAnim = string.Empty;
     public LayerMask whatIsDamageable;
@@ -49,7 +50,9 @@ public class CombatManager : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         myAnimator.SetBool("inCombat", inCombat);
-        myAnimator.SetBool("attackOneHold", playerMgmt.inputMgmt.attackInputHeld);
+
+        if(attackAnim != null)
+            myAnimator.SetBool(attackAnim, playerMgmt.inputMgmt.attackInputHeld);
 
         if (impactActivated)
         {
@@ -151,11 +154,25 @@ public class CombatManager : NetworkBehaviour
         // If weaponMgmt.currentWeapon.Type == RangedWeapon: animString = "rangedAttack"
 
         // Etc...
+        if(equipmentManager.currentlyEquippedWeapon != null)
+        {
+            Weapon newWeapon = equipmentManager.currentlyEquippedWeapon;
+
+            if (newWeapon.weaponData.wieldStyle ==
+            WeaponData.WieldStyle.OneHanded)
+            {
+                attackAnim = "attackOneHold";
+            }
+        }
+        else
+        {
+            //attackAnim = "unarmedAttack";
+        }
 
         // Plays the appropriate attack animation
-        playerMgmt.inputMgmt.attackInputHeld = true;
-        myNetworkAnimator.SetTrigger(attackAnim);
-        
+
+        if(playerMgmt.inputMgmt.attackInputHeld)
+            myAnimator.SetBool(attackAnim, true);
 
         inCombat = true;
         currentCombatTimer = combatTimer;
