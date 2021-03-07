@@ -5,6 +5,7 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
+    #region Setup
     [SerializeField] EquipmentManager equipmentManager;
     [SerializeField] GameObject hitFX = null;
     public string attackAnim = string.Empty;
@@ -35,14 +36,13 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] GameObject projectile = null;
     float nextShotTime = 0f;
     [SerializeField] float msBetweenShots = 0f;
-
+    #endregion
 
     public override void OnStartAuthority()
     {
         enabled = true;
         playerMgmt = GetComponent<PlayerManager>();
     }
-
 
     [ClientCallback]
     private void Update()
@@ -54,11 +54,7 @@ public class CombatManager : NetworkBehaviour
         if(attackAnim != null)
             myAnimator.SetBool(attackAnim, playerMgmt.inputMgmt.attackInputHeld);
 
-        if (impactActivated)
-        {
-            CheckCreateImpactCollider(impactOrigin.position,
-                impactEnd.position, impactRadius, whatIsDamageable);
-        }
+        CheckMeleeAttack();
 
         if(playerMgmt.inputMgmt.attackInputHeld)
         {
@@ -158,15 +154,33 @@ public class CombatManager : NetworkBehaviour
         {
             Weapon newWeapon = equipmentManager.currentlyEquippedWeapon;
 
-            if (newWeapon.weaponData.wieldStyle ==
-            WeaponData.WieldStyle.OneHanded)
+            if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
-                attackAnim = "attackOneHold";
+                if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
+                {
+                    attackAnim = "1H_meleeAttackHold";
+                }
+                else if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.TwoHanded)
+                {
+                    attackAnim = "2H_meleeAttackHold";
+                }
+            }
+            
+            if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
+            {
+                if(newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
+                {
+                    attackAnim = "1H_rangedAttackHold";
+                }
+                else if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.TwoHanded)
+                {
+                    attackAnim = "2H_rangedAttackHold";
+                }
             }
         }
         else
         {
-            //attackAnim = "unarmedAttack";
+            attackAnim = "unarmedAttack";
         }
 
         // Plays the appropriate attack animation
@@ -183,6 +197,18 @@ public class CombatManager : NetworkBehaviour
         Debug.Log("CHARGING!");
     }
 
+    void CheckMeleeAttack()
+    {
+        if (impactActivated)
+        {
+            MeleeWeapon equippedWeapon = equipmentManager.currentlyEquippedWeapon as MeleeWeapon;
+            if (equippedWeapon != null)
+            {
+                CheckCreateImpactCollider(equippedWeapon);
+            }
+        }
+    }
+
     /// <summary>
     /// Called by an Animation Event from the player checks an int
     /// to determine the means of the attack
@@ -193,53 +219,64 @@ public class CombatManager : NetworkBehaviour
         // Only activate the impact if you have auth over this object
         if(!base.hasAuthority) { return; }
 
-        // You have no weapon equipped
-        // Left hand
-        if (impactID == 1)
-        {
-            impactOrigin = leftHand.transform;
-            impactEnd = leftHand.transform;
-            impactRadius = 0.5f;
-        }
-        // Right hand
-        else if (impactID == 2)
-        {
-            impactOrigin = rightHand.transform;
-            impactEnd = rightHand.transform;
-            impactRadius = 0.5f;
-        }
-        //else if (impactID == 3)
+        //// You have no weapon equipped
+        //// Left hand
+        //if (impactID == 1)
         //{
-        //    // LEFT OR RIGHT FOOT?
-        //    // SINGLE FEET ATTACK POS?
+        //    impactOrigin = leftHand.transform;
+        //    impactEnd = leftHand.transform;
+        //    impactRadius = 0.5f;
         //}
-
-        // You have a weapon equipped
-        //if(impactID == 0)
+        //// Right hand
+        //else if (impactID == 2)
         //{
-        //    impactOrigin = weaponMgmt.currentWeapon.startPos;
-        //    impactEnd = weaponMgmt.currentWeapon.endPos;
-        //    impactRadius = weaponMgmt.currentWeapon.impactRadius;
+        //    impactOrigin = rightHand.transform;
+        //    impactEnd = rightHand.transform;
+        //    impactRadius = 0.5f;
         //}
+        ////else if (impactID == 3)
+        ////{
+        ////    // LEFT OR RIGHT FOOT?
+        ////    // SINGLE FEET ATTACK POS?
+        ////}
 
         impactActivated = true;
     }
 
-    void CheckCreateImpactCollider(Vector3 origin, Vector3 end, float radius, LayerMask whatIsDamageable)
+    void CheckCreateImpactCollider(MeleeWeapon equippedWeapon)
     {
-        Collider[] verifiedImpactCol = Physics.OverlapCapsule(origin, end, radius, whatIsDamageable);
-        foreach (Collider hit in verifiedImpactCol)
+        // Generate a collider array that will act as the weapon's collision area
+        Collider[] impactCollisions = null;
+
+        if (equippedWeapon != null)
         {
-            GameObject hitGfx = Instantiate(hitFX, hit.ClosestPoint(end), Quaternion.identity);
+            impactCollisions = Physics.OverlapCapsule(
+                equippedWeapon.impactOrigin.position,
+                equippedWeapon.impactEnd.position,
+                equippedWeapon.impactRadius, whatIsDamageable);
+        }
+        else
+        {
+            // UNARMED IMPACT LOGIC
+        }
+
+        // for each object the collider hits do this stuff...
+        foreach (Collider hit in impactCollisions)
+        {
+            // Create equippedWeapon's hit visuals
+            GameObject hitGfx = Instantiate(equippedWeapon.weaponData.hitVisuals, 
+                hit.ClosestPoint(equippedWeapon.impactEnd.position), Quaternion.identity);
+
+            // If the collider hit has an IHaveHealth component on it.
             if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
             {
+                // Grab the NetworkIdentity of the hit object to pass into the Cmd
                 NetworkIdentity objIdentity = hit.gameObject.GetComponentInParent<NetworkIdentity>();
-                // PASS THE OBJECT HIT INTO A SERVER CHECK AND COMMAND
-                CmdCreateImpactCollider(objIdentity, origin, end, radius);
-                impactActivated = false;
-            }
-            else
-            {
+                CmdCreateImpactCollider(objIdentity,
+                    equippedWeapon.impactOrigin.position, 
+                    equippedWeapon.impactEnd.position, 
+                    equippedWeapon.impactRadius);
+
                 impactActivated = false;
             }
         }
@@ -263,15 +300,10 @@ public class CombatManager : NetworkBehaviour
         Collider[] verifiedImpactCol = Physics.OverlapCapsule(origin, end, colRadius, whatIsDamageable);
         foreach (Collider hit in verifiedImpactCol)
         {
-            Debug.Log(hit.gameObject.name);
             if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
             {
                 // PASS THE OBJECT HIT INTO A SERVER CHECK AND COMMAND
                 CheckProcessAttack(hitObj.gameObject);
-                impactActivated = false;
-            }
-            else
-            {
                 impactActivated = false;
             }
         }
@@ -287,7 +319,8 @@ public class CombatManager : NetworkBehaviour
         Collider[] verifiedImpactCol = Physics.OverlapCapsule(origin, end, colRadius, whatIsDamageable);
         foreach (Collider hit in verifiedImpactCol)
         {
-            GameObject hitGfx = Instantiate(hitFX, hit.ClosestPoint(end), Quaternion.identity);
+            /// CREATE THE WEAPONS HIT VISUALS HERE ///
+
             if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
             {
                 // PASS THE OBJECT HIT INTO A SERVER CHECK AND COMMAND
@@ -306,7 +339,7 @@ public class CombatManager : NetworkBehaviour
     void CheckProcessAttack(GameObject target)
     {
         IHaveHealth entity = target.GetComponentInParent<IHaveHealth>();
-        entity.TakeDamage(myStats.baseAttackDamage);
+        entity.TakeDamage(myStats.baseAttackDamage * equipmentManager.currentlyEquippedWeapon.weaponData.damage);
     }
     #endregion
 }
