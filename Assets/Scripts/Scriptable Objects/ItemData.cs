@@ -3,8 +3,5 @@
 public class ItemData : ScriptableObject
 {
     public string itemName = string.Empty;
-
-    public enum WeaponType { Melee, Ranged }
-
-
+    public bool equippable;
 }
