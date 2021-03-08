@@ -17,8 +17,11 @@ public class EquipmentManager : MonoBehaviour
         }
         else
         {
-            Weapon newWeapon = Instantiate(weaponToEquip, weaponEquipPos.position, weaponEquipPos.rotation);
+            Weapon newWeapon = Instantiate(weaponToEquip, weaponEquipPos);
             newWeapon.transform.SetParent(weaponEquipPos);
+            newWeapon.transform.localPosition = Vector3.zero;
+            newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
+
             currentlyEquippedWeapon = newWeapon;
         }
     }

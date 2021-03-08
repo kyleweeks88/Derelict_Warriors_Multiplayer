@@ -5,6 +5,9 @@ using Mirror;
 
 public class InputManager : NetworkBehaviour
 {
+    public delegate void OnInteractPressed();
+    public event OnInteractPressed Event_OnInteract;
+
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] CombatManager combatMgmt = null;
@@ -43,6 +46,9 @@ public class InputManager : NetworkBehaviour
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
         Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
+
+        // Player Interaction
+        Controls.Player.Interact.performed += ctx => InteractPressed();
     }
 
     void InitializeComponents(GameObject go)
@@ -85,5 +91,10 @@ public class InputManager : NetworkBehaviour
     void SprintReleased()
     {
         playerMovement.SprintReleased();
+    }
+
+    void InteractPressed()
+    {
+        Event_OnInteract?.Invoke();
     }
 }
