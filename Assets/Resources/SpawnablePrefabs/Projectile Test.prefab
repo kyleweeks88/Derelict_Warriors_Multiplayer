@@ -210,7 +210,7 @@ MonoBehaviour:
     type: 3}
   collisionsMask:
     serializedVersion: 2
-    m_Bits: 513
+    m_Bits: 3585
   projectileDamage: 10
   speed: 15
   skinWidth: 1

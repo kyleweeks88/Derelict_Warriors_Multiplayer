@@ -35,7 +35,6 @@ public class Projectile : NetworkBehaviour
     		yield return wait;
         }
     }
-
 	
 	void CheckCollisions()
 	{
@@ -46,37 +45,7 @@ public class Projectile : NetworkBehaviour
 		{
 			OnHitObject(hit);
 		}
-
-		//CmdCheckCollisions();
 	}
-
-	//[Command]
-	//void CmdCheckCollisions()
- //   {
- //       if (!base.isClient) { return; }
-
-	//	Ray ray = new Ray(transform.position, transform.forward);
-	//	RaycastHit hit;
-
-	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-	//	{
-	//		OnHitObject(hit);
-	//	}
-
-	//	RpcCheckCollisions();
-	//}
-
-	//[ClientRpc]
-	//void RpcCheckCollisions()
- //   {
-	//	Ray ray = new Ray(transform.position, transform.forward);
-	//	RaycastHit hit;
-
-	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-	//	{
-	//		OnHitObject(hit);
-	//	}
-	//}
 	
 	void OnHitObject(RaycastHit hit)
 	{
@@ -90,12 +59,16 @@ public class Projectile : NetworkBehaviour
 		//GameObject.Destroy(this.gameObject);
 
 		NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
-		CmdOnHitObject(hitId, hit.point);
+
+		//if(base.isClient)
+			CmdOnHitObject(hitId, hit.point);
 	}
 
-	[Command]
+	[Command(ignoreAuthority = true)]
 	void CmdOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
     {
+		Debug.Break();
+
 		if (hitId != null)
 		{
 			HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
@@ -105,13 +78,8 @@ public class Projectile : NetworkBehaviour
 			}
 		}
 
-		if (base.isClient)
-		{
-			GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
-		}
-
-		GameObject.Destroy(this.gameObject);
 		RpcOnHitObject(hitId, hitPoint);
+		GameObject.Destroy(this.gameObject);
 	}
 
     [ClientRpc]

@@ -1839,7 +1839,7 @@ GameObject:
   - component: {fileID: 7562662533682897996}
   - component: {fileID: 3467262495813199297}
   - component: {fileID: 6899203083148865249}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1967,6 +1967,9 @@ MonoBehaviour:
   moveSpeed: 5
   sprintMultiplier: 2
   turnSpeed: 15
+  whatIsWalkable:
+    serializedVersion: 2
+    m_Bits: 7169
   jumpVelocity: 5
 --- !u!114 &-2486189703782248511
 MonoBehaviour:
@@ -1984,10 +1987,10 @@ MonoBehaviour:
   syncInterval: 0.1
   equipmentManager: {fileID: 6899203083148865249}
   hitFX: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4, type: 3}
-  attackAnim: 
+  attackAnim: unarmedAttackHold
   whatIsDamageable:
     serializedVersion: 2
-    m_Bits: 3584
+    m_Bits: 3585
   myStats: {fileID: 2684214008263218707}
   leftHand: {fileID: 2288533030411638327}
   rightHand: {fileID: 2288697096786165153}
@@ -2117,7 +2120,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b46f4b3ed2d2624fa43c35f0e7905f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentlyEquippedWeapon: {fileID: 0}
+  syncMode: 0
+  syncInterval: 0.1
+  currentlyEquippedWeapon: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38,
+    type: 3}
   weaponEquipPos: {fileID: 3735642073622450782}
 --- !u!1 &6757011220328924237
 GameObject:

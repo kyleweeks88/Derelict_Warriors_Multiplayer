@@ -20,6 +20,7 @@ public class PlayerMovement : NetworkBehaviour
     bool isSprinting = false;
 
     [Header("Jump settings")]
+    public LayerMask whatIsWalkable;
     [SerializeField] float jumpVelocity = 5f;
     bool isJumping;
     float yVelocity = 0;
@@ -35,22 +36,6 @@ public class PlayerMovement : NetworkBehaviour
     int inputYParam = Animator.StringToHash("InputY");
     #endregion
 
-    //#region Initialize Input
-    //Controls controls;
-    //Controls Controls
-    //{
-    //    get
-    //    {
-    //        if(controls != null) { return controls; }
-    //        return controls = new Controls();
-    //    }
-    //}
-    //#endregion
-
-    //[ClientCallback]
-    //void OnEnable() => Controls.Enable();
-    //[ClientCallback]
-    //void OnDisable() => Controls.Disable();
 
     public override void OnStartAuthority()
     {
@@ -59,10 +44,6 @@ public class PlayerMovement : NetworkBehaviour
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-
-        //playerMgmt.inputMgmt.Controls.Player.Jump.performed += ctx => Jump();
-        //playerMgmt.inputMgmt.Controls.Locomotion.Sprint.started += ctx => SprintPressed();
-        //playerMgmt.inputMgmt.Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
 
         currentMoveSpeed = moveSpeed;
     }
@@ -85,7 +66,7 @@ public class PlayerMovement : NetworkBehaviour
         if(isJumping && yVelocity < 0)
         {
             RaycastHit hit;
-            if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, LayerMask.GetMask("Default")))
+            if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
             {
                 isJumping = false;
             }

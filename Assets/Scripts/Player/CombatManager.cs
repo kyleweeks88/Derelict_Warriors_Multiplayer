@@ -8,7 +8,7 @@ public class CombatManager : NetworkBehaviour
     #region Setup
     [SerializeField] EquipmentManager equipmentManager;
     [SerializeField] GameObject hitFX = null;
-    public string attackAnim = string.Empty;
+    public string attackAnim = "unarmedAttackHold";
     public LayerMask whatIsDamageable;
 
     [Header("Component Reference")]
@@ -73,52 +73,21 @@ public class CombatManager : NetworkBehaviour
         return result;
     }
 
-    // THIS WILL BE CALLED FROM AN ANIMATION EVENT????
+    // CALLED BY AN ANIMATION EVENT 
     [Client]
     public void CheckRangedAttack()
     {
         if (!base.hasAuthority) { return; }
         if (!ShotTimeMet()) { return; }
 
-        // Spawn projectile locally w/auth
-        SpawnProjectile(projectileSpawn.position, projectileSpawn.rotation);
         // Ask the server to check your pos, and spawn a projectile for the server
         CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation);
-    }
-
-    void SpawnProjectile(Vector3 pos, Quaternion rot)
-    {
-        GameObject newProjectile = Instantiate(projectile,
-            pos,
-            rot);
     }
 
     [Command]
     void CmdRangedAttack(Vector3 pos, Quaternion rot)
     {
-        if (!ShotTimeMet()) { return; }
-
-        float maxPosOffset = 1;
-        if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
-        {
-            Vector3 posDir = pos - projectileSpawn.position;
-            pos = projectileSpawn.position + (posDir * maxPosOffset);
-        }
-
-        // This is for the client/host to spawn a projectile
-        //if (base.isClient)
-        //    SpawnProjectile();
-
-        // Tells observing clients to also spawn the projectile
-        RpcRangedAttack(pos, rot);
-    }  
-
-    [ClientRpc]
-    void RpcRangedAttack(Vector3 pos, Quaternion rot)
-    {
-        //if (base.isServer) { return; }
-        if(base.hasAuthority){return;}
-        if (!ShotTimeMet()) { return; }
+        // CHECK ShotTime HERE AS WELL?? \\
 
         float maxPosOffset = 1;
         if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
@@ -128,6 +97,26 @@ public class CombatManager : NetworkBehaviour
         }
 
         SpawnProjectile(pos, rot);
+        RpcSpawnProjectile(pos, rot);
+
+        // Tells observing clients to also spawn the projectile
+        //RpcRangedAttack(pos, rot);
+    }  
+
+    [Server]
+    void SpawnProjectile(Vector3 pos, Quaternion rot)
+    {
+        GameObject newProjectile = Instantiate(projectile,
+            pos,
+            rot);
+    }
+
+    [ClientRpc]
+    void RpcSpawnProjectile(Vector3 pos, Quaternion rot)
+    {
+        GameObject newProjectile = Instantiate(projectile,
+            pos,
+            rot);
     }
     #endregion
 
@@ -137,25 +126,15 @@ public class CombatManager : NetworkBehaviour
     /// </summary>
     public void CheckAttack()
     {
-        //string animString = string.Empty;
-        // RUN LOGIC TO DETERMINE THE MEANS OF THE ATTACK //
-        // CHECK IF ARMED OR UNARMED //
-        // CHECK IF STUNNED //
-        // OTHER IMPORTANT STUFF //
-
-        // If unarmed: animString = "unarmedAttack"
-
-        // If 1H melee weapon: animString = "meleeAttack_1H"
-
-        // If weaponMgmt.currentWeapon.Type == RangedWeapon: animString = "rangedAttack"
-
-        // Etc...
+        // If you have a weapon equipped
         if(equipmentManager.currentlyEquippedWeapon != null)
         {
             Weapon newWeapon = equipmentManager.currentlyEquippedWeapon;
 
+            // If current weapon is a melee type...
             if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
+                // Determines the correct animation to play
                 if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
                 {
                     attackAnim = "1H_meleeAttackHold";
@@ -166,8 +145,10 @@ public class CombatManager : NetworkBehaviour
                 }
             }
             
+            // If current weapon is a ranged type...
             if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
             {
+                // Determines correct animation to play
                 if(newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
                 {
                     attackAnim = "1H_rangedAttackHold";
@@ -178,13 +159,13 @@ public class CombatManager : NetworkBehaviour
                 }
             }
         }
+        // If you have no equipped weapon, you're unarmed
         else
         {
-            attackAnim = "unarmedAttack";
+            attackAnim = "unarmedAttackHold";
         }
 
         // Plays the appropriate attack animation
-
         if(playerMgmt.inputMgmt.attackInputHeld)
             myAnimator.SetBool(attackAnim, true);
 

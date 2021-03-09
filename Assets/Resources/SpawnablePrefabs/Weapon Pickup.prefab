@@ -186,8 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  interactingEntity: {fileID: 0}
-  weaponToPickup: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38,
+  weaponToPickup_Pf: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38,
     type: 3}
 --- !u!114 &5422946838205441017
 MonoBehaviour:
