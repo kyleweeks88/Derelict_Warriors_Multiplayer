@@ -80,17 +80,16 @@ public class Projectile : NetworkBehaviour
 	
 	void OnHitObject(RaycastHit hit)
 	{
-        HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
-        if (hitTarget != null)
-        {
-            hitTarget.TakeDamage(projectileDamage);
-        }
+  //      HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
+  //      if (hitTarget != null)
+  //      {
+  //          hitTarget.TakeDamage(projectileDamage);
+  //      }
 
-		GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
-		GameObject.Destroy(this.gameObject);
+		//GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
+		//GameObject.Destroy(this.gameObject);
 
 		NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
-		//RpcOnHitObject(hitId, hit.point);
 		CmdOnHitObject(hitId, hit.point);
 	}
 
@@ -112,26 +111,26 @@ public class Projectile : NetworkBehaviour
 		}
 
 		GameObject.Destroy(this.gameObject);
-		//RpcOnHitObject(hitId, hitPoint);
+		RpcOnHitObject(hitId, hitPoint);
 	}
 
-	//[ClientRpc]
-	//void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
-	//{
-	//	if(hitId != null)
-	//	{
-	//		HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
-	//		if (hitTarget != null)
-	//		{
-	//			hitTarget.TakeDamage(projectileDamage);
-	//		}
-	//	}
+    [ClientRpc]
+    void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
+    {
+        if (hitId != null)
+        {
+            HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
+            if (hitTarget != null)
+            {
+                hitTarget.TakeDamage(projectileDamage);
+            }
+        }
 
-	//	GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
-	//	GameObject.Destroy(this.gameObject);
-	//}
+        GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
+        GameObject.Destroy(this.gameObject);
+    }
 
-	IEnumerator DestroyAfterLifetime()
+    IEnumerator DestroyAfterLifetime()
 	{
 		yield return new WaitForSeconds(2f);
 

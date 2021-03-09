@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 5422946838205441017}
   m_Layer: 0
   m_Name: Weapon Pickup
-  m_TagString: Untagged
+  m_TagString: Weapon Pickup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -184,8 +184,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9aa7810e3992624eba0212aa0288eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38, type: 3}
+  syncMode: 0
+  syncInterval: 0.1
   interactingEntity: {fileID: 0}
+  weaponToPickup: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38,
+    type: 3}
 --- !u!114 &5422946838205441017
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,8 +10,11 @@ public class AdjustInteractingBool : StateMachineBehaviour
     {
         playerMgmt = animator.transform.GetComponentInParent<PlayerManager>();
 
-        playerMgmt.isInteracting = false;
-        animator.SetBool("isInteracting", false);
+        if (playerMgmt != null)
+        {
+            playerMgmt.isInteracting = false;
+            animator.SetBool("isInteracting", false);
+        }
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -22,7 +25,10 @@ public class AdjustInteractingBool : StateMachineBehaviour
 
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        playerMgmt.isInteracting = true;
-        animator.SetBool("isInteracting", true);
+        if (playerMgmt != null)
+        {
+            playerMgmt.isInteracting = true;
+            animator.SetBool("isInteracting", true);
+        }
     }
 }
