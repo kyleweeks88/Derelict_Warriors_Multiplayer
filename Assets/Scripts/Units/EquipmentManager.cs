@@ -5,10 +5,19 @@ using Mirror;
 
 public class EquipmentManager : NetworkBehaviour
 {
+    [SerializeField] AnimationManager animMgmt;
     public Weapon currentlyEquippedWeapon;
     Weapon weaponToEquip;
 
     [SerializeField] Transform weaponEquipPos;
+
+    public override void OnStartAuthority()
+    {
+        if(currentlyEquippedWeapon != null)
+        {
+            animMgmt.SetAnimation(currentlyEquippedWeapon.weaponData.animationSet);
+        }
+    }
 
     [Client]
     public void CheckEquipWeapon(Weapon _weaponToEquip)
@@ -23,7 +32,7 @@ public class EquipmentManager : NetworkBehaviour
     [Command]
     void CmdEquipWeapon(Transform equipPos)
     {
-        EquipWeapon(weaponToEquip, equipPos);
+        //EquipWeapon(weaponToEquip, equipPos);
         RpcEquipWeapon(equipPos);
     }
 
@@ -51,6 +60,7 @@ public class EquipmentManager : NetworkBehaviour
             newWeapon.transform.localPosition = Vector3.zero;
             newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
+            animMgmt.SetAnimation(newWeapon.weaponData.animationSet);
             currentlyEquippedWeapon = newWeapon;
         }
     }

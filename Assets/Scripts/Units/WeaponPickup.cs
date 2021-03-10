@@ -84,7 +84,7 @@ public class WeaponPickup : NetworkBehaviour
 
     /// <summary>
     /// Tell all observing clients to Retrieve the EquipmentManager from the passed NetworkIdentity, attempt to equip the weapon prefab.
-    /// and destroy this Weapon Pickup object on their client.
+    /// and destroy this Weapon Pickup object.
     /// </summary>
     /// <param name="_colNetId"></param>
     [ClientRpc]

@@ -15,25 +15,21 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] CharacterStats myStats = null;
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
-    [SerializeField] Animator myAnimator;
-    [SerializeField] NetworkAnimator myNetworkAnimator = null;
     PlayerManager playerMgmt;
-    Transform impactOrigin;
-    Transform impactEnd;
 
     [Tooltip("Determines how long the player stays in combat mode")]
     public float combatTimer = 10f;
     [HideInInspector] public float currentCombatTimer;
     [HideInInspector] public bool inCombat;
-
     [HideInInspector] public bool canRecieveAttackInput;
     [HideInInspector] public bool attackInputRecieved;
-    [SerializeField] float impactRadius = 1f;
     public bool impactActivated;
 
     [Header("RANGED TESTING")]
     [SerializeField] Transform projectileSpawn;
-    [SerializeField] GameObject projectile = null;
+    // THIS PROJECTILE NEEDS TO BE DETERMINED BY THE CURRENT WEAPON \\
+    // IT SHOULD NOT BE ON THIS SCRIPT!!!
+    [SerializeField] GameObject projectile = null; //<<<========== FIX THIS!!!
     float nextShotTime = 0f;
     [SerializeField] float msBetweenShots = 0f;
     #endregion
@@ -48,11 +44,6 @@ public class CombatManager : NetworkBehaviour
     private void Update()
     {
         if (!hasAuthority) { return; }
-        
-        myAnimator.SetBool("inCombat", inCombat);
-
-        if(attackAnim != null)
-            myAnimator.SetBool(attackAnim, playerMgmt.inputMgmt.attackInputHeld);
 
         CheckMeleeAttack();
 
@@ -78,7 +69,7 @@ public class CombatManager : NetworkBehaviour
     public void CheckRangedAttack()
     {
         if (!base.hasAuthority) { return; }
-        if (!ShotTimeMet()) { return; }
+        //if (!ShotTimeMet()) { return; }
 
         // Ask the server to check your pos, and spawn a projectile for the server
         CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation);
@@ -88,6 +79,7 @@ public class CombatManager : NetworkBehaviour
     void CmdRangedAttack(Vector3 pos, Quaternion rot)
     {
         // CHECK ShotTime HERE AS WELL?? \\
+        if (!ShotTimeMet()) { return; }
 
         float maxPosOffset = 1;
         if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
@@ -97,7 +89,7 @@ public class CombatManager : NetworkBehaviour
         }
 
         SpawnProjectile(pos, rot);
-        RpcSpawnProjectile(pos, rot);
+        //RpcSpawnProjectile(pos, rot);
 
         // Tells observing clients to also spawn the projectile
         //RpcRangedAttack(pos, rot);
@@ -109,6 +101,8 @@ public class CombatManager : NetworkBehaviour
         GameObject newProjectile = Instantiate(projectile,
             pos,
             rot);
+
+        NetworkServer.Spawn(newProjectile);
     }
 
     [ClientRpc]
@@ -134,40 +128,26 @@ public class CombatManager : NetworkBehaviour
             // If current weapon is a melee type...
             if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
-                // Determines the correct animation to play
-                if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
-                {
-                    attackAnim = "1H_meleeAttackHold";
-                }
-                else if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.TwoHanded)
-                {
-                    attackAnim = "2H_meleeAttackHold";
-                }
+                // Determines correct animation to play
+                attackAnim = "meleeAttackHold";
             }
             
             // If current weapon is a ranged type...
             if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
             {
                 // Determines correct animation to play
-                if(newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.OneHanded)
-                {
-                    attackAnim = "1H_rangedAttackHold";
-                }
-                else if (newWeapon.weaponData.wieldStyle == WeaponData.WieldStyle.TwoHanded)
-                {
-                    attackAnim = "2H_rangedAttackHold";
-                }
+                attackAnim = "rangedAttackHold";
             }
         }
         // If you have no equipped weapon, you're unarmed
         else
         {
-            attackAnim = "unarmedAttackHold";
+            attackAnim = "meleeAttackHold";
         }
 
         // Plays the appropriate attack animation
-        if(playerMgmt.inputMgmt.attackInputHeld)
-            myAnimator.SetBool(attackAnim, true);
+        //if(playerMgmt.inputMgmt.attackInputHeld)
+            //animMgmt.myAnim.SetBool(attackAnim, true);
 
         inCombat = true;
         currentCombatTimer = combatTimer;
@@ -202,18 +182,18 @@ public class CombatManager : NetworkBehaviour
 
         //// You have no weapon equipped
         //// Left hand
-        //if (impactID == 1)
+        //if (impactid == 1)
         //{
-        //    impactOrigin = leftHand.transform;
-        //    impactEnd = leftHand.transform;
-        //    impactRadius = 0.5f;
+        //    impactorigin = lefthand.transform;
+        //    impactend = lefthand.transform;
+        //    impactradius = 0.5f;
         //}
-        //// Right hand
-        //else if (impactID == 2)
+        //// right hand
+        //else if (impactid == 2)
         //{
-        //    impactOrigin = rightHand.transform;
-        //    impactEnd = rightHand.transform;
-        //    impactRadius = 0.5f;
+        //    impactorigin = righthand.transform;
+        //    impactend = righthand.transform;
+        //    impactradius = 0.5f;
         //}
         ////else if (impactID == 3)
         ////{

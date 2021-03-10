@@ -6,7 +6,7 @@ using Mirror;
 // TEST
 public class EnemySpawner : NetworkBehaviour
 {
-    float nextSpawnTime;
+    float nextSpawnTime = 1f;
     bool spawnEnemy = true;
 
     [SerializeField] float spawnDelay = 2f;
@@ -15,6 +15,7 @@ public class EnemySpawner : NetworkBehaviour
 
     public override void OnStartServer()
     {
+        nextSpawnTime = spawnDelay;
         spawnEnemy = true;
         base.OnStartServer();
     }

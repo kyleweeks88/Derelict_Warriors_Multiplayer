@@ -8,6 +8,8 @@ public abstract class WeaponData : ItemData
     public enum WieldStyle { OneHanded, TwoHanded, DualWield }
     public WieldStyle wieldStyle;
 
+    public AnimatorOverrideController animationSet;
+
     public GameObject hitVisuals;
     public float damage;
 }

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Test Ranged Weapon
   m_EditorClassIdentifier: 
   itemName: Ranged Weapon
+  equippable: 0
   weaponType: 0
   wieldStyle: 0
+  animationSet: {fileID: 22100000, guid: 5009554467c69b1489c7c65fc83e2508, type: 2}
   hitVisuals: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4,
     type: 3}
   damage: 1

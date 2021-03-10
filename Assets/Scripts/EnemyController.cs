@@ -34,6 +34,17 @@ public class EnemyController : NetworkBehaviour
         }
     }
 
+    [ServerCallback]
+    private void Update()
+    {
+        TargetInSight();
+
+        if (visibleTargets.Count > 0)
+        {
+            myNavAgent.SetDestination(FindClosestTarget().transform.position);
+        }
+    }
+
     // Call when a new player joins???
     void InitializePlayer()
     {
@@ -48,17 +59,7 @@ public class EnemyController : NetworkBehaviour
         }
     }
 
-    [ServerCallback]
-    private void Update()
-    {
-        TargetInSight();
-
-        if(visibleTargets != null)
-        {
-            myNavAgent.SetDestination(FindClosestTarget().transform.position);
-        }    
-    }
-
+    [Server]
     void TargetInSight()
     {
         foreach (GameObject target in targetObjects)
@@ -81,6 +82,7 @@ public class EnemyController : NetworkBehaviour
         }
     }
 
+    [Server]
     GameObject FindClosestTarget()
     {
         float dist = Mathf.Infinity;
