@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class Enemy : CharacterStats
+public class NpcStats : CharacterStats
 {
     public override void Death()
     {
@@ -14,7 +14,6 @@ public class Enemy : CharacterStats
     [Server]
     public virtual void ServerDeath()
     {
-        Debug.Log(charName + " has died!");
         RpcDeath();
         Object.Destroy(this.gameObject);
     }
@@ -24,7 +23,6 @@ public class Enemy : CharacterStats
     {
         if (base.hasAuthority) { return; }
 
-        Debug.Log(charName + " has died!");
         Object.Destroy(this.gameObject);
     }
 }

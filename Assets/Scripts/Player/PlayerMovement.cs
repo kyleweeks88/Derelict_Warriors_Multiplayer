@@ -8,7 +8,7 @@ public class PlayerMovement : NetworkBehaviour
 {
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
-    [SerializeField] StaminaManager staminaMgmt = null;
+    [SerializeField] PlayerStaminaManager staminaMgmt = null;
     [SerializeField] CharacterController controller = null;
     [SerializeField] Animator myAnimator;
 
@@ -41,6 +41,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         enabled = true;
         controller.enabled = true;
+
+        staminaMgmt = GetComponent<PlayerStaminaManager>();
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;

@@ -69,7 +69,7 @@ public class InputManager : NetworkBehaviour
         {
             attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
-            combatMgmt.CheckAttack();
+            combatMgmt.AttackPerformed();
         }
     }
 

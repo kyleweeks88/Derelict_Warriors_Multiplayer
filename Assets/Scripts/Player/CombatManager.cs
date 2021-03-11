@@ -5,14 +5,12 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
+    //float chargeMultiplier;
+
     #region Setup
-    [SerializeField] EquipmentManager equipmentManager;
-    [SerializeField] GameObject hitFX = null;
-    public string attackAnim = "unarmedAttackHold";
+    [HideInInspector] public string attackAnim;
     public LayerMask whatIsDamageable;
 
-    [Header("Component Reference")]
-    [SerializeField] CharacterStats myStats = null;
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
     PlayerManager playerMgmt;
@@ -21,8 +19,8 @@ public class CombatManager : NetworkBehaviour
     public float combatTimer = 10f;
     [HideInInspector] public float currentCombatTimer;
     [HideInInspector] public bool inCombat;
-    [HideInInspector] public bool canRecieveAttackInput;
-    [HideInInspector] public bool attackInputRecieved;
+    //[HideInInspector] public bool canRecieveAttackInput;
+    //[HideInInspector] public bool attackInputRecieved;
     public bool impactActivated;
 
     [Header("RANGED TESTING")]
@@ -38,6 +36,7 @@ public class CombatManager : NetworkBehaviour
     {
         enabled = true;
         playerMgmt = GetComponent<PlayerManager>();
+
     }
 
     [ClientCallback]
@@ -49,7 +48,7 @@ public class CombatManager : NetworkBehaviour
 
         if(playerMgmt.inputMgmt.attackInputHeld)
         {
-            ChargingAttack();
+            ChargeAttack();
         }
     }
 
@@ -79,7 +78,7 @@ public class CombatManager : NetworkBehaviour
     void CmdRangedAttack(Vector3 pos, Quaternion rot)
     {
         // CHECK ShotTime HERE AS WELL?? \\
-        if (!ShotTimeMet()) { return; }
+        //if (!ShotTimeMet()) { return; }
 
         float maxPosOffset = 1;
         if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
@@ -118,22 +117,20 @@ public class CombatManager : NetworkBehaviour
     /// <summary>
     /// Called by the player's attack input
     /// </summary>
-    public void CheckAttack()
+    public void AttackPerformed()
     {
         // If you have a weapon equipped
-        if(equipmentManager.currentlyEquippedWeapon != null)
+        if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
         {
-            Weapon newWeapon = equipmentManager.currentlyEquippedWeapon;
-
             // If current weapon is a melee type...
-            if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
+            if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
                 // Determines correct animation to play
                 attackAnim = "meleeAttackHold";
             }
             
             // If current weapon is a ranged type...
-            if(newWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
+            if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
             {
                 // Determines correct animation to play
                 attackAnim = "rangedAttackHold";
@@ -145,28 +142,27 @@ public class CombatManager : NetworkBehaviour
             attackAnim = "meleeAttackHold";
         }
 
-        // Plays the appropriate attack animation
-        //if(playerMgmt.inputMgmt.attackInputHeld)
-            //animMgmt.myAnim.SetBool(attackAnim, true);
-
         inCombat = true;
         currentCombatTimer = combatTimer;
     }
 
-    public void ChargingAttack()
+    public virtual void ChargeAttack()
     {
-        Debug.Log("CHARGING!");
-    }
-
-    void CheckMeleeAttack()
-    {
-        if (impactActivated)
+        // If you have a weapon equipped...
+        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
         {
-            MeleeWeapon equippedWeapon = equipmentManager.currentlyEquippedWeapon as MeleeWeapon;
-            if (equippedWeapon != null)
+            // If that weapon's current charge is less than it's max charge,
+            // increase the currenty charge by time * charge rate until it reaches it's max charge.
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge <=
+                playerMgmt.equipmentMgmt.currentlyEquippedWeapon.maxCharge)
             {
-                CheckCreateImpactCollider(equippedWeapon);
+                playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge += 
+                    Time.deltaTime * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.chargeRate / 100f;
             }
+        }
+        else
+        {
+            // UNARMED CHARGING LOGIC
         }
     }
 
@@ -180,28 +176,19 @@ public class CombatManager : NetworkBehaviour
         // Only activate the impact if you have auth over this object
         if(!base.hasAuthority) { return; }
 
-        //// You have no weapon equipped
-        //// Left hand
-        //if (impactid == 1)
-        //{
-        //    impactorigin = lefthand.transform;
-        //    impactend = lefthand.transform;
-        //    impactradius = 0.5f;
-        //}
-        //// right hand
-        //else if (impactid == 2)
-        //{
-        //    impactorigin = righthand.transform;
-        //    impactend = righthand.transform;
-        //    impactradius = 0.5f;
-        //}
-        ////else if (impactID == 3)
-        ////{
-        ////    // LEFT OR RIGHT FOOT?
-        ////    // SINGLE FEET ATTACK POS?
-        ////}
-
         impactActivated = true;
+    }
+
+    void CheckMeleeAttack()
+    {
+        if (impactActivated)
+        {
+            MeleeWeapon equippedWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
+            if (equippedWeapon != null)
+            {
+                CheckCreateImpactCollider(equippedWeapon);
+            }
+        }
     }
 
     void CheckCreateImpactCollider(MeleeWeapon equippedWeapon)
@@ -228,79 +215,84 @@ public class CombatManager : NetworkBehaviour
             GameObject hitGfx = Instantiate(equippedWeapon.weaponData.hitVisuals, 
                 hit.ClosestPoint(equippedWeapon.impactEnd.position), Quaternion.identity);
 
-            // If the collider hit has an IHaveHealth component on it.
-            if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
+            // If the collider hit has an NpcHealthManager component on it.
+            if (hit.gameObject.GetComponent<NpcHealthManager>() != null)
             {
-                // Grab the NetworkIdentity of the hit object to pass into the Cmd
-                NetworkIdentity objIdentity = hit.gameObject.GetComponentInParent<NetworkIdentity>();
-                CmdCreateImpactCollider(objIdentity,
-                    equippedWeapon.impactOrigin.position, 
-                    equippedWeapon.impactEnd.position, 
-                    equippedWeapon.impactRadius);
-
+                CheckProcessAttack(hit.gameObject.GetComponent<NpcHealthManager>());
                 impactActivated = false;
+                //chargeMultiplier = 0f;
+                playerMgmt.equipmentMgmt.currentlyEquippedWeapon.ResetCharge();
             }
+
+            // Create the impact collider on the server
+            CmdCreateImpactCollider(
+                equippedWeapon.impactOrigin.position,
+                equippedWeapon.impactEnd.position,
+                equippedWeapon.impactRadius);
         }
     }
 
     [Command]
-    void CmdCreateImpactCollider(NetworkIdentity hitObj, Vector3 origin, Vector3 end, float colRadius)
+    void CmdCreateImpactCollider(Vector3 origin, Vector3 end, float colRadius)
     {
-        // ALSO CHECK THE impactRadius AGAINST A CLAMPED RADIUS TO MAKE SURE CLIENT
-        // ISN'T HACKING impactRadius SIZE.
-        //if (colRadius > 3f) { return; }
-
-        // CHECK LENGTH OF CAPSULE COLLIDER FOR HACKING
-        //float colLength = Vector3.Distance(origin, end);
-        //if (colLength > 5f) { return; }
-
-        // CHECK DISTANCE FROM CLIENT TO HIT OBJECT
-        //float distToHitObject = Vector3.Distance(this.transform.position, hitObj.transform.position);
-        //if (distToHitObject > 5f) { return; }
+        // DO SOME SERVER VERIFICATION RIGHT HERE \\
 
         Collider[] verifiedImpactCol = Physics.OverlapCapsule(origin, end, colRadius, whatIsDamageable);
         foreach (Collider hit in verifiedImpactCol)
         {
-            if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
+            if (hit.gameObject.GetComponent<NpcHealthManager>() != null)
             {
-                // PASS THE OBJECT HIT INTO A SERVER CHECK AND COMMAND
-                CheckProcessAttack(hitObj.gameObject);
+                // Process the attack and damage on the server
+                //CheckProcessAttack(hit.gameObject.GetComponent<NpcHealthManager>());
                 impactActivated = false;
             }
-        }
 
-        RpcCreateImpactCollider(hitObj, origin, end, colRadius);
+            RpcCreateImpactCollider(origin, end, colRadius);
+        }
     }
 
     [ClientRpc]
-    void RpcCreateImpactCollider(NetworkIdentity hitObj, Vector3 origin, Vector3 end, float colRadius)
+    void RpcCreateImpactCollider(Vector3 origin, Vector3 end, float colRadius)
     {
         if (hasAuthority) { return; }
 
         Collider[] verifiedImpactCol = Physics.OverlapCapsule(origin, end, colRadius, whatIsDamageable);
         foreach (Collider hit in verifiedImpactCol)
         {
-            /// CREATE THE WEAPONS HIT VISUALS HERE ///
-
-            if (hit.gameObject.GetComponentInParent<IHaveHealth>() != null)
+            if (hit.gameObject.GetComponent<NpcHealthManager>() != null)
             {
                 // PASS THE OBJECT HIT INTO A SERVER CHECK AND COMMAND
+                //CheckProcessAttack(hit.gameObject.GetComponent<NpcHealthManager>());
                 impactActivated = false;
-                return;
-            }
-            else
-            {
-                impactActivated = false;
-                return;
             }
         }
     }
 
-    [Server]
-    void CheckProcessAttack(GameObject target)
+    void CheckProcessAttack(NpcHealthManager target)
     {
-        IHaveHealth entity = target.GetComponentInParent<IHaveHealth>();
-        entity.TakeDamage(myStats.baseAttackDamage * equipmentManager.currentlyEquippedWeapon.weaponData.damage);
+        float dmgVal = (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.damage 
+            * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge) + playerMgmt.playerStats.baseAttackDamage;
+
+        NetworkIdentity targetNetId = target.gameObject.GetComponent<NetworkIdentity>();
+
+        CmdProcessAttack(targetNetId, dmgVal);
     }
+
+    [Command]
+    void CmdProcessAttack(NetworkIdentity _targetNetId, float dmgVal)
+    {
+        NpcHealthManager entity = _targetNetId.gameObject.GetComponent<NpcHealthManager>();
+        entity.TakeDamage(dmgVal);
+        //RpcProcessAttack(_targetNetId, dmgVal);
+    }
+
+    //[ClientRpc]
+    //void RpcProcessAttack(NetworkIdentity _targetNetId, float dmgVal)
+    //{
+    //    //if (base.hasAuthority) { return; }
+
+    //    NpcHealthManager entity = _targetNetId.gameObject.GetComponent<NpcHealthManager>();
+    //    entity.TakeDamage(dmgVal);
+    //}
     #endregion
 }

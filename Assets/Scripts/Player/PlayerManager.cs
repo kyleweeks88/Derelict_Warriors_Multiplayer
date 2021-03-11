@@ -8,6 +8,8 @@ public class PlayerManager : NetworkBehaviour
     [Header("Component Ref")]
     public ClientInstance ci;
     public InputManager inputMgmt;
+    public EquipmentManager equipmentMgmt;
+    public PlayerStats playerStats;
 
     [Header("Camera Ref")]
     public GameObject myCamera = null;
@@ -23,6 +25,12 @@ public class PlayerManager : NetworkBehaviour
         {
             inputMgmt = ci.GetComponent<InputManager>();
         }
+
+        equipmentMgmt = gameObject.GetComponent<EquipmentManager>();
+        equipmentMgmt.enabled = true;
+
+        playerStats = gameObject.GetComponent<PlayerStats>();
+        playerStats.enabled = true;
 
         myCamera.SetActive(true);
         freeLook.SetActive(true);

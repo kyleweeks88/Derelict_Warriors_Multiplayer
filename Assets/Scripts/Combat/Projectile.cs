@@ -53,7 +53,7 @@ public class Projectile : NetworkBehaviour
         NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
         if(hitId != null)
         {
-            HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
+            NpcHealthManager hitTarget = hit.collider.GetComponent<NpcHealthManager>();
             if (hitTarget != null)
             {
                 hitTarget.TakeDamage(projDmg);
@@ -76,7 +76,7 @@ public class Projectile : NetworkBehaviour
     {
         if (hitId != null)
         {
-            HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
+            NpcHealthManager hitTarget = hitId.gameObject.GetComponent<NpcHealthManager>();
             if (hitTarget != null)
             {
                 hitTarget.TakeDamage(projDmg);

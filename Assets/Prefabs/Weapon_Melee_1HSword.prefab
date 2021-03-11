@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 3032946686388105788}
   - component: {fileID: 8307531084251409164}
   m_Layer: 0
-  m_Name: Test Weapon
+  m_Name: Weapon_Melee_1HSword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7b728bda045f3d4990591990c8e6ca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponData: {fileID: 11400000, guid: c2fc03d687f374d4d8082d2391283533, type: 2}
+  weaponData: {fileID: 11400000, guid: 9f6e51974b91fe245bcb944eb6ed0907, type: 2}
   impactOrigin: {fileID: 8689463681558261426}
   impactEnd: {fileID: 4904108490734283828}
   impactRadius: 0.5

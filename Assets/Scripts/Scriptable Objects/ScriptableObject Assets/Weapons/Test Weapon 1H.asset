@@ -19,5 +19,5 @@ MonoBehaviour:
   animationSet: {fileID: 22100000, guid: 98186c8755407bb499eb11eadddd5020, type: 2}
   hitVisuals: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4,
     type: 3}
-  damage: 1
+  damage: 25
   damageType: 0
