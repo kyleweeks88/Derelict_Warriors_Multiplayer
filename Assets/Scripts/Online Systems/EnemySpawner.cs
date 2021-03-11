@@ -6,15 +6,16 @@ using Mirror;
 // TEST
 public class EnemySpawner : NetworkBehaviour
 {
-    float nextSpawnTime;
+    float nextSpawnTime = 1f;
     bool spawnEnemy = true;
 
     [SerializeField] float spawnDelay = 2f;
     [SerializeField] Transform[] spawnPoints;
-    [SerializeField] Enemy[] enemies;
+    [SerializeField] NpcStats[] enemies;
 
     public override void OnStartServer()
     {
+        nextSpawnTime = spawnDelay;
         spawnEnemy = true;
         base.OnStartServer();
     }
@@ -33,9 +34,9 @@ public class EnemySpawner : NetworkBehaviour
         // TAKES THE CURRENT TIME AND ADDS THE SPAWN DELAY TIME
         nextSpawnTime = Time.time + spawnDelay;
         Transform spawnPoint = ChooseSpawnPoint();
-        Enemy enemyPrefab = ChooseEnemy();
-        Enemy enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
-        NetworkServer.Spawn(enemy.gameObject);
+        NpcStats enemyPrefab = ChooseEnemy();
+        NpcStats enemyInstance = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+        NetworkServer.Spawn(enemyInstance.gameObject);
     }
 
 
@@ -46,7 +47,7 @@ public class EnemySpawner : NetworkBehaviour
         return spawnPoint;
     }
 
-    Enemy ChooseEnemy()
+    NpcStats ChooseEnemy()
     {
         int randomIndex = UnityEngine.Random.Range(0, enemies.Length);
         var enemy = enemies[randomIndex];

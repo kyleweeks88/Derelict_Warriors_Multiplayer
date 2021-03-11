@@ -614,6 +614,36 @@ MonoBehaviour:
   m_BiasX: 0
   m_BiasY: 0
   m_CenterOnActivate: 1
+--- !u!1 &1544839422752658262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3735642073622450782}
+  m_Layer: 0
+  m_Name: weapon pivot l
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3735642073622450782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544839422752658262}
+  m_LocalRotation: {x: 0.7089846, y: -0.00000074505806, z: 0.00000041909516, w: 0.70522404}
+  m_LocalPosition: {x: -0.102, y: -0.028, z: 0.09}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2294159835578381327}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 90.30298, y: 0.004989624, z: 0.004989624}
 --- !u!1 &1674453814961982921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1305,7 +1335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthManager: {fileID: 3469177221623152036}
+  healthManager: {fileID: 0}
   staminaManager: {fileID: 0}
   healthBarImage: {fileID: 41788978711997718}
   staminaBarImage: {fileID: 0}
@@ -1782,8 +1812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthManager: {fileID: 3469177221623152036}
-  staminaManager: {fileID: 7562662533682897996}
+  healthManager: {fileID: 6785309732559405815}
+  staminaManager: {fileID: -7243457902745452413}
   healthBarImage: {fileID: 4680986782954741257}
   staminaBarImage: {fileID: 4950630359981323419}
 --- !u!1 &6519869665437484994
@@ -1798,18 +1828,19 @@ GameObject:
   - component: {fileID: 634059099541056551}
   - component: {fileID: 7304204219145124143}
   - component: {fileID: 6245793244553626863}
-  - component: {fileID: 3257659834398278457}
   - component: {fileID: 1661257383019214067}
+  - component: {fileID: 3257659834398278457}
   - component: {fileID: -5031885848669305226}
   - component: {fileID: -2486189703782248511}
   - component: {fileID: 244091649480622315}
   - component: {fileID: 874442707189623235}
   - component: {fileID: 2684214008263218707}
-  - component: {fileID: 3469177221623152036}
-  - component: {fileID: 7562662533682897996}
   - component: {fileID: 3467262495813199297}
   - component: {fileID: 6899203083148865249}
-  m_Layer: 0
+  - component: {fileID: 6016297192550152662}
+  - component: {fileID: 6785309732559405815}
+  - component: {fileID: -7243457902745452413}
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1884,6 +1915,20 @@ MonoBehaviour:
   syncInterval: 0.1
   clientAuthority: 1
   animator: {fileID: 2203414895770027891}
+--- !u!136 &1661257383019214067
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.31
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!143 &3257659834398278457
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1902,20 +1947,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!136 &1661257383019214067
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519869665437484994}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.31
-  m_Height: 1.8
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &-5031885848669305226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1931,12 +1962,15 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerMgmt: {fileID: 3467262495813199297}
-  staminaMgmt: {fileID: 7562662533682897996}
+  staminaMgmt: {fileID: 0}
   controller: {fileID: 3257659834398278457}
   myAnimator: {fileID: 2203414895770027891}
   moveSpeed: 5
   sprintMultiplier: 2
   turnSpeed: 15
+  whatIsWalkable:
+    serializedVersion: 2
+    m_Bits: 7169
   jumpVelocity: 5
 --- !u!114 &-2486189703782248511
 MonoBehaviour:
@@ -1957,18 +1991,15 @@ MonoBehaviour:
   attackAnim: 
   whatIsDamageable:
     serializedVersion: 2
-    m_Bits: 3584
+    m_Bits: 3585
   myStats: {fileID: 2684214008263218707}
   leftHand: {fileID: 2288533030411638327}
   rightHand: {fileID: 2288697096786165153}
-  myAnimator: {fileID: 2203414895770027891}
-  myNetworkAnimator: {fileID: 6245793244553626863}
   combatTimer: 10
   currentCombatTimer: 0
   inCombat: 0
   canRecieveAttackInput: 0
   attackInputRecieved: 0
-  impactRadius: 1
   impactActivated: 0
   projectileSpawn: {fileID: 1773856740210876494}
   projectile: {fileID: 5501600362227425314, guid: 1b2f6f05219a82044b216ee31f3c384b,
@@ -2019,42 +2050,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   charName: PLAYER
-  baseAttackDamage: 25
---- !u!114 &3469177221623152036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519869665437484994}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea5dcabee551e1848afb8baff0879a0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  maxVital: 100
-  myUI: {fileID: 6513304617872774401}
-  worldUI: {fileID: 0}
---- !u!114 &7562662533682897996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519869665437484994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6098ac56abdc7a48a1d40c29c5a2cba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  maxVital: 100
-  staminaGainAmount: 1
-  staminaDrainAmount: 1
-  drainingStamina: 0
+  baseAttackDamage: 1
 --- !u!114 &3467262495813199297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2087,8 +2083,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b46f4b3ed2d2624fa43c35f0e7905f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentlyEquippedWeapon: {fileID: 7533719324029341983, guid: 272ec6d59fba3d04ea9cab17289e0c38,
-    type: 3}
+  syncMode: 0
+  syncInterval: 0.1
+  animMgmt: {fileID: 6016297192550152662}
+  currentlyEquippedWeapon: {fileID: 0}
+  weaponEquipPos: {fileID: 3735642073622450782}
+--- !u!114 &6016297192550152662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8bd8f47e268f2a4ab687be3ddd9bd3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  myAnim: {fileID: 2203414895770027891}
+  combatMgmt: {fileID: 0}
+  playerMgmt: {fileID: 0}
+--- !u!114 &6785309732559405815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b54ba250763370f4dbc14df5347ed14b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  maxVital: 100
+  worldUI: {fileID: 0}
+  myUI: {fileID: 6513304617872774401}
+--- !u!114 &-7243457902745452413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d756aacc544e8704e9062a87fdef8dd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  maxVital: 100
+  staminaGainAmount: 1
+  staminaDrainAmount: 1
+  drainingStamina: 0
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0
@@ -2608,12 +2659,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
---- !u!1 &2288697096786165153 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1667118767334454, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
-    type: 3}
-  m_PrefabInstance: {fileID: 2289792194481281431}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2289322945793128889 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1045401375514670, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
@@ -2635,6 +2680,18 @@ Animator:
 --- !u!1 &2288533030411638327 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1259439162904480, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
+    type: 3}
+  m_PrefabInstance: {fileID: 2289792194481281431}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2288697096786165153 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1667118767334454, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
+    type: 3}
+  m_PrefabInstance: {fileID: 2289792194481281431}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2294159835578381327 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4653035768442264, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
     type: 3}
   m_PrefabInstance: {fileID: 2289792194481281431}
   m_PrefabAsset: {fileID: 0}

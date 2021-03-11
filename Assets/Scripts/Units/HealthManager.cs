@@ -6,88 +6,36 @@ using UnityEngine.InputSystem;
 
 public class HealthManager : VitalStat, IDamageable<float>
 {
-    [SerializeField] GameObject myUI;
     [SerializeField] GameObject worldUI;
+
     public delegate void OnHealthChanged(float curVal, float maxVal);
     public event OnHealthChanged Event_HealthChanged;
 
-    public override void OnStartAuthority()
-    {
-        enabled = true;
-    }
-
-    // Currently using this for testing only
-    [ClientCallback]
-    private void Update()
-    {
-        if (!hasAuthority) { return; }
-
-        if (Keyboard.current.hKey.wasPressedThisFrame)
-        {
-            TakeDamage(10f);
-        }
-    }
-
-    [Client]
     public override void SetVital(float setVal)
     {
-        if(myUI != null)
-            myUI.SetActive(true);
-
         InitializeVital();
         this.Event_HealthChanged?.Invoke(currentVital, maxVital);
-        CmdSetVital(setVal);
     }
 
-    [Command]
-    public override void CmdSetVital(float setVal)
+    public virtual void TakeDamage(float dmgVal)
     {
-        InitializeVital();
-        base.CmdSetVital(setVal);
-        
-        RpcOnHealthChanged(currentVital, maxVital);
+        Debug.Log(gameObject.name + " took: " + dmgVal + "!");
     }
 
-    [ClientRpc]
-    private void RpcOnHealthChanged(float curVal, float maxVal)
-    {
-        if(base.hasAuthority){return;}
-
-        this.Event_HealthChanged?.Invoke(curVal, maxVal);
-    }
-
-    public void TakeDamage(float dmgVal)
-    {
-        dmgVal *= -1f;
-        ModfiyVital(dmgVal);
-    }
-
-    [Client]
     public override void ModfiyVital(float modVal)
     {
         base.ModfiyVital(modVal);
         this.Event_HealthChanged?.Invoke(currentVital, maxVital);
-
-        CmdModifyVital(modVal);
-
-        if(currentVital <= 0)
-            Die();
     }
 
-    [Command]
-    public override void CmdModifyVital(float modVal)
+    public virtual void Die()
     {
-        base.CmdModifyVital(modVal);
-        RpcOnHealthChanged(currentVital, maxVital);
+        // GENERIC DIE CODE HERE
     }
 
-    public void Die()
+    [ClientRpc]
+    public virtual void RpcOnHealthChanged(float curVal, float maxVal)
     {
-        CharacterStats characterStats = GetComponent<CharacterStats>();
-
-        if(characterStats != null)
-        {
-            characterStats.Death();
-        }
+        this.Event_HealthChanged?.Invoke(curVal, maxVal);
     }
 }

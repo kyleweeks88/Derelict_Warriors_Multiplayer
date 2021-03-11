@@ -1,25 +1,24 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
 public class Projectile : NetworkBehaviour
 {
-	public GameObject hitFxPrefab;
+	public GameObject hitFx_Pf;
 	public LayerMask collisionsMask;
-	public float projectileDamage = 10f;
-    public float speed = 10f;
-	public float skinWidth = 0.1f;
+	public float projDmg = 10f;
+    public float projSpeed = 10f;
+	public float raycastLength = 0.1f;
 
 	void Start()
     {
-        SetSpeed(speed);
+        SetSpeed(projSpeed);
 		StartCoroutine(DestroyAfterLifetime());
     }
 
     public void SetSpeed(float newSpeed)
     {
-    	speed = newSpeed;
+    	projSpeed = newSpeed;
     	StartCoroutine(TranslateProjectile(newSpeed));
     }
 
@@ -35,103 +34,60 @@ public class Projectile : NetworkBehaviour
     		yield return wait;
         }
     }
-
 	
+    [Server]
 	void CheckCollisions()
 	{
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit hit;
 
-		if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
+		if (Physics.Raycast(ray, out hit, raycastLength, collisionsMask, QueryTriggerInteraction.Collide))
 		{
 			OnHitObject(hit);
 		}
-
-		//CmdCheckCollisions();
 	}
-
-	//[Command]
-	//void CmdCheckCollisions()
- //   {
- //       if (!base.isClient) { return; }
-
-	//	Ray ray = new Ray(transform.position, transform.forward);
-	//	RaycastHit hit;
-
-	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-	//	{
-	//		OnHitObject(hit);
-	//	}
-
-	//	RpcCheckCollisions();
-	//}
-
-	//[ClientRpc]
-	//void RpcCheckCollisions()
- //   {
-	//	Ray ray = new Ray(transform.position, transform.forward);
-	//	RaycastHit hit;
-
-	//	if (Physics.Raycast(ray, out hit, skinWidth, collisionsMask, QueryTriggerInteraction.Collide))
-	//	{
-	//		OnHitObject(hit);
-	//	}
-	//}
 	
+    [Server]
 	void OnHitObject(RaycastHit hit)
 	{
-        HealthManager hitTarget = hit.collider.GetComponent<HealthManager>();
-        if (hitTarget != null)
+        NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
+        if(hitId != null)
         {
-            hitTarget.TakeDamage(projectileDamage);
+            NpcHealthManager hitTarget = hit.collider.GetComponent<NpcHealthManager>();
+            if (hitTarget != null)
+            {
+                hitTarget.TakeDamage(projDmg);
+            }
         }
 
-		GameObject hitFx = Instantiate(hitFxPrefab, hit.point, Quaternion.identity);
-		GameObject.Destroy(this.gameObject);
+        RpcOnHitObject(hitId, hit.point);
 
-		NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
-		//RpcOnHitObject(hitId, hit.point);
-		CmdOnHitObject(hitId, hit.point);
-	}
+        if (base.isClient)
+        {
+            GameObject hitFx = Instantiate(hitFx_Pf, hit.point, Quaternion.identity);
+            GameObject.Destroy(this.gameObject);
+        }
 
-	[Command]
-	void CmdOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
+        GameObject.Destroy(this.gameObject);
+    }
+
+    [ClientRpc]
+    void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
     {
-		if (hitId != null)
-		{
-			HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
-			if (hitTarget != null)
-			{
-				hitTarget.TakeDamage(projectileDamage);
-			}
-		}
+        if (hitId != null)
+        {
+            NpcHealthManager hitTarget = hitId.gameObject.GetComponent<NpcHealthManager>();
+            if (hitTarget != null)
+            {
+                hitTarget.TakeDamage(projDmg);
+            }
+        }
 
-		if (base.isClient)
-		{
-			GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
-		}
+        GameObject hitFx = Instantiate(hitFx_Pf, hitPoint, Quaternion.identity);
+        GameObject.Destroy(this.gameObject);
+    }
 
-		GameObject.Destroy(this.gameObject);
-		//RpcOnHitObject(hitId, hitPoint);
-	}
-
-	//[ClientRpc]
-	//void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
-	//{
-	//	if(hitId != null)
-	//	{
-	//		HealthManager hitTarget = hitId.gameObject.GetComponent<HealthManager>();
-	//		if (hitTarget != null)
-	//		{
-	//			hitTarget.TakeDamage(projectileDamage);
-	//		}
-	//	}
-
-	//	GameObject hitFx = Instantiate(hitFxPrefab, hitPoint, Quaternion.identity);
-	//	GameObject.Destroy(this.gameObject);
-	//}
-
-	IEnumerator DestroyAfterLifetime()
+    IEnumerator DestroyAfterLifetime()
 	{
 		yield return new WaitForSeconds(2f);
 

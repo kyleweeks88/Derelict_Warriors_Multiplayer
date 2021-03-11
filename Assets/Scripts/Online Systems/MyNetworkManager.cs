@@ -87,6 +87,7 @@ public class MyNetworkManager : NetworkManager
         OnServerStopped?.Invoke();
 
         playerDataList.Clear();
+        LocalPlayers.Clear();
     }
 
 
@@ -103,10 +104,7 @@ public class MyNetworkManager : NetworkManager
 
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        Transform startPos = GetStartPosition();
-        GameObject player = startPos != null
-            ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
-            : Instantiate(playerPrefab);
+        GameObject player = Instantiate(playerPrefab);
 
         LocalPlayers[conn] = player.GetComponent<NetworkIdentity>();
         NetworkServer.AddPlayerForConnection(conn, player);

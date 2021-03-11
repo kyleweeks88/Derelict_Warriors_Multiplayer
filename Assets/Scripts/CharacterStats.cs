@@ -18,28 +18,11 @@ public class CharacterStats : NetworkBehaviour, IKillable
     [Client]
     public virtual void Death()
     {
-        if(!base.hasAuthority){return;}
+        //if(!base.hasAuthority){return;}
         
         Debug.Log(charName + " has died!");
-        this.transform.position = Vector3.zero;
-        CmdDeath();
-    }
-
-    [Command]
-    public virtual void CmdDeath()
-    {
-        Debug.Log(charName + " has died!");
-        this.transform.position = Vector3.zero;
-        RpcDeath();
-    }
-
-    [ClientRpc]
-    void RpcDeath()
-    {
-        if(base.hasAuthority){return;}
-
-        Debug.Log(charName + " has died!");
-        this.transform.position = Vector3.zero;
+        //this.transform.position = Vector3.zero;
+        //CmdDeath();
     }
     #endregion
 }

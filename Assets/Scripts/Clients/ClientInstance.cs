@@ -46,12 +46,14 @@ public class ClientInstance : NetworkBehaviour
     }
 
     /// <summary>
-    /// Spawns a character prefab for the player
+    /// Spawns a character prefab for the player on the server
     /// </summary>
     [Server]
     private void NetworkSpawnPlayer()
     {
-        GameObject playerObjectInstance = Instantiate(playerPrefab.gameObject);
+        Transform startPos = NetworkManager.singleton.GetStartPosition();
+        GameObject playerObjectInstance = Instantiate(playerPrefab.gameObject, 
+            startPos.position, startPos.rotation);
         NetworkServer.Spawn(playerObjectInstance, base.connectionToClient);
     }
 
@@ -81,7 +83,7 @@ public class ClientInstance : NetworkBehaviour
     {
         if(currentCharacter != null)
         {
-            HealthManager healthMgmt = currentCharacter.GetComponent<HealthManager>();
+            PlayerHealthManager healthMgmt = currentCharacter.GetComponent<PlayerHealthManager>();
             healthMgmt.SetVital(healthMgmt.maxVital);
 
             StaminaManager staminaMgmt = currentCharacter.GetComponent<StaminaManager>();
