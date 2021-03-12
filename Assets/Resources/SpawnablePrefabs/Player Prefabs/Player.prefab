@@ -2023,13 +2023,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  attackAnim: 
   whatIsDamageable:
     serializedVersion: 2
     m_Bits: 3585
   playerMgmt: {fileID: 3467262495813199297}
   inCombat: 0
   impactActivated: 0
+  attackAnim: 
   projectileSpawn: {fileID: 1773856740210876494}
   projectile: {fileID: 5501600362227425314, guid: 1b2f6f05219a82044b216ee31f3c384b,
     type: 3}
@@ -2083,6 +2083,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  equippedWeapons: []
   playerMgmt: {fileID: 3467262495813199297}
   currentlyEquippedWeapon: {fileID: 0}
   weaponEquipPos: {fileID: 3735642073622450782}
@@ -2101,6 +2102,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   myAnim: {fileID: 2203414895770027891}
+  netAnim: {fileID: 6245793244553626863}
   playerMgmt: {fileID: 3467262495813199297}
   isSprintingParam: 1125312739
   inputXParam: -1468965832

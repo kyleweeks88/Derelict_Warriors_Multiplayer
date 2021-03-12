@@ -6,6 +6,7 @@ using Mirror;
 public class AnimationManager : NetworkBehaviour
 {
     public Animator myAnim;
+    public NetworkAnimator netAnim;
     [SerializeField] PlayerManager playerMgmt;
 
     #region Animator Parameters
@@ -42,8 +43,26 @@ public class AnimationManager : NetworkBehaviour
 
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
 
-        if (playerMgmt.combatMgmt.attackAnim != null)
+        // Character has a weapon equipped.
+        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
+        {
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
+            {
+                myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, playerMgmt.inputMgmt.attackInputHeld);
+            }
+            else
+            {
+                if(playerMgmt.inputMgmt.attackInputHeld)
+                {
+                    netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
+                }
+            }
+        }
+        // Character is unarmed.
+        else
+        {
             myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, playerMgmt.inputMgmt.attackInputHeld);
+        }
     }
 
     public void MovementAnimation(float xMove, float zMove)

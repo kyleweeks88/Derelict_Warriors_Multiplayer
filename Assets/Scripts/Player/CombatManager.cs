@@ -5,10 +5,7 @@ using Mirror;
 
 public class CombatManager : NetworkBehaviour
 {
-    //float chargeMultiplier;
-
     #region Setup
-    [HideInInspector] public string attackAnim;
     public LayerMask whatIsDamageable;
 
     [Header("Component Ref")]
@@ -18,8 +15,9 @@ public class CombatManager : NetworkBehaviour
     float currentCombatTimer;
     [HideInInspector] public bool inCombat;
     [HideInInspector] public bool impactActivated;
+    [HideInInspector] public string attackAnim;
 
-    [Header("RANGED TESTING")]
+    [Header("RANGED TESTING")] 
     [SerializeField] Transform projectileSpawn;
     // THIS PROJECTILE NEEDS TO BE DETERMINED BY THE CURRENT WEAPON \\
     // IT SHOULD NOT BE ON THIS SCRIPT!!!
@@ -55,6 +53,46 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Called by the player's attack input
+    /// </summary>
+    public void AttackPerformed()
+    {
+        // If you have a weapon equipped
+        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
+        {
+            // If current weapon is a melee type...
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
+            {
+                // Determines correct animation to play
+                attackAnim = "meleeAttackHold";
+            }
+
+            // If current weapon is a ranged type...
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
+            {
+                RangedWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as RangedWeapon;
+                if (myWeapon.weaponData.isChargeable)
+                {
+                    // Determines correct animation to play
+                    attackAnim = "rangedAttackHold";
+                }
+                else
+                {
+                    attackAnim = "rangedAttackTrigger";
+                }
+            }
+        }
+        // If you have no equipped weapon, you're unarmed
+        else
+        {
+            attackAnim = "meleeAttackHold";
+        }
+
+        inCombat = true;
+        currentCombatTimer = combatTimer;
+    }
+
     #region Ranged
     bool ShotTimeMet(bool resetTime = true)
     {
@@ -71,7 +109,7 @@ public class CombatManager : NetworkBehaviour
     public void CheckRangedAttack()
     {
         if (!base.hasAuthority) { return; }
-        //if (!ShotTimeMet()) { return; }
+        if (!ShotTimeMet()) { return; }
 
         // Ask the server to check your pos, and spawn a projectile for the server
         CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation);
@@ -117,50 +155,26 @@ public class CombatManager : NetworkBehaviour
     #endregion
 
     #region Melee
-    /// <summary>
-    /// Called by the player's attack input
-    /// </summary>
-    public void AttackPerformed()
-    {
-        // If you have a weapon equipped
-        if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
-        {
-            // If current weapon is a melee type...
-            if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
-            {
-                // Determines correct animation to play
-                attackAnim = "meleeAttackHold";
-            }
-            
-            // If current weapon is a ranged type...
-            if(playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Ranged)
-            {
-                // Determines correct animation to play
-                attackAnim = "rangedAttackHold";
-            }
-        }
-        // If you have no equipped weapon, you're unarmed
-        else
-        {
-            attackAnim = "meleeAttackHold";
-        }
-
-        inCombat = true;
-        currentCombatTimer = combatTimer;
-    }
-
     public virtual void ChargeAttack()
     {
         // If you have a weapon equipped...
         if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
         {
-            // If that weapon's current charge is less than it's max charge,
-            // increase the currenty charge by time * charge rate until it reaches it's max charge.
-            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge <=
-                playerMgmt.equipmentMgmt.currentlyEquippedWeapon.maxCharge)
+            // If the current weapon is chargeable...
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
             {
-                playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge += 
-                    Time.deltaTime * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.chargeRate / 100f;
+                // If that weapon's current charge is less than it's max charge,
+                // increase the currenty charge by time * charge rate until it reaches it's max charge.
+                if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge <=
+                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.maxCharge)
+                {
+                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge +=
+                        Time.deltaTime * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.chargeRate / 100f;
+                }
+            }
+            else
+            {
+                return;
             }
         }
         else

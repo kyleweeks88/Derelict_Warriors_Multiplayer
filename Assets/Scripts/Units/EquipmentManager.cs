@@ -5,7 +5,7 @@ using Mirror;
 
 public class EquipmentManager : NetworkBehaviour
 {
-    //[SerializeField] AnimationManager animMgmt;
+    public Weapon[] equippedWeapons;
     [SerializeField] PlayerManager playerMgmt;
     public Weapon currentlyEquippedWeapon;
     Weapon weaponToEquip;

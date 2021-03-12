@@ -12,4 +12,5 @@ public abstract class WeaponData : ItemData
 
     public GameObject hitVisuals;
     public float damage;
+    public bool isChargeable;
 }
