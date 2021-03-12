@@ -12,17 +12,15 @@ public class CharacterStats : NetworkBehaviour, IKillable
 {
     [Header("Settings")]
     public string charName;
-    public float baseAttackDamage;
+    public float moveSpeed = 5f;
+    public float sprintMultiplier = 2f;
+    public float baseAttackDamage = 1f;
 
     #region Death!!!
     [Client]
     public virtual void Death()
     {
-        //if(!base.hasAuthority){return;}
-        
         Debug.Log(charName + " has died!");
-        //this.transform.position = Vector3.zero;
-        //CmdDeath();
     }
     #endregion
 }

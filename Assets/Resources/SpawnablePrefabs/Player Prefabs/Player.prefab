@@ -2003,9 +2003,8 @@ MonoBehaviour:
   syncInterval: 0.1
   playerMgmt: {fileID: 3467262495813199297}
   staminaMgmt: {fileID: -7243457902745452413}
-  moveSpeed: 5
-  sprintMultiplier: 2
   turnSpeed: 15
+  isSprinting: 0
   whatIsWalkable:
     serializedVersion: 2
     m_Bits: 7169
@@ -2071,6 +2070,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   charName: PLAYER
+  moveSpeed: 5
+  sprintMultiplier: 1.5
   baseAttackDamage: 1
 --- !u!114 &6899203083148865249
 MonoBehaviour:

@@ -11,9 +11,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] PlayerStaminaManager staminaMgmt = null;
 
     [Header("Movement settings")]
-    [SerializeField] float moveSpeed = 5f;
     float currentMoveSpeed = 0f;
-    [SerializeField] float sprintMultiplier = 2f;
     [SerializeField] float turnSpeed = 15f;
     [HideInInspector] public bool isSprinting = false;
     Vector3 movement;
@@ -30,7 +28,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         staminaMgmt = GetComponent<PlayerStaminaManager>();
 
-        currentMoveSpeed = moveSpeed;
+        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
     }
 
     [ClientCallback]
@@ -111,7 +109,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (movement.z > 0.1 && staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
-            currentMoveSpeed *= sprintMultiplier;
+            currentMoveSpeed *= playerMgmt.playerStats.sprintMultiplier;
             isSprinting = true;
             playerMgmt.isInteracting = true;
 
@@ -123,7 +121,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         isSprinting = false;
         playerMgmt.isInteracting = false;
-        currentMoveSpeed = moveSpeed;
+        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
