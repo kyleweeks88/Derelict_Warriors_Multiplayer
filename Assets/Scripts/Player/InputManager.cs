@@ -5,6 +5,7 @@ using Mirror;
 
 public class InputManager : NetworkBehaviour
 {
+
     public delegate void OnInteractPressed();
     public event OnInteractPressed Event_OnInteract;
 

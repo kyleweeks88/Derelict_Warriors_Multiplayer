@@ -20,13 +20,13 @@ public class VitalsDisplay : MonoBehaviour
     private void OnEnable()
     {
         healthManager.Event_HealthChanged += HandleHealthChanged;
-        //staminaManager.Event_StaminaChanged += HandleStaminaChanged;
+        staminaManager.Event_StaminaChanged += HandleStaminaChanged;
     }
 
     private void OnDisable()
     {
         healthManager.Event_HealthChanged -= HandleHealthChanged;
-        //staminaManager.Event_StaminaChanged -= HandleStaminaChanged;
+        staminaManager.Event_StaminaChanged -= HandleStaminaChanged;
     }
 
     void HandleHealthChanged(float curVal, float maxVal)

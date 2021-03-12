@@ -9,43 +9,26 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] PlayerStaminaManager staminaMgmt = null;
-    [SerializeField] CharacterController controller = null;
-    [SerializeField] Animator myAnimator;
 
     [Header("Movement settings")]
     [SerializeField] float moveSpeed = 5f;
     float currentMoveSpeed = 0f;
     [SerializeField] float sprintMultiplier = 2f;
     [SerializeField] float turnSpeed = 15f;
-    bool isSprinting = false;
+    [HideInInspector] public bool isSprinting = false;
+    Vector3 movement;
 
     [Header("Jump settings")]
     public LayerMask whatIsWalkable;
     [SerializeField] float jumpVelocity = 5f;
-    bool isJumping;
-    float yVelocity = 0;
+    [HideInInspector] public bool isJumping;
+    [HideInInspector] public float yVelocity = 0;
     float gravity = -9.81f;
-
-    #region Animator Parameters
-    // My Animator parameters turned from costly Strings to cheap Ints
-    int isSprintingParam = Animator.StringToHash("isSprinting");
-    int isJumpingParam = Animator.StringToHash("isJumping");
-    int isGroundedParam = Animator.StringToHash("isGrounded");
-    int yVelocityParam = Animator.StringToHash("yVelocity");
-    int inputXParam = Animator.StringToHash("InputX");
-    int inputYParam = Animator.StringToHash("InputY");
-    #endregion
 
 
     public override void OnStartAuthority()
     {
-        enabled = true;
-        controller.enabled = true;
-
         staminaMgmt = GetComponent<PlayerStaminaManager>();
-
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
 
         currentMoveSpeed = moveSpeed;
     }
@@ -56,7 +39,7 @@ public class PlayerMovement : NetworkBehaviour
         if(!hasAuthority) {return;}
 
         // APPLIES GRAVITY TO CHARACTER IF NOT GROUNDED
-        if(!controller.isGrounded)
+        if(!playerMgmt.charCtrl.isGrounded)
         {
             yVelocity += gravity * Time.deltaTime;
         }
@@ -74,10 +57,6 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        myAnimator.SetBool(isJumpingParam, isJumping);
-        myAnimator.SetBool(isGroundedParam, controller.isGrounded);
-        myAnimator.SetFloat(yVelocityParam, yVelocity);
-
         Move();
         UpdateIsSprinting();
     } 
@@ -90,11 +69,18 @@ public class PlayerMovement : NetworkBehaviour
         var movementInput = playerMgmt.inputMgmt.Controls.Player.Move.ReadValue<Vector2>();
 
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
-        var movement = new Vector3
+        //var movement = new Vector3
+        //{
+        //    x = movementInput.x,
+        //    z = movementInput.y
+        //}.normalized;
+
+        movement = new Vector3
         {
             x = movementInput.x,
             z = movementInput.y
         }.normalized;
+
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
         Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
@@ -108,21 +94,26 @@ public class PlayerMovement : NetworkBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, cameraYaw, 0), turnSpeed * Time.deltaTime);
         }
 
+        if(movement.z <= 0)
+        {
+            SprintReleased();
+        }
+
         // HANDLES ANIMATIONS
-        myAnimator.SetFloat(inputXParam, movement.x);
-        myAnimator.SetFloat(inputYParam, movement.z);
+        playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        controller.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
+        playerMgmt.charCtrl.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
     }
 
     #region Sprinting
     public void SprintPressed()
     {
-        if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
+        if (movement.z > 0.1 && staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= sprintMultiplier;
             isSprinting = true;
+            playerMgmt.isInteracting = true;
 
             playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 11;
         }
@@ -131,6 +122,7 @@ public class PlayerMovement : NetworkBehaviour
     public void SprintReleased()
     {
         isSprinting = false;
+        playerMgmt.isInteracting = false;
         currentMoveSpeed = moveSpeed;
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
@@ -150,8 +142,6 @@ public class PlayerMovement : NetworkBehaviour
                 return;
             }
         }
-
-        myAnimator.SetBool(isSprintingParam, isSprinting);
     }
     #endregion
 

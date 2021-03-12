@@ -53,8 +53,9 @@ public class PlayerStaminaManager : StaminaManager
     public override void TakeDamage(float dmgVal)
     {
         base.TakeDamage(dmgVal);
-        dmgVal *= -1f;
-        ModfiyVital(dmgVal);
+
+        ModfiyVital(-dmgVal);
+        StartCoroutine(StaminaGainDelay(currentVital));
     }
 
     public void StaminaDrain()
@@ -90,7 +91,7 @@ public class PlayerStaminaManager : StaminaManager
 
     IEnumerator StaminaGainDelay(float oldValue)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
 
         if (oldValue == currentVital)
         {

@@ -5,7 +5,8 @@ using Mirror;
 
 public class EquipmentManager : NetworkBehaviour
 {
-    [SerializeField] AnimationManager animMgmt;
+    //[SerializeField] AnimationManager animMgmt;
+    [SerializeField] PlayerManager playerMgmt;
     public Weapon currentlyEquippedWeapon;
     Weapon weaponToEquip;
 
@@ -15,7 +16,7 @@ public class EquipmentManager : NetworkBehaviour
     {
         if(currentlyEquippedWeapon != null)
         {
-            animMgmt.SetAnimation(currentlyEquippedWeapon.weaponData.animationSet);
+            playerMgmt.animMgmt.SetAnimation(currentlyEquippedWeapon.weaponData.animationSet);
         }
     }
 
@@ -60,7 +61,7 @@ public class EquipmentManager : NetworkBehaviour
             newWeapon.transform.localPosition = Vector3.zero;
             newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
-            animMgmt.SetAnimation(newWeapon.weaponData.animationSet);
+            playerMgmt.animMgmt.SetAnimation(newWeapon.weaponData.animationSet);
             currentlyEquippedWeapon = newWeapon;
         }
     }
