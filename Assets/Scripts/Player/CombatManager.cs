@@ -11,17 +11,13 @@ public class CombatManager : NetworkBehaviour
     [HideInInspector] public string attackAnim;
     public LayerMask whatIsDamageable;
 
-    [SerializeField] GameObject leftHand;
-    [SerializeField] GameObject rightHand;
-    PlayerManager playerMgmt;
+    [Header("Component Ref")]
+    [SerializeField] PlayerManager playerMgmt;
 
-    [Tooltip("Determines how long the player stays in combat mode")]
-    public float combatTimer = 10f;
-    [HideInInspector] public float currentCombatTimer;
+    float combatTimer = 10f;
+    float currentCombatTimer;
     [HideInInspector] public bool inCombat;
-    //[HideInInspector] public bool canRecieveAttackInput;
-    //[HideInInspector] public bool attackInputRecieved;
-    public bool impactActivated;
+    [HideInInspector] public bool impactActivated;
 
     [Header("RANGED TESTING")]
     [SerializeField] Transform projectileSpawn;
@@ -32,12 +28,6 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] float msBetweenShots = 0f;
     #endregion
 
-    public override void OnStartAuthority()
-    {
-        enabled = true;
-        playerMgmt = GetComponent<PlayerManager>();
-
-    }
 
     [ClientCallback]
     private void Update()
@@ -49,6 +39,19 @@ public class CombatManager : NetworkBehaviour
         if(playerMgmt.inputMgmt.attackInputHeld)
         {
             ChargeAttack();
+        }
+    }
+
+    public void HandleCombatTimer()
+    {
+        if (!base.hasAuthority) { return; }
+
+        currentCombatTimer -= Time.deltaTime;
+
+        if (currentCombatTimer <= 0)
+        {
+            currentCombatTimer = combatTimer;
+            inCombat = false;
         }
     }
 

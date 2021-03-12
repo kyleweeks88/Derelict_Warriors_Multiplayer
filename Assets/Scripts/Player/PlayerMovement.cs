@@ -6,19 +6,17 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    public LayerMask whatIsWalkable;
+
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] PlayerStaminaManager staminaMgmt = null;
 
-    [Header("Movement settings")]
     float currentMoveSpeed = 0f;
-    [SerializeField] float turnSpeed = 15f;
+    float turnSpeed = 15f;
     [HideInInspector] public bool isSprinting = false;
     Vector3 movement;
 
-    [Header("Jump settings")]
-    public LayerMask whatIsWalkable;
-    [SerializeField] float jumpVelocity = 5f;
     [HideInInspector] public bool isJumping;
     [HideInInspector] public float yVelocity = 0;
     float gravity = -9.81f;
@@ -153,7 +151,7 @@ public class PlayerMovement : NetworkBehaviour
                 staminaMgmt.TakeDamage(10f);
                 isJumping = true;
 
-                yVelocity += jumpVelocity;
+                yVelocity += playerMgmt.playerStats.jumpVelocity;
             }
         }
     }

@@ -11,8 +11,6 @@ public class InputManager : NetworkBehaviour
 
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
-    [SerializeField] CombatManager combatMgmt = null;
-    [SerializeField] PlayerMovement playerMovement = null;
 
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
@@ -55,8 +53,6 @@ public class InputManager : NetworkBehaviour
     void InitializeComponents(GameObject go)
     {
         playerMgmt = go.GetComponent<PlayerManager>();
-        combatMgmt = go.GetComponent<CombatManager>();
-        playerMovement = go.GetComponent<PlayerMovement>();
     }
 
     public void RecieveAttackInput()
@@ -70,7 +66,7 @@ public class InputManager : NetworkBehaviour
         {
             attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
-            combatMgmt.AttackPerformed();
+            playerMgmt.combatMgmt.AttackPerformed();
         }
     }
 
@@ -81,17 +77,19 @@ public class InputManager : NetworkBehaviour
 
     void Jump()
     {
-        playerMovement.Jump();
+        if (playerMgmt.isInteracting) { return; }
+
+        playerMgmt.playerMovement.Jump();
     }
 
     void SprintPressed()
     {
-        playerMovement.SprintPressed();
+        playerMgmt.playerMovement.SprintPressed();
     }
 
     void SprintReleased()
     {
-        playerMovement.SprintReleased();
+        playerMgmt.playerMovement.SprintReleased();
     }
 
     void InteractPressed()
