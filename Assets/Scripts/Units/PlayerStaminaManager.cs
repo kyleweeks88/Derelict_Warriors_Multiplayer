@@ -52,6 +52,7 @@ public class PlayerStaminaManager : StaminaManager
     #region Drain
     public override void TakeDamage(float dmgVal)
     {
+        // Turns takingDamage bool to true
         base.TakeDamage(dmgVal);
 
         ModfiyVital(-dmgVal);

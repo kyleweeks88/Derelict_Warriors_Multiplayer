@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class RangedWeapon : Weapon
 {
+    public RangedWeaponData rangedData;
     public Transform projSpawnPos;
-
-    
 }

@@ -15,6 +15,7 @@ public class InputManager : NetworkBehaviour
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
     public bool attackInputHeld;
+    public bool rangedAttackHeld;
 
     Controls controls;
     public Controls Controls
@@ -41,6 +42,9 @@ public class InputManager : NetworkBehaviour
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
 
+        Controls.Player.RangedAttack.started += ctx => RecieveRangedAttackInput();
+        Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
+
         // Player Locomotion
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
@@ -55,6 +59,31 @@ public class InputManager : NetworkBehaviour
         playerMgmt = go.GetComponent<PlayerManager>();
     }
 
+    #region Ranged
+    public void RecieveRangedAttackInput()
+    {
+        // If player is locked into an "interacting" state then don't let this happen.
+        if (playerMgmt.isInteracting) { return; }
+
+        if (!canRecieveAttackInput) { return; }
+
+        if (canRecieveAttackInput)
+        {
+            rangedAttackHeld = true;
+            // Tells CombatManager to determine the means of the attack
+            playerMgmt.combatMgmt.RangedAttackPerformed();
+            playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+        }
+    }
+
+    public void ReleaseRangedAttackInput()
+    {
+        rangedAttackHeld = false;
+        playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+    }
+    #endregion
+
+    #region Melee
     public void RecieveAttackInput()
     {
         // If player is locked into an "interacting" state then don't let this happen.
@@ -73,7 +102,9 @@ public class InputManager : NetworkBehaviour
     public void ReleaseAttackInput()
     {
         attackInputHeld = false;
+        playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
     }
+    #endregion
 
     void Jump()
     {

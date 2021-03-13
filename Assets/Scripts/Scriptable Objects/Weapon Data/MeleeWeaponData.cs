@@ -7,4 +7,5 @@ public class MeleeWeaponData : WeaponData
 
     [Header("Melee Settings")]
     public DamageType damageType;
+    public float staminaCost;
 }

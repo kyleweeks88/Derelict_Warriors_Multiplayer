@@ -14,6 +14,7 @@ public class PlayerManager : NetworkBehaviour
     public AnimationManager animMgmt;
     public CombatManager combatMgmt;
     public PlayerMovement playerMovement;
+    public StaminaManager staminaMgmt;
 
     [Header("Camera Ref")]
     public GameObject myCamera = null;
@@ -47,6 +48,9 @@ public class PlayerManager : NetworkBehaviour
 
         combatMgmt = gameObject.GetComponent<CombatManager>();
         combatMgmt.enabled = true;
+
+        staminaMgmt = gameObject.GetComponent<StaminaManager>();
+        staminaMgmt.enabled = true;
 
         myCamera.SetActive(true);
         freeLook.SetActive(true);

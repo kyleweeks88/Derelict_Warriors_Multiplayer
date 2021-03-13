@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -59,24 +60,17 @@ public class PlayerMovement : NetworkBehaviour
 
 
     [Client]
-    void Move()
+    public void Move()
     {
         // READS THE INPUT SYSTEMS ACTION
         var movementInput = playerMgmt.inputMgmt.Controls.Player.Move.ReadValue<Vector2>();
 
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
-        //var movement = new Vector3
-        //{
-        //    x = movementInput.x,
-        //    z = movementInput.y
-        //}.normalized;
-
         movement = new Vector3
         {
             x = movementInput.x,
             z = movementInput.y
         }.normalized;
-
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
         Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;

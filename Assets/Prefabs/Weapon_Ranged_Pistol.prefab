@@ -108,7 +108,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: c2fc03d687f374d4d8082d2391283533, type: 2}
+  maxCharge: 2
+  chargeRate: 5
+  currentCharge: 1
   projSpawnPos: {fileID: 0}
+  projectile_Pf: {fileID: 5501600362227425314, guid: 1b2f6f05219a82044b216ee31f3c384b,
+    type: 3}
 --- !u!1 &3300615786760439017
 GameObject:
   m_ObjectHideFlags: 0
