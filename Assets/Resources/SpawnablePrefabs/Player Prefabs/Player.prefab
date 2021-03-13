@@ -1983,6 +1983,7 @@ MonoBehaviour:
   animMgmt: {fileID: 0}
   combatMgmt: {fileID: 0}
   playerMovement: {fileID: 0}
+  staminaMgmt: {fileID: 0}
   myCamera: {fileID: 6482849343757429649}
   freeLook: {fileID: 1674453814961982921}
   sprintCamera: {fileID: 6757011220328924237}

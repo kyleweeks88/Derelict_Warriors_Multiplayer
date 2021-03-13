@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "PassThrough",
+                    "type": "Value",
                     "id": "101f2cf0-b6d8-45f0-96b6-db45898787f0",
                     "expectedControlType": "Vector2",
                     "processors": "",
@@ -41,6 +41,14 @@
                     "name": "Interact",
                     "type": "Button",
                     "id": "57e7474a-5f31-4641-aa8b-15c5a44396c5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "RangedAttack",
+                    "type": "Button",
+                    "id": "b029ba26-1e5d-46d1-ab62-c502c4a6546f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -104,6 +112,17 @@
                 },
                 {
                     "name": "",
+                    "id": "9c9c8845-9f68-4ce9-808a-997bb219e96f",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "49a61875-84cf-40b3-b6f0-73074534cdfc",
                     "path": "<Mouse>/delta",
                     "interactions": "",
@@ -126,11 +145,33 @@
                 },
                 {
                     "name": "",
+                    "id": "2c44d746-22de-4010-bc65-abc7f1c5cab9",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "d04d0210-81d0-4696-8c37-4b9f4a88c856",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "M&K",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7e8140a6-b449-4ebd-9ad7-43f1bc6bbd86",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -145,31 +186,15 @@
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Combat",
-            "id": "be80f206-67ee-4c6e-b2a9-ea0cd5588464",
-            "actions": [
-                {
-                    "name": "Shoot",
-                    "type": "Button",
-                    "id": "ebecd25a-ad3c-440b-baa0-d87bc4d6885a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                }
-            ],
-            "bindings": [
+                },
                 {
                     "name": "",
-                    "id": "89a32af9-8099-4fb8-8056-e5a4649ac59d",
-                    "path": "<Keyboard>/r",
+                    "id": "d9b42175-2e41-44a7-926b-7e9eb5831bfd",
+                    "path": "<Mouse>/middleButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "M&K",
-                    "action": "Shoot",
+                    "action": "RangedAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -215,6 +240,17 @@
                 },
                 {
                     "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Gamepad",
+            "bindingGroup": "Gamepad",
+            "devices": [
+                {
+                    "devicePath": "<Gamepad>",
                     "isOptional": false,
                     "isOR": false
                 }

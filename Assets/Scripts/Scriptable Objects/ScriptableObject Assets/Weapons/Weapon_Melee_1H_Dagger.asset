@@ -16,7 +16,7 @@ MonoBehaviour:
   equippable: 0
   weaponType: 1
   wieldStyle: 0
-  animationSet: {fileID: 22100000, guid: 98186c8755407bb499eb11eadddd5020, type: 2}
+  animationSet: {fileID: 22100000, guid: 0855f824cf51f1f4baff006a124a2856, type: 2}
   hitVisuals: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4,
     type: 3}
   damage: 15

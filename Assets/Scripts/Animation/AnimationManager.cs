@@ -43,11 +43,15 @@ public class AnimationManager : NetworkBehaviour
 
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
 
-        if(playerMgmt.inputMgmt.attackInputHeld)
+        if (playerMgmt.inputMgmt.attackInputHeld)
         {
             if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null &&
                 !playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
-                netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
+            {
+                MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
+                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) > 0)
+                    netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
+            }
         }
     }
 
@@ -64,6 +68,7 @@ public class AnimationManager : NetworkBehaviour
 
     public void HandleRangedAttackAnimation(bool boolVal)
     {
+        Debug.Log(playerMgmt.combatMgmt.attackAnim);
         myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
     }
 }

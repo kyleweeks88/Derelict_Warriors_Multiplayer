@@ -36,7 +36,12 @@ public class CombatManager : NetworkBehaviour
 
         if(playerMgmt.inputMgmt.attackInputHeld)
         {
-            ChargeAttack();
+            ChargeMeleeAttack();
+        }
+
+        if(playerMgmt.inputMgmt.rangedAttackHeld)
+        {
+            ChargeRangedAttack();
         }
     }
 
@@ -53,41 +58,23 @@ public class CombatManager : NetworkBehaviour
         }
     }
 
-    public virtual void ChargeAttack()
-    {
-        // If you have a weapon equipped...
-        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
-        {
-            // If the current weapon is chargeable...
-            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
-            {
-                // If that weapon's current charge is less than it's max charge,
-                // increase the currenty charge by time * charge rate until it reaches it's max charge.
-                if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge <=
-                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.maxCharge)
-                {
-                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge +=
-                        Time.deltaTime * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.chargeRate / 100f;
-                }
-            }
-            else
-            {
-                return;
-            }
-        }
-        else
-        {
-            // UNARMED CHARGING LOGIC
-        }
-    }
-
     #region Ranged
 
     // Called by the player's input manager
     public void RangedAttackPerformed()
     {
         attackAnim = "rangedAttackHold";
-        Debug.Log("TEST");
+    }
+
+    public virtual void ChargeRangedAttack()
+    {
+        // CHECK IF CHARACTER HAS A RANGED WEAPON \\
+
+        // ACCESS THAT RANGED WEAPON SOMEHOW \\
+
+        // INCREASE THAT RANGED WEAPON'S DAMAGE AND/OR PROJECTILE VELOCITY \\
+
+        Debug.Log("CHARGING RANGED ATTACK!");
     }
 
     // CALLED BY AN ANIMATION EVENT 
@@ -136,7 +123,7 @@ public class CombatManager : NetworkBehaviour
             if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
                 MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
-                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) >= 0)
+                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) > 0)
                 {
                     if(myWeapon.meleeData.isChargeable)
                     {
@@ -156,11 +143,40 @@ public class CombatManager : NetworkBehaviour
         else
         {
             attackAnim = "meleeAttackHold";
+            playerMgmt.animMgmt.HandleMeleeAttackAnimation(true);
             // EVENTUALLY THIS WILL TRIGGER DIFFERENT UNARMED COMBOS \\\
         }
 
         inCombat = true;
         currentCombatTimer = combatTimer;
+    }
+
+    public virtual void ChargeMeleeAttack()
+    {
+        // If you have a weapon equipped...
+        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
+        {
+            // If the current weapon is chargeable...
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
+            {
+                // If that weapon's current charge is less than it's max charge,
+                // increase the currenty charge by time * charge rate until it reaches it's max charge.
+                if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge <=
+                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.maxCharge)
+                {
+                    playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge +=
+                        Time.deltaTime * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.chargeRate / 100f;
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+            // UNARMED CHARGING LOGIC
+        }
     }
 
     /// <summary>

@@ -16,6 +16,7 @@ public class VitalStat : NetworkBehaviour
 
     public float GetCurrentVital()
     {
+        Debug.Log(currentVital);
         return currentVital;
     }
 

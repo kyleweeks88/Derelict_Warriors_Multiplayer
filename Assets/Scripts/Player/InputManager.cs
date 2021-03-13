@@ -42,8 +42,8 @@ public class InputManager : NetworkBehaviour
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
 
-        Controls.Combat.Shoot.started += ctx => RecieveRangedAttackInput();
-        Controls.Combat.Shoot.started += ctx => ReleaseRangedAttackInput();
+        Controls.Player.RangedAttack.started += ctx => RecieveRangedAttackInput();
+        Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
 
         // Player Locomotion
         Controls.Player.Jump.performed += ctx => Jump();
@@ -59,6 +59,7 @@ public class InputManager : NetworkBehaviour
         playerMgmt = go.GetComponent<PlayerManager>();
     }
 
+    #region Ranged
     public void RecieveRangedAttackInput()
     {
         // If player is locked into an "interacting" state then don't let this happen.
@@ -80,7 +81,9 @@ public class InputManager : NetworkBehaviour
         rangedAttackHeld = false;
         playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
     }
+    #endregion
 
+    #region Melee
     public void RecieveAttackInput()
     {
         // If player is locked into an "interacting" state then don't let this happen.
@@ -99,8 +102,9 @@ public class InputManager : NetworkBehaviour
     public void ReleaseAttackInput()
     {
         attackInputHeld = false;
-        playerMgmt.animMgmt.HandleMeleeAttackAnimation(false);
+        playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
     }
+    #endregion
 
     void Jump()
     {
