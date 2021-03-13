@@ -112,6 +112,7 @@ MonoBehaviour:
   maxCharge: 2
   chargeRate: 10
   currentCharge: 1
+  meleeData: {fileID: 11400000, guid: 9f6e51974b91fe245bcb944eb6ed0907, type: 2}
   impactOrigin: {fileID: 8689463681558261426}
   impactEnd: {fileID: 4904108490734283828}
   impactRadius: 0.1

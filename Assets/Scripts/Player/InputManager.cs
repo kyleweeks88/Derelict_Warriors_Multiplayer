@@ -15,6 +15,7 @@ public class InputManager : NetworkBehaviour
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
     public bool attackInputHeld;
+    public bool rangedAttackHeld;
 
     Controls controls;
     public Controls Controls
@@ -41,6 +42,9 @@ public class InputManager : NetworkBehaviour
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
 
+        Controls.Combat.Shoot.started += ctx => RecieveRangedAttackInput();
+        Controls.Combat.Shoot.started += ctx => ReleaseRangedAttackInput();
+
         // Player Locomotion
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
@@ -53,6 +57,28 @@ public class InputManager : NetworkBehaviour
     void InitializeComponents(GameObject go)
     {
         playerMgmt = go.GetComponent<PlayerManager>();
+    }
+
+    public void RecieveRangedAttackInput()
+    {
+        // If player is locked into an "interacting" state then don't let this happen.
+        if (playerMgmt.isInteracting) { return; }
+
+        if (!canRecieveAttackInput) { return; }
+
+        if (canRecieveAttackInput)
+        {
+            rangedAttackHeld = true;
+            // Tells CombatManager to determine the means of the attack
+            playerMgmt.combatMgmt.RangedAttackPerformed();
+            playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+        }
+    }
+
+    public void ReleaseRangedAttackInput()
+    {
+        rangedAttackHeld = false;
+        playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
     }
 
     public void RecieveAttackInput()
@@ -73,6 +99,7 @@ public class InputManager : NetworkBehaviour
     public void ReleaseAttackInput()
     {
         attackInputHeld = false;
+        playerMgmt.animMgmt.HandleMeleeAttackAnimation(false);
     }
 
     void Jump()

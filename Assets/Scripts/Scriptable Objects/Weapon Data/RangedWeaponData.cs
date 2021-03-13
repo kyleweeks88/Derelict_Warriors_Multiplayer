@@ -4,5 +4,5 @@
 public class RangedWeaponData : WeaponData
 {
     [Header("Ranged Specific")]
-    public Projectile projectile;
+    public GameObject projectile_Pf;
 }

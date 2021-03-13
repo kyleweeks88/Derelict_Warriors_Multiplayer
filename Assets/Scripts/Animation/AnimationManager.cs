@@ -43,25 +43,11 @@ public class AnimationManager : NetworkBehaviour
 
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
 
-        // Character has a weapon equipped.
-        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
+        if(playerMgmt.inputMgmt.attackInputHeld)
         {
-            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
-            {
-                myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, playerMgmt.inputMgmt.attackInputHeld);
-            }
-            else
-            {
-                if(playerMgmt.inputMgmt.attackInputHeld)
-                {
-                    netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
-                }
-            }
-        }
-        // Character is unarmed.
-        else
-        {
-            myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, playerMgmt.inputMgmt.attackInputHeld);
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null &&
+                !playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
+                netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
         }
     }
 
@@ -69,5 +55,15 @@ public class AnimationManager : NetworkBehaviour
     {
         myAnim.SetFloat(playerMgmt.animMgmt.inputXParam, xMove);
         myAnim.SetFloat(playerMgmt.animMgmt.inputYParam, zMove);
+    }
+
+    public void HandleMeleeAttackAnimation(bool boolVal)
+    {
+        myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
+    }
+
+    public void HandleRangedAttackAnimation(bool boolVal)
+    {
+        myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
     }
 }
