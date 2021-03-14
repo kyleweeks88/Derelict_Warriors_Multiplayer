@@ -8,83 +8,64 @@ public class Projectile : NetworkBehaviour
 	public LayerMask collisionsMask;
 	public float projDmg = 10f;
     public float projSpeed = 10f;
-	public float raycastLength = 0.1f;
+	public float raycastLength = 1f;
 
 	void Start()
     {
-        SetSpeed(projSpeed);
 		StartCoroutine(DestroyAfterLifetime());
     }
 
-    public void SetSpeed(float newSpeed)
+    [ServerCallback]
+    private void OnTriggerEnter(Collider col)
     {
-    	projSpeed = newSpeed;
-    	StartCoroutine(TranslateProjectile(newSpeed));
+        ColHit(col);
     }
 
-    IEnumerator TranslateProjectile(float speed)
+    [Server]
+    void ColHit(Collider col)
     {
-    	Vector3 direction = transform.forward;
-
-    	WaitForEndOfFrame wait = new WaitForEndOfFrame();
-    	while(this.gameObject != null)
+        NetworkIdentity hitId = col.GetComponent<NetworkIdentity>();
+        if (hitId != null)
         {
-    		this.transform.position += (direction * speed * Time.deltaTime);
-    		CheckCollisions();
-    		yield return wait;
-        }
-    }
-	
-    [Server]
-	void CheckCollisions()
-	{
-		Ray ray = new Ray(transform.position, transform.forward);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, raycastLength, collisionsMask, QueryTriggerInteraction.Collide))
-		{
-			OnHitObject(hit);
-		}
-	}
-	
-    [Server]
-	void OnHitObject(RaycastHit hit)
-	{
-        NetworkIdentity hitId = hit.collider.GetComponent<NetworkIdentity>();
-        if(hitId != null)
-        {
-            NpcHealthManager hitTarget = hit.collider.GetComponent<NpcHealthManager>();
+            NpcHealthManager hitTarget = col.GetComponent<NpcHealthManager>();
             if (hitTarget != null)
             {
                 hitTarget.TakeDamage(projDmg);
             }
         }
 
-        RpcOnHitObject(hitId, hit.point);
+        Vector3 hitPoint = col.ClosestPointOnBounds(this.transform.position);
 
         if (base.isClient)
         {
-            GameObject hitFx = Instantiate(hitFx_Pf, hit.point, Quaternion.identity);
-            GameObject.Destroy(this.gameObject);
+            GameObject hitFx = Instantiate(hitFx_Pf, hitPoint, Quaternion.identity);
         }
-
+        
+        RpcColHit(hitId, hitPoint);
         GameObject.Destroy(this.gameObject);
     }
 
     [ClientRpc]
-    void RpcOnHitObject(NetworkIdentity hitId, Vector3 hitPoint)
+    void RpcColHit(NetworkIdentity hitId, Vector3 hitPoint)
     {
-        if (hitId != null)
-        {
-            NpcHealthManager hitTarget = hitId.gameObject.GetComponent<NpcHealthManager>();
-            if (hitTarget != null)
-            {
-                hitTarget.TakeDamage(projDmg);
-            }
-        }
-
         GameObject hitFx = Instantiate(hitFx_Pf, hitPoint, Quaternion.identity);
         GameObject.Destroy(this.gameObject);
+    }
+
+    public void SetSpeed(float newSpeed, Vector3 dir)
+    {
+    	projSpeed = newSpeed;
+    	StartCoroutine(TranslateProjectile(newSpeed, dir));
+    }
+
+    IEnumerator TranslateProjectile(float speed, Vector3 dir)
+    {
+    	WaitForEndOfFrame wait = new WaitForEndOfFrame();
+    	while(this.gameObject != null)
+        {
+    		this.transform.position += (dir * speed * Time.deltaTime);
+    		yield return wait;
+        }
     }
 
     IEnumerator DestroyAfterLifetime()

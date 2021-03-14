@@ -21,7 +21,7 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] Transform projectileSpawn;
     // THIS PROJECTILE NEEDS TO BE DETERMINED BY THE CURRENT WEAPON \\
     // IT SHOULD NOT BE ON THIS SCRIPT!!!
-    [SerializeField] GameObject projectile = null; //<<<========== FIX THIS!!!
+    [SerializeField] Projectile projectile = null; //<<<========== FIX THIS!!!
     float nextShotTime = 0f;
     [SerializeField] float msBetweenShots = 0f;
     #endregion
@@ -83,11 +83,11 @@ public class CombatManager : NetworkBehaviour
     {
         if (!base.hasAuthority) { return; }
         // Ask the server to check your pos, and spawn a projectile for the server
-        CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation);
+        CmdRangedAttack(projectileSpawn.position, projectileSpawn.rotation, playerMgmt.myCamera.transform.forward);
     }
 
     [Command]
-    void CmdRangedAttack(Vector3 pos, Quaternion rot)
+    void CmdRangedAttack(Vector3 pos, Quaternion rot, Vector3 dir)
     {
         float maxPosOffset = 1;
         if (Vector3.Distance(pos, projectileSpawn.position) > maxPosOffset)
@@ -96,17 +96,18 @@ public class CombatManager : NetworkBehaviour
             pos = projectileSpawn.position + (posDir * maxPosOffset);
         }
 
-        SpawnProjectile(pos, rot);
+        SpawnProjectile(pos, rot, dir);
     }  
 
     [Server]
-    void SpawnProjectile(Vector3 pos, Quaternion rot)
+    void SpawnProjectile(Vector3 pos, Quaternion rot, Vector3 dir)
     {
-        GameObject newProjectile = Instantiate(projectile,
+        Projectile newProjectile = Instantiate(projectile,
             pos,
             rot);
+        newProjectile.SetSpeed(20f, dir);
 
-        NetworkServer.Spawn(newProjectile);
+        NetworkServer.Spawn(newProjectile.gameObject);
     }
     #endregion
 

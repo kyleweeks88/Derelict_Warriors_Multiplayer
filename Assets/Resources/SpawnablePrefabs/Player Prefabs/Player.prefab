@@ -2032,7 +2032,7 @@ MonoBehaviour:
   impactActivated: 0
   attackAnim: 
   projectileSpawn: {fileID: 1773856740210876494}
-  projectile: {fileID: 5501600362227425314, guid: 1b2f6f05219a82044b216ee31f3c384b,
+  projectile: {fileID: 9000197042435062865, guid: 1b2f6f05219a82044b216ee31f3c384b,
     type: 3}
   msBetweenShots: 1
 --- !u!114 &874442707189623235
