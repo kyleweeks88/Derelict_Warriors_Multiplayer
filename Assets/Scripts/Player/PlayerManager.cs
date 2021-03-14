@@ -6,7 +6,7 @@ using Mirror;
 public class PlayerManager : NetworkBehaviour
 {
     [Header("Component Ref")]
-    public CharacterController charCtrl;
+    //public CharacterController charCtrl;
     public ClientInstance ci;
     public InputManager inputMgmt;
     public EquipmentManager equipmentMgmt;

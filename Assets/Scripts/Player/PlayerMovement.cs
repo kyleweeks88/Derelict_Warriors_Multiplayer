@@ -58,6 +58,11 @@ public class PlayerMovement : NetworkBehaviour
         UpdateIsSprinting();
     } 
 
+    [Client]
+    public void Dodge()
+    {
+        // I DUNNO...
+    }
 
     [Client]
     public void Move()

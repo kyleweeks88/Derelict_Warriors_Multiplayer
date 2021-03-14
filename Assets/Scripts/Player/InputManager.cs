@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using Mirror;
 
@@ -52,6 +53,8 @@ public class InputManager : NetworkBehaviour
 
         // Player Interaction
         Controls.Player.Interact.performed += ctx => InteractPressed();
+
+        Controls.Player.Dodge.performed += ctx => DodgeInputRecieved();
     }
 
     void InitializeComponents(GameObject go)
@@ -105,6 +108,11 @@ public class InputManager : NetworkBehaviour
         playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
     }
     #endregion
+
+    void DodgeInputRecieved()
+    {
+        playerMgmt.playerMovement.Dodge();
+    }
 
     void Jump()
     {
