@@ -38,7 +38,7 @@ public class AnimationManager : NetworkBehaviour
         myAnim.SetBool(isSprintingParam, playerMgmt.playerMovement.isSprinting);
         myAnim.SetBool(isInteractingParam, playerMgmt.isInteracting);
         myAnim.SetBool(isJumpingParam, playerMgmt.playerMovement.isJumping);
-        myAnim.SetBool(isGroundedParam, playerMgmt.charCtrl.isGrounded);
+        myAnim.SetBool(isGroundedParam, playerMgmt.playerMovement.isGrounded);
         myAnim.SetFloat(yVelocityParam, playerMgmt.playerMovement.yVelocity);
 
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
