@@ -71,8 +71,9 @@ public class AnimationManager : NetworkBehaviour
         myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
     }
 
-    public void TriggerDodgeAnim()
+    public void TriggerDodgeAnim(Vector3 dir)
     {
-        netAnim.SetTrigger("isDodging");
+        if(dir.z < -0.1)
+            netAnim.SetTrigger("isDodging");
     }
 }

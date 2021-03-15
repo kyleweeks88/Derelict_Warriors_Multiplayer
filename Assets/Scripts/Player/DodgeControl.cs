@@ -28,14 +28,12 @@ public class DodgeControl : NetworkBehaviour
         }
     }
 
+    // MAKE THIS MORE LIKE A DASH WITHOUT I-FRAMES
     public void Dodge(Vector3 dir)
     {
         if(cooldown > 0) { return; }
 
         // INVULNERABLE FUNCTION CALLED HERE
-
-        // PLAY DODGE ANIMATION FROM AnimationManager
-        playerMgmt.animMgmt.TriggerDodgeAnim();
 
         Vector3 _dir = new Vector3
         {
@@ -48,6 +46,11 @@ public class DodgeControl : NetworkBehaviour
 
         playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
 
+        // PLAY DODGE ANIMATION FROM AnimationManager
+        playerMgmt.animMgmt.TriggerDodgeAnim(_dir);
+
         cooldown = dodgeCooldown;
     } 
+
+    // DO A DODGE ROLL WITH I-FRAMES IF THE PLAYER DOUBLE TAPS DODGE
 }
