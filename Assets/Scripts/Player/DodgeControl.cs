@@ -31,6 +31,7 @@ public class DodgeControl : NetworkBehaviour
     // MAKE THIS MORE LIKE A DASH WITHOUT I-FRAMES
     public void Dodge(Vector3 dir)
     {
+        if (!playerMgmt.playerMovement.isGrounded) { return; }
         if(cooldown > 0) { return; }
 
         // INVULNERABLE FUNCTION CALLED HERE

@@ -57,8 +57,8 @@ public class AnimationManager : NetworkBehaviour
 
     public void MovementAnimation(float xMove, float zMove)
     {
-        myAnim.SetFloat(playerMgmt.animMgmt.inputXParam, xMove);
-        myAnim.SetFloat(playerMgmt.animMgmt.inputYParam, zMove);
+        myAnim.SetFloat(inputXParam, xMove);
+        myAnim.SetFloat(inputYParam, zMove);
     }
 
     public void HandleMeleeAttackAnimation(bool boolVal)
@@ -73,7 +73,13 @@ public class AnimationManager : NetworkBehaviour
 
     public void TriggerDodgeAnim(Vector3 dir)
     {
-        if(dir.z < -0.1)
-            netAnim.SetTrigger("isDodging");
+        if (dir.z > 0.1)
+        {
+            netAnim.SetTrigger("isDodgingForwards");
+        }
+        else if(dir.z < -0.1)
+        {
+            netAnim.SetTrigger("isDodgingBackwards");
+        }
     }
 }
