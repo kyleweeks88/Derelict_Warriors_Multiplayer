@@ -125,7 +125,6 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        //playerMgmt.myRb.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
         playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * currentMoveSpeed)) / Time.deltaTime);
     }
 

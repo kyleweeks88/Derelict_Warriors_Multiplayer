@@ -18,6 +18,8 @@ public class InputManager : NetworkBehaviour
     public bool attackInputHeld;
     public bool rangedAttackHeld;
 
+    Vector2 moveInput;
+
     Controls controls;
     public Controls Controls
     {
@@ -47,6 +49,7 @@ public class InputManager : NetworkBehaviour
         Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
 
         // Player Locomotion
+        moveInput = Controls.Player.Move.ReadValue<Vector2>();
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
         Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
@@ -111,7 +114,7 @@ public class InputManager : NetworkBehaviour
 
     void DodgeInputRecieved()
     {
-        playerMgmt.playerMovement.Dodge();
+        playerMgmt.dodgeCtrl.Dodge(Controls.Player.Move.ReadValue<Vector2>());
     }
 
     void Jump()

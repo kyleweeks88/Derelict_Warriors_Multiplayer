@@ -15,6 +15,7 @@ public class PlayerManager : NetworkBehaviour
     public CombatManager combatMgmt;
     public PlayerMovement playerMovement;
     public StaminaManager staminaMgmt;
+    public DodgeControl dodgeCtrl;
 
     [Header("Camera Ref")]
     public GameObject myCamera = null;
@@ -50,6 +51,9 @@ public class PlayerManager : NetworkBehaviour
 
         staminaMgmt = gameObject.GetComponent<StaminaManager>();
         staminaMgmt.enabled = true;
+
+        dodgeCtrl = gameObject.GetComponent<DodgeControl>();
+        dodgeCtrl.enabled = true;
 
         myCamera.SetActive(true);
         freeLook.SetActive(true);

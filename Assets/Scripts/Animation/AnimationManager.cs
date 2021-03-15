@@ -71,4 +71,9 @@ public class AnimationManager : NetworkBehaviour
         Debug.Log(playerMgmt.combatMgmt.attackAnim);
         myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
     }
+
+    public void TriggerDodgeAnim()
+    {
+        netAnim.SetTrigger("isDodging");
+    }
 }
