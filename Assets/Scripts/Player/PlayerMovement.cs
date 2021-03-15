@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using Mirror;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    public bool isGrounded;
+    public Transform groundColPos;
+    public LayerMask whatIsWalkable;
+
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
     [SerializeField] PlayerStaminaManager staminaMgmt = null;
 
-    [Header("Movement settings")]
-    [SerializeField] float moveSpeed = 5f;
     float currentMoveSpeed = 0f;
-    [SerializeField] float sprintMultiplier = 2f;
-    [SerializeField] float turnSpeed = 15f;
+    float turnSpeed = 15f;
     [HideInInspector] public bool isSprinting = false;
     Vector3 movement;
 
-    [Header("Jump settings")]
-    public LayerMask whatIsWalkable;
-    [SerializeField] float jumpVelocity = 5f;
     [HideInInspector] public bool isJumping;
     [HideInInspector] public float yVelocity = 0;
     float gravity = -9.81f;
@@ -30,7 +29,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         staminaMgmt = GetComponent<PlayerStaminaManager>();
 
-        currentMoveSpeed = moveSpeed;
+        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
     }
 
     [ClientCallback]
@@ -38,17 +37,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!hasAuthority) {return;}
 
-        // APPLIES GRAVITY TO CHARACTER IF NOT GROUNDED
-        if(!playerMgmt.charCtrl.isGrounded)
-        {
-            yVelocity += gravity * Time.deltaTime;
-        }
-        else if(yVelocity < 0)
-        {
-            yVelocity = 0f;
-        }
-
-        if(isJumping && yVelocity < 0)
+        if(isJumping && playerMgmt.myRb.velocity.y < 0)
         {
             RaycastHit hit;
             if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
@@ -57,30 +46,53 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        Move();
         UpdateIsSprinting();
-    } 
+    }
 
+    [ClientCallback]
+    private void FixedUpdate()
+    {
+        if (!base.hasAuthority) { return; }
+
+        GroundCheck();
+        Move();
+    }
+
+    void GroundCheck()
+    {
+        Collider[] groundCollisions = Physics.OverlapSphere(groundColPos.position, 0.25f, whatIsWalkable);
+
+        if (groundCollisions.Length <= 0)
+        {
+            isGrounded = false;
+            playerMgmt.myRb.velocity += -Vector3.up * 1.1f;
+        }
+        else
+        {
+            isJumping = false;
+            //isFalling = false;
+            isGrounded = true;
+        }
+    }
 
     [Client]
-    void Move()
+    public void Dodge()
+    {
+        // I DUNNO...
+    }
+
+    [Client]
+    public void Move()
     {
         // READS THE INPUT SYSTEMS ACTION
         var movementInput = playerMgmt.inputMgmt.Controls.Player.Move.ReadValue<Vector2>();
 
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
-        //var movement = new Vector3
-        //{
-        //    x = movementInput.x,
-        //    z = movementInput.y
-        //}.normalized;
-
         movement = new Vector3
         {
             x = movementInput.x,
             z = movementInput.y
         }.normalized;
-
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
         Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
@@ -103,7 +115,7 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        playerMgmt.charCtrl.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
+        playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * currentMoveSpeed)) / Time.deltaTime);
     }
 
     #region Sprinting
@@ -111,7 +123,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (movement.z > 0.1 && staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
         {
-            currentMoveSpeed *= sprintMultiplier;
+            currentMoveSpeed *= playerMgmt.playerStats.sprintMultiplier;
             isSprinting = true;
             playerMgmt.isInteracting = true;
 
@@ -123,7 +135,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         isSprinting = false;
         playerMgmt.isInteracting = false;
-        currentMoveSpeed = moveSpeed;
+        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
@@ -154,8 +166,9 @@ public class PlayerMovement : NetworkBehaviour
             {
                 staminaMgmt.TakeDamage(10f);
                 isJumping = true;
+                isGrounded = false;
 
-                yVelocity += jumpVelocity;
+                playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
             }
         }
     }

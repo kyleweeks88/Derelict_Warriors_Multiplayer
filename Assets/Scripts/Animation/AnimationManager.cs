@@ -6,6 +6,7 @@ using Mirror;
 public class AnimationManager : NetworkBehaviour
 {
     public Animator myAnim;
+    public NetworkAnimator netAnim;
     [SerializeField] PlayerManager playerMgmt;
 
     #region Animator Parameters
@@ -37,18 +38,41 @@ public class AnimationManager : NetworkBehaviour
         myAnim.SetBool(isSprintingParam, playerMgmt.playerMovement.isSprinting);
         myAnim.SetBool(isInteractingParam, playerMgmt.isInteracting);
         myAnim.SetBool(isJumpingParam, playerMgmt.playerMovement.isJumping);
-        myAnim.SetBool(isGroundedParam, playerMgmt.charCtrl.isGrounded);
+        myAnim.SetBool(isGroundedParam, playerMgmt.playerMovement.isGrounded);
         myAnim.SetFloat(yVelocityParam, playerMgmt.playerMovement.yVelocity);
 
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
 
-        if (playerMgmt.combatMgmt.attackAnim != null)
-            myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, playerMgmt.inputMgmt.attackInputHeld);
+        if (playerMgmt.inputMgmt.attackInputHeld)
+        {
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null &&
+                !playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
+            {
+                MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
+                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) > 0)
+                    netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
+            }
+        }
     }
 
     public void MovementAnimation(float xMove, float zMove)
     {
         myAnim.SetFloat(playerMgmt.animMgmt.inputXParam, xMove);
         myAnim.SetFloat(playerMgmt.animMgmt.inputYParam, zMove);
+    }
+
+    public void HandleMeleeAttackAnimation(bool boolVal)
+    {
+        myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
+    }
+
+    public void HandleRangedAttackAnimation(bool boolVal)
+    {
+        myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
+    }
+
+    public void TriggerDodgeAnim()
+    {
+        netAnim.SetTrigger("isDodging");
     }
 }

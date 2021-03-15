@@ -10,19 +10,22 @@ using UnityEngine.InputSystem;
 // and the way they modify or mitigate incoming/outgoing damage.
 public class CharacterStats : NetworkBehaviour, IKillable
 {
-    [Header("Settings")]
+    [Header("General settings")]
     public string charName;
-    public float baseAttackDamage;
+
+    [Header("Locomotion settings")]
+    public float moveSpeed = 5f;
+    public float sprintMultiplier = 2f;
+    public float jumpVelocity = 5f;
+
+    [Header("Combat settings")]
+    public float baseAttackDamage = 1f;
 
     #region Death!!!
     [Client]
     public virtual void Death()
     {
-        //if(!base.hasAuthority){return;}
-        
         Debug.Log(charName + " has died!");
-        //this.transform.position = Vector3.zero;
-        //CmdDeath();
     }
     #endregion
 }

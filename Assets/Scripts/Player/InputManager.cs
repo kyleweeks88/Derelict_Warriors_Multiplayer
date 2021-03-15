@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using Mirror;
 
@@ -11,12 +12,13 @@ public class InputManager : NetworkBehaviour
 
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
-    [SerializeField] CombatManager combatMgmt = null;
-    [SerializeField] PlayerMovement playerMovement = null;
 
     public bool canRecieveAttackInput;
     public bool attackInputRecieved;
     public bool attackInputHeld;
+    public bool rangedAttackHeld;
+
+    Vector2 moveInput;
 
     Controls controls;
     public Controls Controls
@@ -43,22 +45,51 @@ public class InputManager : NetworkBehaviour
         Controls.Player.Attack.started += ctx => RecieveAttackInput();
         Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
 
+        Controls.Player.RangedAttack.started += ctx => RecieveRangedAttackInput();
+        Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
+
         // Player Locomotion
+        moveInput = Controls.Player.Move.ReadValue<Vector2>();
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
         Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
 
         // Player Interaction
         Controls.Player.Interact.performed += ctx => InteractPressed();
+
+        Controls.Player.Dodge.performed += ctx => DodgeInputRecieved();
     }
 
     void InitializeComponents(GameObject go)
     {
         playerMgmt = go.GetComponent<PlayerManager>();
-        combatMgmt = go.GetComponent<CombatManager>();
-        playerMovement = go.GetComponent<PlayerMovement>();
     }
 
+    #region Ranged
+    public void RecieveRangedAttackInput()
+    {
+        // If player is locked into an "interacting" state then don't let this happen.
+        if (playerMgmt.isInteracting) { return; }
+
+        if (!canRecieveAttackInput) { return; }
+
+        if (canRecieveAttackInput)
+        {
+            rangedAttackHeld = true;
+            // Tells CombatManager to determine the means of the attack
+            playerMgmt.combatMgmt.RangedAttackPerformed();
+            playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+        }
+    }
+
+    public void ReleaseRangedAttackInput()
+    {
+        rangedAttackHeld = false;
+        playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+    }
+    #endregion
+
+    #region Melee
     public void RecieveAttackInput()
     {
         // If player is locked into an "interacting" state then don't let this happen.
@@ -70,28 +101,37 @@ public class InputManager : NetworkBehaviour
         {
             attackInputHeld = true;
             // Tells CombatManager to determine the means of the attack
-            combatMgmt.AttackPerformed();
+            playerMgmt.combatMgmt.AttackPerformed();
         }
     }
 
     public void ReleaseAttackInput()
     {
         attackInputHeld = false;
+        playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
+    }
+    #endregion
+
+    void DodgeInputRecieved()
+    {
+        playerMgmt.dodgeCtrl.Dodge(Controls.Player.Move.ReadValue<Vector2>());
     }
 
     void Jump()
     {
-        playerMovement.Jump();
+        if (playerMgmt.isInteracting) { return; }
+
+        playerMgmt.playerMovement.Jump();
     }
 
     void SprintPressed()
     {
-        playerMovement.SprintPressed();
+        playerMgmt.playerMovement.SprintPressed();
     }
 
     void SprintReleased()
     {
-        playerMovement.SprintReleased();
+        playerMgmt.playerMovement.SprintReleased();
     }
 
     void InteractPressed()

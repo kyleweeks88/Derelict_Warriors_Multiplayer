@@ -20,7 +20,7 @@ public class @Controls : IInputActionCollection, IDisposable
             ""actions"": [
                 {
                     ""name"": ""Move"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Value"",
                     ""id"": ""101f2cf0-b6d8-45f0-96b6-db45898787f0"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -54,6 +54,22 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""name"": ""Interact"",
                     ""type"": ""Button"",
                     ""id"": ""57e7474a-5f31-4641-aa8b-15c5a44396c5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RangedAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""b029ba26-1e5d-46d1-ab62-c502c4a6546f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Dodge"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f17d74e-4099-4322-b560-bed6cc1eb38e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -117,6 +133,17 @@ public class @Controls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""9c9c8845-9f68-4ce9-808a-997bb219e96f"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""49a61875-84cf-40b3-b6f0-73074534cdfc"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
@@ -139,11 +166,33 @@ public class @Controls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""2c44d746-22de-4010-bc65-abc7f1c5cab9"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""d04d0210-81d0-4696-8c37-4b9f4a88c856"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""M&K"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7e8140a6-b449-4ebd-9ad7-43f1bc6bbd86"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
                     ""action"": ""Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -158,31 +207,37 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""Combat"",
-            ""id"": ""be80f206-67ee-4c6e-b2a9-ea0cd5588464"",
-            ""actions"": [
-                {
-                    ""name"": ""Shoot"",
-                    ""type"": ""Button"",
-                    ""id"": ""ebecd25a-ad3c-440b-baa0-d87bc4d6885a"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                }
-            ],
-            ""bindings"": [
+                },
                 {
                     ""name"": """",
-                    ""id"": ""89a32af9-8099-4fb8-8056-e5a4649ac59d"",
+                    ""id"": ""d9b42175-2e41-44a7-926b-7e9eb5831bfd"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""RangedAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d52b8904-8a77-4611-b244-dae45a4bd2b8"",
                     ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""M&K"",
-                    ""action"": ""Shoot"",
+                    ""action"": ""RangedAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""debd5772-815e-4929-90b3-5e4c388eae7c"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""Dodge"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -232,6 +287,17 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""isOR"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Gamepad"",
+            ""bindingGroup"": ""Gamepad"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Gamepad>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
         }
     ]
 }");
@@ -242,9 +308,8 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
-        // Combat
-        m_Combat = asset.FindActionMap("Combat", throwIfNotFound: true);
-        m_Combat_Shoot = m_Combat.FindAction("Shoot", throwIfNotFound: true);
+        m_Player_RangedAttack = m_Player.FindAction("RangedAttack", throwIfNotFound: true);
+        m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
         // Locomotion
         m_Locomotion = asset.FindActionMap("Locomotion", throwIfNotFound: true);
         m_Locomotion_Sprint = m_Locomotion.FindAction("Sprint", throwIfNotFound: true);
@@ -302,6 +367,8 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_RangedAttack;
+    private readonly InputAction m_Player_Dodge;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -311,6 +378,8 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @RangedAttack => m_Wrapper.m_Player_RangedAttack;
+        public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -335,6 +404,12 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Interact.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
                 @Interact.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
                 @Interact.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
+                @RangedAttack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRangedAttack;
+                @RangedAttack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRangedAttack;
+                @RangedAttack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRangedAttack;
+                @Dodge.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
+                @Dodge.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
+                @Dodge.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -354,43 +429,16 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
+                @RangedAttack.started += instance.OnRangedAttack;
+                @RangedAttack.performed += instance.OnRangedAttack;
+                @RangedAttack.canceled += instance.OnRangedAttack;
+                @Dodge.started += instance.OnDodge;
+                @Dodge.performed += instance.OnDodge;
+                @Dodge.canceled += instance.OnDodge;
             }
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
-
-    // Combat
-    private readonly InputActionMap m_Combat;
-    private ICombatActions m_CombatActionsCallbackInterface;
-    private readonly InputAction m_Combat_Shoot;
-    public struct CombatActions
-    {
-        private @Controls m_Wrapper;
-        public CombatActions(@Controls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Shoot => m_Wrapper.m_Combat_Shoot;
-        public InputActionMap Get() { return m_Wrapper.m_Combat; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(CombatActions set) { return set.Get(); }
-        public void SetCallbacks(ICombatActions instance)
-        {
-            if (m_Wrapper.m_CombatActionsCallbackInterface != null)
-            {
-                @Shoot.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
-                @Shoot.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
-                @Shoot.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnShoot;
-            }
-            m_Wrapper.m_CombatActionsCallbackInterface = instance;
-            if (instance != null)
-            {
-                @Shoot.started += instance.OnShoot;
-                @Shoot.performed += instance.OnShoot;
-                @Shoot.canceled += instance.OnShoot;
-            }
-        }
-    }
-    public CombatActions @Combat => new CombatActions(this);
 
     // Locomotion
     private readonly InputActionMap m_Locomotion;
@@ -433,6 +481,15 @@ public class @Controls : IInputActionCollection, IDisposable
             return asset.controlSchemes[m_MKSchemeIndex];
         }
     }
+    private int m_GamepadSchemeIndex = -1;
+    public InputControlScheme GamepadScheme
+    {
+        get
+        {
+            if (m_GamepadSchemeIndex == -1) m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
+            return asset.controlSchemes[m_GamepadSchemeIndex];
+        }
+    }
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -440,10 +497,8 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
-    }
-    public interface ICombatActions
-    {
-        void OnShoot(InputAction.CallbackContext context);
+        void OnRangedAttack(InputAction.CallbackContext context);
+        void OnDodge(InputAction.CallbackContext context);
     }
     public interface ILocomotionActions
     {

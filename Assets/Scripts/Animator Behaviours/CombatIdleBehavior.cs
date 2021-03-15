@@ -11,8 +11,6 @@ public class CombatIdleBehavior : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         combatManager = animator.transform.GetComponentInParent<CombatManager>();
-
-        //combatManager.currentCombatTimer = combatManager.combatTimer;
     }
 
 
@@ -21,13 +19,7 @@ public class CombatIdleBehavior : StateMachineBehaviour
         // TIMER FOR COMBAT IDLE ANIMATION
         if (combatManager.inCombat)
         {
-            combatManager.currentCombatTimer -= Time.deltaTime;
-
-            if (combatManager.currentCombatTimer <= 0)
-            {
-                combatManager.currentCombatTimer = combatManager.combatTimer;
-                combatManager.inCombat = false;
-            }
+            combatManager.HandleCombatTimer();
         }
         else
         {

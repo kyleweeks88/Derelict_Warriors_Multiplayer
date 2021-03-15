@@ -6,7 +6,7 @@ using Mirror;
 public class PlayerManager : NetworkBehaviour
 {
     [Header("Component Ref")]
-    public CharacterController charCtrl;
+    public Rigidbody myRb;
     public ClientInstance ci;
     public InputManager inputMgmt;
     public EquipmentManager equipmentMgmt;
@@ -14,6 +14,8 @@ public class PlayerManager : NetworkBehaviour
     public AnimationManager animMgmt;
     public CombatManager combatMgmt;
     public PlayerMovement playerMovement;
+    public StaminaManager staminaMgmt;
+    public DodgeControl dodgeCtrl;
 
     [Header("Camera Ref")]
     public GameObject myCamera = null;
@@ -30,8 +32,7 @@ public class PlayerManager : NetworkBehaviour
             inputMgmt = ci.GetComponent<InputManager>();
         }
 
-        charCtrl = gameObject.GetComponent<CharacterController>();
-        charCtrl.enabled = true;
+        myRb = gameObject.GetComponent<Rigidbody>();
 
         playerMovement = gameObject.GetComponent<PlayerMovement>();
         playerMovement.enabled = true;
@@ -47,6 +48,12 @@ public class PlayerManager : NetworkBehaviour
 
         combatMgmt = gameObject.GetComponent<CombatManager>();
         combatMgmt.enabled = true;
+
+        staminaMgmt = gameObject.GetComponent<StaminaManager>();
+        staminaMgmt.enabled = true;
+
+        dodgeCtrl = gameObject.GetComponent<DodgeControl>();
+        dodgeCtrl.enabled = true;
 
         myCamera.SetActive(true);
         freeLook.SetActive(true);
