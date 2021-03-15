@@ -31,6 +31,7 @@ public class DodgeControl : NetworkBehaviour
     public void Dodge(Vector3 dir)
     {
         if(cooldown > 0) { return; }
+
         // INVULNERABLE FUNCTION CALLED HERE
 
         // PLAY DODGE ANIMATION FROM AnimationManager
@@ -42,9 +43,11 @@ public class DodgeControl : NetworkBehaviour
             z = dir.y
         }.normalized;
 
-        playerMgmt.myRb.AddForce(_dir * dodgeVelocity, ForceMode.Impulse);
+        Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * _dir;
+        Vector3 verticalMovement = Vector3.up * playerMgmt.myRb.velocity.y;
+
+        playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
 
         cooldown = dodgeCooldown;
-        Debug.Log("TEST");
     } 
 }

@@ -68,7 +68,6 @@ public class AnimationManager : NetworkBehaviour
 
     public void HandleRangedAttackAnimation(bool boolVal)
     {
-        Debug.Log(playerMgmt.combatMgmt.attackAnim);
         myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
     }
 

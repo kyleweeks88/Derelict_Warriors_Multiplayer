@@ -37,17 +37,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!hasAuthority) {return;}
 
-        // APPLIES GRAVITY TO CHARACTER IF NOT GROUNDED
-        //if(!GroundCheck())
-        //{
-        //    yVelocity += gravity * Time.deltaTime;
-        //}
-        //else if(yVelocity < 0)
-        //{
-        //    yVelocity = 0f;
-        //}
-
-        if(isJumping && yVelocity < 0)
+        if(isJumping && playerMgmt.myRb.velocity.y < 0)
         {
             RaycastHit hit;
             if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
