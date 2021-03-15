@@ -1829,7 +1829,7 @@ GameObject:
   - component: {fileID: 7304204219145124143}
   - component: {fileID: 6245793244553626863}
   - component: {fileID: 1661257383019214067}
-  - component: {fileID: 3257659834398278457}
+  - component: {fileID: 39545557919816564}
   - component: {fileID: 244091649480622315}
   - component: {fileID: 3467262495813199297}
   - component: {fileID: -5031885848669305226}
@@ -1840,6 +1840,7 @@ GameObject:
   - component: {fileID: 6016297192550152662}
   - component: {fileID: 6785309732559405815}
   - component: {fileID: -7243457902745452413}
+  - component: {fileID: 5870174210345145216}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -1862,6 +1863,7 @@ Transform:
   - {fileID: 1342896626933763026}
   - {fileID: 4704538343655802368}
   - {fileID: 1773856740210876494}
+  - {fileID: 1997108214747581923}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1922,31 +1924,29 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6519869665437484994}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 3d742b486bafafb45a21e8826173ba00, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.31
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!143 &3257659834398278457
-CharacterController:
+--- !u!54 &39545557919816564
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6519869665437484994}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
   serializedVersion: 2
-  m_Height: 1.8
-  m_Radius: 0.3
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.9, z: 0}
+  m_Mass: 1
+  m_Drag: 8
+  m_AngularDrag: 0.1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!114 &244091649480622315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1975,7 +1975,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  charCtrl: {fileID: 0}
+  myRb: {fileID: 0}
   ci: {fileID: 0}
   inputMgmt: {fileID: 0}
   equipmentMgmt: {fileID: 0}
@@ -1984,6 +1984,7 @@ MonoBehaviour:
   combatMgmt: {fileID: 0}
   playerMovement: {fileID: 0}
   staminaMgmt: {fileID: 0}
+  dodgeCtrl: {fileID: 0}
   myCamera: {fileID: 6482849343757429649}
   freeLook: {fileID: 1674453814961982921}
   sprintCamera: {fileID: 6757011220328924237}
@@ -2002,6 +2003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  isGrounded: 0
+  groundColPos: {fileID: 1997108214747581923}
   whatIsWalkable:
     serializedVersion: 2
     m_Bits: 7169
@@ -2066,9 +2069,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   charName: PLAYER
-  moveSpeed: 5
+  moveSpeed: 1
   sprintMultiplier: 1.5
-  jumpVelocity: 5
+  jumpVelocity: 25
   baseAttackDamage: 1
 --- !u!114 &6899203083148865249
 MonoBehaviour:
@@ -2143,6 +2146,25 @@ MonoBehaviour:
   staminaGainAmount: 1
   staminaDrainAmount: 1
   drainingStamina: 0
+--- !u!114 &5870174210345145216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 271a3b11c1c90524793500a311500dbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  playerMgmt: {fileID: 3467262495813199297}
+  delayBeforeInvulnerable: 0.2
+  invulnerableDuration: 0.5
+  dodgeCooldown: 1
+  dodgeVelocity: 30
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0
@@ -2592,6 +2614,36 @@ MonoBehaviour:
   m_BiasX: 0
   m_BiasY: 0
   m_CenterOnActivate: 1
+--- !u!1 &9146853414030169426
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1997108214747581923}
+  m_Layer: 8
+  m_Name: groundCol
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1997108214747581923
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9146853414030169426}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 392230492053937152}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2289792194481281431
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2621,7 +2673,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4111819248598986, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4111819248598986, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2662,15 +2714,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
---- !u!4 &2290188660810032733 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4111819248598986, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
-    type: 3}
-  m_PrefabInstance: {fileID: 2289792194481281431}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2289322945793128889 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1045401375514670, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
+    type: 3}
+  m_PrefabInstance: {fileID: 2289792194481281431}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2290188660810032733 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4111819248598986, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
     type: 3}
   m_PrefabInstance: {fileID: 2289792194481281431}
   m_PrefabAsset: {fileID: 0}

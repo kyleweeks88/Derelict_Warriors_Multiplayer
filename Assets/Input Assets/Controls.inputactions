@@ -208,6 +208,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d52b8904-8a77-4611-b244-dae45a4bd2b8",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "M&K",
+                    "action": "RangedAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "debd5772-815e-4929-90b3-5e4c388eae7c",
                     "path": "<Keyboard>/alt",
                     "interactions": "",

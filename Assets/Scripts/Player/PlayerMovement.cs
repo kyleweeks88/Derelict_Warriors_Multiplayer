@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    public bool isGrounded;
+    public Transform groundColPos;
     public LayerMask whatIsWalkable;
 
     [Header("Component Ref")]
@@ -35,17 +37,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!hasAuthority) {return;}
 
-        // APPLIES GRAVITY TO CHARACTER IF NOT GROUNDED
-        if(!playerMgmt.charCtrl.isGrounded)
-        {
-            yVelocity += gravity * Time.deltaTime;
-        }
-        else if(yVelocity < 0)
-        {
-            yVelocity = 0f;
-        }
-
-        if(isJumping && yVelocity < 0)
+        if(isJumping && playerMgmt.myRb.velocity.y < 0)
         {
             RaycastHit hit;
             if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
@@ -54,9 +46,34 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        Move();
         UpdateIsSprinting();
-    } 
+    }
+
+    [ClientCallback]
+    private void FixedUpdate()
+    {
+        if (!base.hasAuthority) { return; }
+
+        GroundCheck();
+        Move();
+    }
+
+    void GroundCheck()
+    {
+        Collider[] groundCollisions = Physics.OverlapSphere(groundColPos.position, 0.25f, whatIsWalkable);
+
+        if (groundCollisions.Length <= 0)
+        {
+            isGrounded = false;
+            playerMgmt.myRb.velocity += -Vector3.up * 1.1f;
+        }
+        else
+        {
+            isJumping = false;
+            //isFalling = false;
+            isGrounded = true;
+        }
+    }
 
     [Client]
     public void Dodge()
@@ -98,7 +115,7 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        playerMgmt.charCtrl.Move((verticalMovement + (rotationMovement * currentMoveSpeed)) * Time.deltaTime);
+        playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * currentMoveSpeed)) / Time.deltaTime);
     }
 
     #region Sprinting
@@ -149,8 +166,9 @@ public class PlayerMovement : NetworkBehaviour
             {
                 staminaMgmt.TakeDamage(10f);
                 isJumping = true;
+                isGrounded = false;
 
-                yVelocity += playerMgmt.playerStats.jumpVelocity;
+                playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
             }
         }
     }
