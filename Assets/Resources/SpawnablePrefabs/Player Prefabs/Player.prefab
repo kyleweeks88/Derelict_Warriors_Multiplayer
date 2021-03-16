@@ -2164,7 +2164,7 @@ MonoBehaviour:
   delayBeforeInvulnerable: 0.2
   invulnerableDuration: 0.5
   dodgeCooldown: 1
-  dodgeVelocity: 30
+  dodgeVelocity: 20
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0

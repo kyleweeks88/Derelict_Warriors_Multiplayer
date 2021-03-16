@@ -47,7 +47,7 @@ public class PlayerMovement : NetworkBehaviour
 
         GroundCheck();
 
-        if (isJumping && playerMgmt.myRb.velocity.y < 0)
+        if (isJumping && playerMgmt.myRb.velocity.y < -5f)
         {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
@@ -72,7 +72,6 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             isJumping = false;
-            //isFalling = false;
             isGrounded = true;
         }
     }
@@ -127,7 +126,6 @@ public class PlayerMovement : NetworkBehaviour
     public void SprintReleased()
     {
         isSprinting = false;
-        playerMgmt.isInteracting = false;
         currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
@@ -153,13 +151,14 @@ public class PlayerMovement : NetworkBehaviour
     [Client]
     public void Jump()
     {
-        if(!isJumping)
+        if(!isJumping && isGrounded)
         {
             if (staminaMgmt.GetCurrentVital() - 10f > 0)
             {
-                staminaMgmt.TakeDamage(10f);
+                playerMgmt.isInteracting = true;
                 isJumping = true;
                 isGrounded = false;
+                staminaMgmt.TakeDamage(10f);
 
                 playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
             }

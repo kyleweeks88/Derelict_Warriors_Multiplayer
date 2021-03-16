@@ -21,6 +21,11 @@ public class CharacterStats : NetworkBehaviour, IKillable
     [Header("Combat settings")]
     public float baseAttackDamage = 1f;
 
+    public void Invulnerability()
+    {
+        StartCoroutine(Invulnerable(0.25f));
+    }
+
     #region Death!!!
     [Client]
     public virtual void Death()
@@ -28,4 +33,19 @@ public class CharacterStats : NetworkBehaviour, IKillable
         Debug.Log(charName + " has died!");
     }
     #endregion
+
+    IEnumerator Invulnerable(float timer)
+    {
+        string originalTag = gameObject.tag;
+
+        WaitForEndOfFrame wait = new WaitForEndOfFrame();
+        while(timer > 0)
+        {
+            this.gameObject.tag = "Invulnerable";
+            timer -= Time.deltaTime;
+            yield return wait;
+        }
+
+        gameObject.tag = originalTag;
+    }
 }

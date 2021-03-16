@@ -147,6 +147,7 @@ public class InputManager : NetworkBehaviour
 
     void SprintReleased()
     {
+        playerMgmt.isInteracting = false;
         playerMgmt.playerMovement.SprintReleased();
     }
 
