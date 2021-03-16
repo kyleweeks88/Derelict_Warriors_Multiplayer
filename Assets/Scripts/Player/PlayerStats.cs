@@ -7,7 +7,6 @@ public class PlayerStats : CharacterStats
 {
     PlayerName playerName;
 
-
     public override void OnStartAuthority()
     {
         base.OnStartAuthority();
