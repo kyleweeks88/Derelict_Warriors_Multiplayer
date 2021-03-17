@@ -28,26 +28,44 @@ public class DodgeControl : NetworkBehaviour
         }
     }
 
+    // MAKE THIS MORE LIKE A DASH WITHOUT I-FRAMES
     public void Dodge(Vector3 dir)
     {
-        if(cooldown > 0) { return; }
+        // If the player is in the air then exit
+        if (!playerMgmt.playerMovement.isGrounded) { return; }
+        // If the cooldown isn't ready then exit
+        if (cooldown > 0) { return; }
 
-        // INVULNERABLE FUNCTION CALLED HERE
-
-        // PLAY DODGE ANIMATION FROM AnimationManager
-        playerMgmt.animMgmt.TriggerDodgeAnim();
-
-        Vector3 _dir = new Vector3
+        // If the entity has enough stamina to dodge
+        if ((playerMgmt.staminaMgmt.GetCurrentVital() - 10f) > 0)
         {
-            x = dir.x,
-            z = dir.y
-        }.normalized;
+            playerMgmt.isInteracting = true;
+            playerMgmt.staminaMgmt.TakeDamage(10f);
 
-        Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * _dir;
-        Vector3 verticalMovement = Vector3.up * playerMgmt.myRb.velocity.y;
+            // INVULNERABLE FUNCTION CALLED HERE
+            playerMgmt.playerStats.Invulnerability();
 
-        playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
+            // normalizes the dir vector
+            Vector3 _dir = new Vector3
+            {
+                x = dir.x,
+                z = dir.y
+            }.normalized;
 
-        cooldown = dodgeCooldown;
+            // Get entity's direction/rotation relative to the camera
+            Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * _dir;
+            Vector3 verticalMovement = Vector3.up * playerMgmt.myRb.velocity.y;
+
+            // Adds force relative to the camera in a direction
+            playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
+
+            // PLAY DODGE ANIMATION FROM AnimationManager
+            playerMgmt.animMgmt.TriggerDodgeAnim(_dir);
+
+            // Resets the cooldown timer
+            cooldown = dodgeCooldown;
+        }
     } 
+
+    // DO A DODGE ROLL WITH I-FRAMES IF THE PLAYER DOUBLE TAPS DODGE
 }

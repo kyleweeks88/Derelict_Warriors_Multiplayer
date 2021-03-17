@@ -84,7 +84,8 @@ public class ClientInstance : NetworkBehaviour
         if(currentCharacter != null)
         {
             PlayerHealthManager healthMgmt = currentCharacter.GetComponent<PlayerHealthManager>();
-            healthMgmt.SetVital(healthMgmt.maxVital);
+            //healthMgmt.SetVital(healthMgmt.maxVital);
+            healthMgmt.InitializeVital();
 
             StaminaManager staminaMgmt = currentCharacter.GetComponent<StaminaManager>();
             staminaMgmt.SetVital(staminaMgmt.maxVital);

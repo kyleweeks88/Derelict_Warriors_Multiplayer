@@ -17,18 +17,12 @@ public class AdjustInteractingBool : StateMachineBehaviour
         }
     }
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{
-    //    
+    //    if (playerMgmt != null)
+    //    {
+    //        playerMgmt.isInteracting = true;
+    //        animator.SetBool("isInteracting", true);
+    //    }
     //}
-
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if (playerMgmt != null)
-        {
-            playerMgmt.isInteracting = true;
-            animator.SetBool("isInteracting", true);
-        }
-    }
 }

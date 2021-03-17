@@ -11,6 +11,7 @@ public class PlayerHealthManager : HealthManager
     public override void OnStartAuthority()
     {
         enabled = true;
+
     }
 
     // Currently using this for testing only
@@ -28,23 +29,47 @@ public class PlayerHealthManager : HealthManager
     public override void TakeDamage(float dmgVal)
     {
         base.TakeDamage(dmgVal);
-        ModfiyVital(dmgVal);
+        ModfiyVital(-dmgVal);
+    }
+
+    [Client]
+    public override void InitializeVital()
+    {
+        if (myUI != null)
+            myUI.SetActive(true);
+
+        // Sets currentVital to maxVital and Invokes Event_OnHealthChanged
+        base.InitializeVital();
+
+        CmdInitializeVital();
+    }
+
+    [Command]
+    void CmdInitializeVital()
+    {
+        // Sets the vitals for the server
+        currentVital = maxVital;
+        synchronizedVital = currentVital;
+
+        RpcOnHealthChanged(currentVital, maxVital);
     }
 
     [Client]
     public override void SetVital(float setVal)
     {
-        if (myUI != null)
-            myUI.SetActive(true);
+        //if (myUI != null)
+        //    myUI.SetActive(true);
 
+        // Sets currentVital to setVal and Invokes Event_OnHealthChanged
         base.SetVital(setVal);
+
         CmdSetVital(setVal);
     }
 
     [Command]
     void CmdSetVital(float setVal)
     {
-        InitializeVital();
+        //InitializeVital();
         synchronizedVital = setVal;
 
         RpcOnHealthChanged(currentVital, maxVital);
@@ -52,8 +77,12 @@ public class PlayerHealthManager : HealthManager
 
     public override void ModfiyVital(float modVal)
     {
+        // Calculates currentVal+modVal and clamps between 0 and maxVital
+        // also invokes Event_HealthChanged
         base.ModfiyVital(modVal);
 
+        // For the server: Calculates currentVal+modVal and clamps between 0 and maxVital
+        // also sets the synchronizedVital to the calculated value
         CmdModifyVital(modVal);
 
         if (currentVital <= 0)
@@ -63,7 +92,7 @@ public class PlayerHealthManager : HealthManager
     [Command]
     void CmdModifyVital(float modVal)
     {
-        currentVital = Mathf.Clamp((synchronizedVital + modVal), 0, maxVital);
+        //currentVital = Mathf.Clamp((currentVital + modVal), 0, maxVital);
         synchronizedVital = currentVital;
         RpcOnHealthChanged(currentVital, maxVital);
     }
@@ -83,6 +112,7 @@ public class PlayerHealthManager : HealthManager
         if (playerStats != null)
         {
             playerStats.Death();
+            SetVital(maxVital);
         }
     }
 }

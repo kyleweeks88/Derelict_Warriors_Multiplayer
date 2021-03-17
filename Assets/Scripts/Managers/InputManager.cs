@@ -18,6 +18,10 @@ public class InputManager : NetworkBehaviour
     public bool attackInputHeld;
     public bool rangedAttackHeld;
 
+    public float horizontal;
+    public float vertical;
+    float moveAmount;
+
     Vector2 moveInput;
 
     Controls controls;
@@ -49,7 +53,7 @@ public class InputManager : NetworkBehaviour
         Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
 
         // Player Locomotion
-        moveInput = Controls.Player.Move.ReadValue<Vector2>();
+        Controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         Controls.Player.Jump.performed += ctx => Jump();
         Controls.Locomotion.Sprint.started += ctx => SprintPressed();
         Controls.Locomotion.Sprint.canceled += ctx => SprintReleased();
@@ -63,6 +67,18 @@ public class InputManager : NetworkBehaviour
     void InitializeComponents(GameObject go)
     {
         playerMgmt = go.GetComponent<PlayerManager>();
+    }
+
+    public void TickInput(float delta)
+    {
+        MovementInput(delta);
+    }
+
+    void MovementInput(float delta)
+    {
+        horizontal = moveInput.x;
+        vertical = moveInput.y;
+        moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
     }
 
     #region Ranged
@@ -131,6 +147,7 @@ public class InputManager : NetworkBehaviour
 
     void SprintReleased()
     {
+        playerMgmt.isInteracting = false;
         playerMgmt.playerMovement.SprintReleased();
     }
 

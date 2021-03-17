@@ -11,9 +11,16 @@ public class HealthManager : VitalStat, IDamageable<float>
     public delegate void OnHealthChanged(float curVal, float maxVal);
     public event OnHealthChanged Event_HealthChanged;
 
+    public override void InitializeVital()
+    {
+        base.InitializeVital();
+        this.Event_HealthChanged?.Invoke(currentVital, maxVital);
+    }
+
     public override void SetVital(float setVal)
     {
-        InitializeVital();
+        //InitializeVital();
+        currentVital = setVal;
         this.Event_HealthChanged?.Invoke(currentVital, maxVital);
     }
 

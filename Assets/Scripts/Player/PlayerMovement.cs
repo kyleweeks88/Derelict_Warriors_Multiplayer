@@ -37,16 +37,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!hasAuthority) {return;}
 
-        if(isJumping && playerMgmt.myRb.velocity.y < 0)
-        {
-            RaycastHit hit;
-            if(Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
-            {
-                isJumping = false;
-            }
-        }
-
-        UpdateIsSprinting();
+        playerMgmt.inputMgmt.TickInput(Time.deltaTime);
     }
 
     [ClientCallback]
@@ -55,6 +46,17 @@ public class PlayerMovement : NetworkBehaviour
         if (!base.hasAuthority) { return; }
 
         GroundCheck();
+
+        if (isJumping && playerMgmt.myRb.velocity.y < -5f)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
+            {
+                isJumping = false;
+            }
+        }
+
+        UpdateIsSprinting();
         Move();
     }
 
@@ -70,28 +72,18 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             isJumping = false;
-            //isFalling = false;
             isGrounded = true;
         }
     }
 
     [Client]
-    public void Dodge()
-    {
-        // I DUNNO...
-    }
-
-    [Client]
     public void Move()
     {
-        // READS THE INPUT SYSTEMS ACTION
-        var movementInput = playerMgmt.inputMgmt.Controls.Player.Move.ReadValue<Vector2>();
-
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
         movement = new Vector3
         {
-            x = movementInput.x,
-            z = movementInput.y
+            x = playerMgmt.inputMgmt.horizontal,
+            z = playerMgmt.inputMgmt.vertical
         }.normalized;
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
@@ -134,7 +126,6 @@ public class PlayerMovement : NetworkBehaviour
     public void SprintReleased()
     {
         isSprinting = false;
-        playerMgmt.isInteracting = false;
         currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
@@ -160,13 +151,14 @@ public class PlayerMovement : NetworkBehaviour
     [Client]
     public void Jump()
     {
-        if(!isJumping)
+        if(!isJumping && isGrounded)
         {
             if (staminaMgmt.GetCurrentVital() - 10f > 0)
             {
-                staminaMgmt.TakeDamage(10f);
+                playerMgmt.isInteracting = true;
                 isJumping = true;
                 isGrounded = false;
+                staminaMgmt.TakeDamage(10f);
 
                 playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
             }

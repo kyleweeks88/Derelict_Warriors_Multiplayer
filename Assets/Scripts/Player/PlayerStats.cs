@@ -7,7 +7,6 @@ public class PlayerStats : CharacterStats
 {
     PlayerName playerName;
 
-
     public override void OnStartAuthority()
     {
         base.OnStartAuthority();
@@ -19,6 +18,7 @@ public class PlayerStats : CharacterStats
     public override void Death()
     {
         base.Death();
+        this.transform.position = Vector3.zero;
         CmdDeath();
     }
 

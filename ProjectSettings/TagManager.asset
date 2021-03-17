@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Spawnpoint
   - Weapon Pickup
+  - Invulnerable
   layers:
   - Default
   - TransparentFX
