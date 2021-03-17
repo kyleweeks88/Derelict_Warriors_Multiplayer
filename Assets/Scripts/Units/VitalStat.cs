@@ -9,7 +9,7 @@ public class VitalStat : NetworkBehaviour
     public float maxVital;
     [SyncVar] protected float synchronizedVital = 0f;
 
-    public void InitializeVital()
+    public virtual void InitializeVital()
     {
         currentVital = maxVital;
     }
@@ -21,7 +21,7 @@ public class VitalStat : NetworkBehaviour
 
     public virtual void SetVital(float setVal)
     {
-        //Generic code here
+        currentVital = setVal;
     }
 
     public virtual void ModfiyVital(float modVal)

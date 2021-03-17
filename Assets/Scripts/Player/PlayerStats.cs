@@ -18,6 +18,7 @@ public class PlayerStats : CharacterStats
     public override void Death()
     {
         base.Death();
+        this.transform.position = Vector3.zero;
         CmdDeath();
     }
 

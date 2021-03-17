@@ -14,9 +14,16 @@ public class StaminaManager : VitalStat, IDamageable<float>
     public delegate void OnStaminaChanged(float curVal, float maxVal);
     public event OnStaminaChanged Event_StaminaChanged;
 
+    public override void InitializeVital()
+    {
+        base.InitializeVital();
+        this.Event_StaminaChanged?.Invoke(currentVital, maxVital);
+    }
+
     public override void SetVital(float setVal)
     {
-        InitializeVital();
+        //InitializeVital();
+        currentVital = setVal;
         this.Event_StaminaChanged?.Invoke(currentVital, maxVital);
     }
 
