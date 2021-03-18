@@ -7,8 +7,7 @@ using Mirror;
 public class VitalsDisplay : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] HealthManager healthManager = null;
-    [SerializeField] StaminaManager staminaManager = null;
+    [SerializeField] VitalsManager vitalsMgmt = null;
 
     [Header("Health Ref")]
     [SerializeField] private Image healthBarImage = null;
@@ -19,14 +18,14 @@ public class VitalsDisplay : MonoBehaviour
 
     private void OnEnable()
     {
-        healthManager.Event_HealthChanged += HandleHealthChanged;
-        staminaManager.Event_StaminaChanged += HandleStaminaChanged;
+        vitalsMgmt.health.Event_ValueChanged += HandleHealthChanged;
+        vitalsMgmt.stamina.Event_ValueChanged += HandleStaminaChanged;
     }
 
     private void OnDisable()
     {
-        healthManager.Event_HealthChanged -= HandleHealthChanged;
-        staminaManager.Event_StaminaChanged -= HandleStaminaChanged;
+        vitalsMgmt.health.Event_ValueChanged -= HandleHealthChanged;
+        vitalsMgmt.stamina.Event_ValueChanged -= HandleStaminaChanged;
     }
 
     void HandleHealthChanged(float curVal, float maxVal)

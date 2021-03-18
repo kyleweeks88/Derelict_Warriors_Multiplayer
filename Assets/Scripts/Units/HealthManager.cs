@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
 
-public class HealthManager : VitalStat, IDamageable<float>
+public class HealthManager : VitalStat//, IDamageable<float>
 {
     [SerializeField] GameObject worldUI;
 

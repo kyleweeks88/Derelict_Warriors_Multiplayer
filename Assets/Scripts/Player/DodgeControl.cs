@@ -37,10 +37,10 @@ public class DodgeControl : NetworkBehaviour
         if (cooldown > 0) { return; }
 
         // If the entity has enough stamina to dodge
-        if ((playerMgmt.staminaMgmt.GetCurrentVital() - 10f) > 0)
+        if ((playerMgmt.vitalsMgmt.stamina.GetCurrentValue() - 10f) > 0)
         {
             playerMgmt.isInteracting = true;
-            playerMgmt.staminaMgmt.TakeDamage(10f);
+            playerMgmt.vitalsMgmt.TakeDamage(playerMgmt.vitalsMgmt.stamina, 10f);
 
             // INVULNERABLE FUNCTION CALLED HERE
             playerMgmt.playerStats.Invulnerability();

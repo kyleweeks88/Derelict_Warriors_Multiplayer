@@ -48,7 +48,7 @@ public class AnimationManager : NetworkBehaviour
                 !playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
             {
                 MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
-                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) > 0)
+                if((playerMgmt.vitalsMgmt.stamina.GetCurrentValue() - myWeapon.meleeData.staminaCost) > 0)
                     netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
             }
         }

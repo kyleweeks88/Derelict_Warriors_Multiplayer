@@ -24,8 +24,16 @@ public class CombatManager : NetworkBehaviour
     [SerializeField] Projectile projectile = null; //<<<========== FIX THIS!!!
     float nextShotTime = 0f;
     [SerializeField] float msBetweenShots = 0f;
+
+    FloatVariable health;
+    FloatVariable stamina;
     #endregion
 
+    public override void OnStartAuthority()
+    {
+        stamina = playerMgmt.vitalsMgmt.stamina;
+        health = playerMgmt.vitalsMgmt.health;
+    }
 
     [ClientCallback]
     private void Update()
@@ -124,7 +132,7 @@ public class CombatManager : NetworkBehaviour
             if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
             {
                 MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
-                if((playerMgmt.staminaMgmt.GetCurrentVital() - myWeapon.meleeData.staminaCost) > 0)
+                if((stamina.GetCurrentValue() - myWeapon.meleeData.staminaCost) > 0)
                 {
                     if(myWeapon.meleeData.isChargeable)
                     {
@@ -191,7 +199,7 @@ public class CombatManager : NetworkBehaviour
         if(!base.hasAuthority) { return; }
 
         MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
-        playerMgmt.staminaMgmt.TakeDamage(myWeapon.meleeData.staminaCost);
+        playerMgmt.vitalsMgmt.TakeDamage(stamina, myWeapon.meleeData.staminaCost);
 
         impactActivated = true;
     }

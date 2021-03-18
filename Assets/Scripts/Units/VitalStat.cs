@@ -1,10 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Mirror;
 using UnityEngine;
-using Mirror;
 
 public class VitalStat : NetworkBehaviour
 {
+    public float vitalGainAmount;
+    public float vitalDrainAmount;
+    protected float vitalDrainInterval = 0f;
+    protected float vitalGainInterval = 0f;
+
     protected float currentVital;
     public float maxVital;
     [SyncVar] protected float synchronizedVital = 0f;
