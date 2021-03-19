@@ -11,7 +11,16 @@ public class PlayerHealthManager : HealthManager
     public override void OnStartAuthority()
     {
         enabled = true;
+    }
 
+    public override void OnStartServer()
+    {
+        // 
+        if (!base.hasAuthority)
+        {
+            worldUI.SetActive(true);
+            SetVital(GetCurrentVital());
+        }
     }
 
     // Currently using this for testing only
@@ -28,15 +37,20 @@ public class PlayerHealthManager : HealthManager
 
     public override void TakeDamage(float dmgVal)
     {
+        // Just runs generic debug damage code for now...
         base.TakeDamage(dmgVal);
         ModfiyVital(-dmgVal);
     }
 
+    #region Initialize Vital
     [Client]
     public override void InitializeVital()
     {
         if (myUI != null)
             myUI.SetActive(true);
+
+        //if (worldUI != null)
+        //    worldUI.SetActive(false);
 
         // Sets currentVital to maxVital and Invokes Event_OnHealthChanged
         base.InitializeVital();
@@ -53,13 +67,12 @@ public class PlayerHealthManager : HealthManager
 
         RpcOnHealthChanged(currentVital, maxVital);
     }
+    #endregion
 
+    #region Set Vital
     [Client]
     public override void SetVital(float setVal)
     {
-        //if (myUI != null)
-        //    myUI.SetActive(true);
-
         // Sets currentVital to setVal and Invokes Event_OnHealthChanged
         base.SetVital(setVal);
 
@@ -74,7 +87,10 @@ public class PlayerHealthManager : HealthManager
 
         RpcOnHealthChanged(currentVital, maxVital);
     }
+    #endregion
 
+    #region Modify Vital
+    [Client]
     public override void ModfiyVital(float modVal)
     {
         // Calculates currentVal+modVal and clamps between 0 and maxVital
@@ -96,12 +112,13 @@ public class PlayerHealthManager : HealthManager
         synchronizedVital = currentVital;
         RpcOnHealthChanged(currentVital, maxVital);
     }
+    #endregion
 
     [ClientRpc]
     public override void RpcOnHealthChanged(float curVal, float maxVal)
     {
         if (base.hasAuthority) { return; }
-
+        
         base.RpcOnHealthChanged(curVal,maxVal);
     }
 

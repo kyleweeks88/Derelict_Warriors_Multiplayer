@@ -21,7 +21,8 @@ public class VitalStat : NetworkBehaviour
 
     public virtual void SetVital(float setVal)
     {
-        currentVital = setVal;
+        //currentVital = setVal;
+        currentVital = Mathf.Clamp(setVal, 0, maxVital);
     }
 
     public virtual void ModfiyVital(float modVal)

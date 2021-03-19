@@ -11,7 +11,8 @@ public class VitalsDisplay : MonoBehaviour
     [SerializeField] StaminaManager staminaManager = null;
 
     [Header("Health Ref")]
-    [SerializeField] private Image healthBarImage = null;
+    [SerializeField] Image healthBarImage = null;
+    [SerializeField] Image worldHealthBarImage = null;
 
     [Header("Stamina Ref")]
     [SerializeField] Image staminaBarImage = null;
@@ -32,6 +33,8 @@ public class VitalsDisplay : MonoBehaviour
     void HandleHealthChanged(float curVal, float maxVal)
     {
         healthBarImage.fillAmount = curVal / maxVal;
+        worldHealthBarImage.fillAmount = curVal / maxVal;
+        Debug.Log("UI: curVal: " + curVal + ", maxVal: " + maxVal);
     }
 
     void HandleStaminaChanged(float curVal, float maxVal)
