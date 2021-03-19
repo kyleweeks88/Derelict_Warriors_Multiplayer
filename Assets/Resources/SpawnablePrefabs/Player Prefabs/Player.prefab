@@ -1286,7 +1286,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7403780257545346437}
   - component: {fileID: 26651144152361468}
-  - component: {fileID: 3899526673793323070}
   m_Layer: 0
   m_Name: Health Parent
   m_TagString: Untagged
@@ -1323,21 +1322,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5373781979647189823}
   m_CullTransparentMesh: 0
---- !u!114 &3899526673793323070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5373781979647189823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vitalsMgmt: {fileID: 0}
-  healthBarImage: {fileID: 41788978711997718}
-  staminaBarImage: {fileID: 0}
 --- !u!1 &5391570073190775220
 GameObject:
   m_ObjectHideFlags: 0
@@ -1727,7 +1711,6 @@ GameObject:
   - component: {fileID: 6456623279029076782}
   - component: {fileID: 2804974000209527548}
   - component: {fileID: 7737185548553403826}
-  - component: {fileID: 4643259374902229013}
   m_Layer: 0
   m_Name: Screenspace Canvas
   m_TagString: Untagged
@@ -1799,21 +1782,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
---- !u!114 &4643259374902229013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513304617872774401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vitalsMgmt: {fileID: 399795552656431348}
-  healthBarImage: {fileID: 4680986782954741257}
-  staminaBarImage: {fileID: 4950630359981323419}
 --- !u!1 &6519869665437484994
 GameObject:
   m_ObjectHideFlags: 0
