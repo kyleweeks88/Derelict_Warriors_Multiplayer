@@ -1286,7 +1286,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7403780257545346437}
   - component: {fileID: 26651144152361468}
-  - component: {fileID: 3899526673793323070}
   m_Layer: 0
   m_Name: Health Parent
   m_TagString: Untagged
@@ -1323,22 +1322,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5373781979647189823}
   m_CullTransparentMesh: 0
---- !u!114 &3899526673793323070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5373781979647189823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthManager: {fileID: 0}
-  staminaManager: {fileID: 0}
-  healthBarImage: {fileID: 41788978711997718}
-  staminaBarImage: {fileID: 0}
 --- !u!1 &5391570073190775220
 GameObject:
   m_ObjectHideFlags: 0
@@ -1728,7 +1711,6 @@ GameObject:
   - component: {fileID: 6456623279029076782}
   - component: {fileID: 2804974000209527548}
   - component: {fileID: 7737185548553403826}
-  - component: {fileID: 4643259374902229013}
   m_Layer: 0
   m_Name: Screenspace Canvas
   m_TagString: Untagged
@@ -1800,22 +1782,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
---- !u!114 &4643259374902229013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513304617872774401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthManager: {fileID: 6785309732559405815}
-  staminaManager: {fileID: -7243457902745452413}
-  healthBarImage: {fileID: 4680986782954741257}
-  staminaBarImage: {fileID: 4950630359981323419}
 --- !u!1 &6519869665437484994
 GameObject:
   m_ObjectHideFlags: 0
@@ -1838,9 +1804,8 @@ GameObject:
   - component: {fileID: 2684214008263218707}
   - component: {fileID: 6899203083148865249}
   - component: {fileID: 6016297192550152662}
-  - component: {fileID: 6785309732559405815}
-  - component: {fileID: -7243457902745452413}
   - component: {fileID: 5870174210345145216}
+  - component: {fileID: 399795552656431348}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -1985,6 +1950,7 @@ MonoBehaviour:
   playerMovement: {fileID: 0}
   staminaMgmt: {fileID: 0}
   dodgeCtrl: {fileID: 0}
+  vitalsMgmt: {fileID: 0}
   myCamera: {fileID: 6482849343757429649}
   freeLook: {fileID: 1674453814961982921}
   sprintCamera: {fileID: 6757011220328924237}
@@ -2009,7 +1975,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 7169
   playerMgmt: {fileID: 3467262495813199297}
-  staminaMgmt: {fileID: -7243457902745452413}
   isSprinting: 0
   isJumping: 0
   yVelocity: 0
@@ -2073,6 +2038,14 @@ MonoBehaviour:
   sprintMultiplier: 1.5
   jumpVelocity: 25
   baseAttackDamage: 1
+  staminaGainAmount: 1
+  staminaGainDelay: 10
+  staminaDrainAmount: 1
+  staminaDrainDelay: 10
+  healthGainAmount: 0
+  healthGainDelay: 0
+  healthDrainAmount: 0
+  healthDrainDelay: 0
 --- !u!114 &6899203083148865249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2111,41 +2084,6 @@ MonoBehaviour:
   isSprintingParam: 1125312739
   inputXParam: -1468965832
   inputYParam: -545887058
---- !u!114 &6785309732559405815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519869665437484994}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b54ba250763370f4dbc14df5347ed14b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  maxVital: 100
-  worldUI: {fileID: 3568110016877136137}
-  myUI: {fileID: 6513304617872774401}
---- !u!114 &-7243457902745452413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519869665437484994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d756aacc544e8704e9062a87fdef8dd7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  maxVital: 100
-  staminaGainAmount: 1
-  staminaDrainAmount: 1
-  drainingStamina: 0
 --- !u!114 &5870174210345145216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2165,6 +2103,23 @@ MonoBehaviour:
   invulnerableDuration: 0.5
   dodgeCooldown: 1
   dodgeVelocity: 20
+--- !u!114 &399795552656431348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9737b3e73b4fc144a87e849d8e864ca5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  health: {fileID: 11400000, guid: 8737e7c5650f0154d813c20a1156ca43, type: 2}
+  stamina: {fileID: 11400000, guid: 4c63e17653190f04b9d4c82dfa2c9857, type: 2}
+  myUI: {fileID: 6513304617872774401}
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0
@@ -2714,6 +2669,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
+--- !u!4 &2294159835578381327 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4653035768442264, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
+    type: 3}
+  m_PrefabInstance: {fileID: 2289792194481281431}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2289322945793128889 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1045401375514670, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
@@ -2729,12 +2690,6 @@ Transform:
 --- !u!95 &2203414895770027891 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 95389170962898660, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
-    type: 3}
-  m_PrefabInstance: {fileID: 2289792194481281431}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2294159835578381327 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4653035768442264, guid: f11fc98cf1e8d5547a9b2ec85cc9c664,
     type: 3}
   m_PrefabInstance: {fileID: 2289792194481281431}
   m_PrefabAsset: {fileID: 0}

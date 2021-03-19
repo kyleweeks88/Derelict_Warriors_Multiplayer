@@ -8,8 +8,10 @@ public class FloatVariable : ScriptableObject, ISerializationCallbackReceiver
     public delegate void OnValueChanged(float curVal, float maxVal);
     public event OnValueChanged Event_ValueChanged;
 
+    public string varName = string.Empty;
     public float InitialValue;
     public float maxValue;
+    public bool drainingVital = false;
 
     [NonSerialized]
 	public float RuntimeValue;
@@ -38,11 +40,9 @@ public class FloatVariable : ScriptableObject, ISerializationCallbackReceiver
         this.Event_ValueChanged?.Invoke(RuntimeValue, maxValue);
     }
 
-    public virtual void ModfiyValue(float modVal)
+    public void ModfiyValue(float modVal)
     {
         RuntimeValue = Mathf.Clamp((RuntimeValue + modVal), 0, maxValue);
-        this.Event_ValueChanged(RuntimeValue, maxValue);
+        this.Event_ValueChanged?.Invoke(RuntimeValue, maxValue);
     }
-
-
 }

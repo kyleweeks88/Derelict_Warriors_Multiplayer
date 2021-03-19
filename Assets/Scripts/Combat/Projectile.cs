@@ -27,10 +27,11 @@ public class Projectile : NetworkBehaviour
         NetworkIdentity hitId = col.GetComponent<NetworkIdentity>();
         if (hitId != null)
         {
-            NpcHealthManager hitTarget = col.GetComponent<NpcHealthManager>();
+            //NpcHealthManager hitTarget = col.GetComponent<NpcHealthManager>();
+            VitalsManager hitTarget = col.GetComponent<VitalsManager>();
             if (hitTarget != null)
             {
-                hitTarget.TakeDamage(projDmg);
+                hitTarget.TakeDamage(hitTarget.health, projDmg);
             }
         }
 

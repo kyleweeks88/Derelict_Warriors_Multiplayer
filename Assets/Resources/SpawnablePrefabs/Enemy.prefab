@@ -233,6 +233,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  vitalGainAmount: 0
+  vitalDrainAmount: 0
   maxVital: 100
   worldUI: {fileID: 6903840143906365927}
 --- !u!114 &3549774648245997707
@@ -250,7 +252,18 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   charName: Baddie
+  moveSpeed: 5
+  sprintMultiplier: 2
+  jumpVelocity: 5
   baseAttackDamage: 50
+  staminaGainAmount: 0
+  staminaGainDelay: 0
+  staminaDrainAmount: 0
+  staminaDrainDelay: 0
+  healthGainAmount: 0
+  healthGainDelay: 0
+  healthDrainAmount: 0
+  healthDrainDelay: 0
 --- !u!114 &-5605180569895802748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,9 +278,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  vitalGainAmount: 0
+  vitalDrainAmount: 0
   maxVital: 100
-  staminaGainAmount: 1
-  staminaDrainAmount: 1
   drainingStamina: 0
 --- !u!1 &1026070167116394870
 GameObject:
@@ -278,7 +291,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5411450033482181721}
-  - component: {fileID: 1560529886322574747}
   m_Layer: 9
   m_Name: Enemy UI
   m_TagString: Untagged
@@ -301,22 +313,6 @@ Transform:
   m_Father: {fileID: 6078599325536702809}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1560529886322574747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1026070167116394870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthManager: {fileID: 2021469925027531097}
-  staminaManager: {fileID: -5605180569895802748}
-  healthBarImage: {fileID: 3489410448080874084}
-  staminaBarImage: {fileID: 0}
 --- !u!1 &1901676367661130347
 GameObject:
   m_ObjectHideFlags: 0

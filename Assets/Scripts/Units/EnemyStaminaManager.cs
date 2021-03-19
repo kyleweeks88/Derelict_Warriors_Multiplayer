@@ -57,8 +57,8 @@ public class EnemyStaminaManager : StaminaManager
         if (ShouldDrainStamina())
         {
             drainingStamina = true;
-            TakeDamage(staminaDrainAmount);
-            staminaDrainInterval = Time.time + 0.1f;
+            //TakeDamage(staminaDrainAmount);
+            vitalDrainInterval = Time.time + 0.1f;
             StartCoroutine(StaminaGainDelay(currentVital));
         }
     }
@@ -78,8 +78,8 @@ public class EnemyStaminaManager : StaminaManager
     {
         if (ShouldGainStamina())
         {
-            GainStamina(staminaGainAmount);
-            staminaGainInterval = Time.time + 100f / 1000f;
+            GainStamina(vitalGainAmount);
+            vitalGainInterval = Time.time + 100f / 1000f;
         }
     }
 

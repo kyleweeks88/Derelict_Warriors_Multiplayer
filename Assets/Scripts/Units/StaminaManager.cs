@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class StaminaManager : VitalStat, IDamageable<float>
+public class StaminaManager : VitalStat//, IDamageable<float>
 {
-    public float staminaGainAmount;
-    public float staminaDrainAmount;
-    protected float staminaDrainInterval = 0f;
-    protected float staminaGainInterval = 0f;
+    //public float staminaGainAmount;
+    //public float staminaDrainAmount;
+    //protected float staminaDrainInterval = 0f;
+    //protected float staminaGainInterval = 0f;
     public bool drainingStamina;
 
     public delegate void OnStaminaChanged(float curVal, float maxVal);
@@ -48,7 +48,7 @@ public class StaminaManager : VitalStat, IDamageable<float>
 
     protected bool ShouldDrainStamina()
     {
-        bool result = (Time.time >= staminaDrainInterval);
+        bool result = (Time.time >= vitalDrainInterval);
 
         return result;
     }
@@ -58,7 +58,7 @@ public class StaminaManager : VitalStat, IDamageable<float>
 
     protected bool ShouldGainStamina()
     {
-        bool result = (Time.time >= staminaGainInterval);
+        bool result = (Time.time >= vitalGainInterval);
 
         return result;
     }

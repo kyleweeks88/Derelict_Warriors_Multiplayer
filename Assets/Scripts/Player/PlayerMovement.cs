@@ -13,7 +13,6 @@ public class PlayerMovement : NetworkBehaviour
 
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
-    [SerializeField] PlayerStaminaManager staminaMgmt = null;
 
     float currentMoveSpeed = 0f;
     float turnSpeed = 15f;
@@ -24,10 +23,13 @@ public class PlayerMovement : NetworkBehaviour
     [HideInInspector] public float yVelocity = 0;
     float gravity = -9.81f;
 
+    FloatVariable stamina;
+    FloatVariable health;
 
     public override void OnStartAuthority()
     {
-        staminaMgmt = GetComponent<PlayerStaminaManager>();
+        stamina = playerMgmt.vitalsMgmt.stamina;
+        health = playerMgmt.vitalsMgmt.health;
 
         currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
     }
@@ -113,7 +115,8 @@ public class PlayerMovement : NetworkBehaviour
     #region Sprinting
     public void SprintPressed()
     {
-        if (movement.z > 0.1 && staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
+        if (movement.z > 0.1 && stamina.GetCurrentValue() 
+            - playerMgmt.playerStats.staminaDrainAmount > 0)
         {
             currentMoveSpeed *= playerMgmt.playerStats.sprintMultiplier;
             isSprinting = true;
@@ -135,9 +138,13 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (isSprinting)
         {
-            if (staminaMgmt.GetCurrentVital() - staminaMgmt.staminaDrainAmount > 0)
+            //vitalsMgmt.staminaVal.GetCurrentValue() - playerMgmt.playerStats.staminaDrainAmount > 0
+            if (stamina.GetCurrentValue() 
+                - playerMgmt.playerStats.staminaDrainAmount > 0)
             {
-                staminaMgmt.StaminaDrain();
+                playerMgmt.vitalsMgmt.VitalDrainOverTime(stamina, 
+                    playerMgmt.playerStats.staminaDrainAmount,
+                    playerMgmt.playerStats.staminaDrainDelay);
             }
             else
             {
@@ -153,12 +160,12 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!isJumping && isGrounded)
         {
-            if (staminaMgmt.GetCurrentVital() - 10f > 0)
+            if (stamina.GetCurrentValue() - 10f > 0)
             {
                 playerMgmt.isInteracting = true;
                 isJumping = true;
                 isGrounded = false;
-                staminaMgmt.TakeDamage(10f);
+                playerMgmt.vitalsMgmt.TakeDamage(stamina, 10f);
 
                 playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
             }

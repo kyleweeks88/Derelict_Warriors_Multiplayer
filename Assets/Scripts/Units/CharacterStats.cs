@@ -21,6 +21,17 @@ public class CharacterStats : NetworkBehaviour, IKillable
     [Header("Combat settings")]
     public float baseAttackDamage = 1f;
 
+    [Header("Stamina vital")]
+    public float staminaGainAmount;
+    public float staminaGainDelay;
+    public float staminaDrainAmount;
+    public float staminaDrainDelay;
+    [Header("Health vital")]
+    public float healthGainAmount;
+    public float healthGainDelay;
+    public float healthDrainAmount;
+    public float healthDrainDelay;
+
     public void Invulnerability()
     {
         StartCoroutine(Invulnerable(0.25f));

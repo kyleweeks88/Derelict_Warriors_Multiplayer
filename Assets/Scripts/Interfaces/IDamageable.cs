@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public interface IDamageable<T>
+public interface IDamageable<FloatVariable, T>
 {
-    void TakeDamage(T damageTaken);
+    void TakeDamage(FloatVariable floatVar, T damageTaken);
 }

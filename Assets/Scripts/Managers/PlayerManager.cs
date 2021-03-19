@@ -16,6 +16,7 @@ public class PlayerManager : NetworkBehaviour
     public PlayerMovement playerMovement;
     public StaminaManager staminaMgmt;
     public DodgeControl dodgeCtrl;
+    public VitalsManager vitalsMgmt;
 
     [Header("Camera Ref")]
     public GameObject myCamera = null;
@@ -37,6 +38,9 @@ public class PlayerManager : NetworkBehaviour
         playerMovement = gameObject.GetComponent<PlayerMovement>();
         playerMovement.enabled = true;
 
+        vitalsMgmt = gameObject.GetComponent<VitalsManager>();
+        vitalsMgmt.enabled = true;
+
         equipmentMgmt = gameObject.GetComponent<EquipmentManager>();
         equipmentMgmt.enabled = true;
 
@@ -49,8 +53,8 @@ public class PlayerManager : NetworkBehaviour
         combatMgmt = gameObject.GetComponent<CombatManager>();
         combatMgmt.enabled = true;
 
-        staminaMgmt = gameObject.GetComponent<StaminaManager>();
-        staminaMgmt.enabled = true;
+        //staminaMgmt = gameObject.GetComponent<StaminaManager>();
+        //staminaMgmt.enabled = true;
 
         dodgeCtrl = gameObject.GetComponent<DodgeControl>();
         dodgeCtrl.enabled = true;
