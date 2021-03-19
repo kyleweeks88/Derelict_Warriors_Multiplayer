@@ -930,7 +930,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7842445721375597165
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1455,13 +1455,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4704538343655802368}
+  - component: {fileID: 6450778165978639097}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4704538343655802368
 Transform:
   m_ObjectHideFlags: 0
@@ -1478,6 +1479,23 @@ Transform:
   m_Father: {fileID: 392230492053937152}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &6450778165978639097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6123483962377342696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthManager: {fileID: 6785309732559405815}
+  staminaManager: {fileID: -7243457902745452413}
+  healthBarImage: {fileID: 4680986782954741257}
+  worldHealthBarImage: {fileID: 41788978711997718}
+  staminaBarImage: {fileID: 4950630359981323419}
 --- !u!1 &6284325982688051954
 GameObject:
   m_ObjectHideFlags: 0
@@ -1711,14 +1729,13 @@ GameObject:
   - component: {fileID: 6456623279029076782}
   - component: {fileID: 2804974000209527548}
   - component: {fileID: 7737185548553403826}
-  - component: {fileID: 4643259374902229013}
   m_Layer: 0
   m_Name: Screenspace Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6456623279029076782
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1783,23 +1800,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
---- !u!114 &4643259374902229013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513304617872774401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5dc1cd48dcce314396e44db030f4c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthManager: {fileID: 6785309732559405815}
-  staminaManager: {fileID: -7243457902745452413}
-  healthBarImage: {fileID: 4680986782954741257}
-  worldHealthBarImage: {fileID: 41788978711997718}
-  staminaBarImage: {fileID: 4950630359981323419}
 --- !u!1 &6519869665437484994
 GameObject:
   m_ObjectHideFlags: 0
@@ -2110,8 +2110,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   maxVital: 100
-  worldUI: {fileID: 3568110016877136137}
-  myUI: {fileID: 6513304617872774401}
+  playerUI: {fileID: 6123483962377342696}
+  worldspaceUI: {fileID: 3568110016877136137}
+  screenspaceUI: {fileID: 6513304617872774401}
 --- !u!114 &-7243457902745452413
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 
 public class HealthManager : VitalStat, IDamageable<float>
 {
-    [SerializeField] protected GameObject worldUI;
+    [SerializeField] protected GameObject playerUI;
+    [SerializeField] protected GameObject worldspaceUI;
 
     public delegate void OnHealthChanged(float curVal, float maxVal);
     public event OnHealthChanged Event_HealthChanged;

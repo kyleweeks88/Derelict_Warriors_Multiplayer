@@ -6,20 +6,20 @@ using Mirror;
 
 public class PlayerHealthManager : HealthManager
 {
-    [SerializeField] GameObject myUI;
+    [SerializeField] GameObject screenspaceUI;
 
     public override void OnStartAuthority()
     {
         enabled = true;
     }
 
-    public override void OnStartServer()
+    public override void OnStartClient()
     {
-        // 
         if (!base.hasAuthority)
         {
-            worldUI.SetActive(true);
-            SetVital(GetCurrentVital());
+
+            InitializeVital();
+            Debug.Log("TEST");
         }
     }
 
@@ -46,11 +46,22 @@ public class PlayerHealthManager : HealthManager
     [Client]
     public override void InitializeVital()
     {
-        if (myUI != null)
-            myUI.SetActive(true);
+        if (base.hasAuthority)
+        {
+            if (playerUI != null)
+                playerUI.SetActive(true);
 
-        //if (worldUI != null)
-        //    worldUI.SetActive(false);
+            if (worldspaceUI != null)
+                worldspaceUI.SetActive(false);
+        }
+        else
+        {
+            if (playerUI != null)
+                playerUI.SetActive(true);
+
+            if (screenspaceUI != null)
+                screenspaceUI.SetActive(false);
+        }
 
         // Sets currentVital to maxVital and Invokes Event_OnHealthChanged
         base.InitializeVital();
@@ -74,7 +85,8 @@ public class PlayerHealthManager : HealthManager
     public override void SetVital(float setVal)
     {
         // Sets currentVital to setVal and Invokes Event_OnHealthChanged
-        base.SetVital(setVal);
+        if(!base.isServer)
+            base.SetVital(setVal);
 
         CmdSetVital(setVal);
     }
@@ -82,8 +94,9 @@ public class PlayerHealthManager : HealthManager
     [Command]
     void CmdSetVital(float setVal)
     {
-        //InitializeVital();
-        synchronizedVital = setVal;
+        currentVital = Mathf.Clamp(setVal, 0, maxVital);
+
+        synchronizedVital = currentVital;
 
         RpcOnHealthChanged(currentVital, maxVital);
     }
@@ -108,7 +121,8 @@ public class PlayerHealthManager : HealthManager
     [Command]
     void CmdModifyVital(float modVal)
     {
-        //currentVital = Mathf.Clamp((currentVital + modVal), 0, maxVital);
+        currentVital = Mathf.Clamp((currentVital + modVal), 0, maxVital);
+
         synchronizedVital = currentVital;
         RpcOnHealthChanged(currentVital, maxVital);
     }
