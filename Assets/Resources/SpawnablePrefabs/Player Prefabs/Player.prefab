@@ -1684,6 +1684,7 @@ GameObject:
   - component: {fileID: 6016297192550152662}
   - component: {fileID: 5870174210345145216}
   - component: {fileID: 399795552656431348}
+  - component: {fileID: 7332910233974431299}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -1818,6 +1819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  inputMgmt: {fileID: 7332910233974431299}
   inputSystem: {fileID: 11400000, guid: dbb71bb0ba90c4848ab00965e926cdbc, type: 2}
   myRb: {fileID: 0}
   equipmentMgmt: {fileID: 0}
@@ -2003,6 +2005,27 @@ MonoBehaviour:
   health: {fileID: 11400000, guid: 8737e7c5650f0154d813c20a1156ca43, type: 2}
   stamina: {fileID: 11400000, guid: 4c63e17653190f04b9d4c82dfa2c9857, type: 2}
   myUI: {fileID: 6513304617872774401}
+--- !u!114 &7332910233974431299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519869665437484994}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95cdd584efea3164392e7dd93a3509f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  playerMgmt: {fileID: 0}
+  canRecieveAttackInput: 0
+  attackInputRecieved: 0
+  attackInputHeld: 0
+  rangedAttackHeld: 0
+  horizontal: 0
+  vertical: 0
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0

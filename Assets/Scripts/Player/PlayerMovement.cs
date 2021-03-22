@@ -30,7 +30,8 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-        playerMgmt.inputSystem.jumpEvent += Jump;
+        //playerMgmt.inputSystem.jumpEvent += Jump;
+        playerMgmt.inputMgmt.jumpEvent += Jump;
         playerMgmt.inputSystem.sprintEventStarted += SprintPressed;
         playerMgmt.inputSystem.sprintEventCancelled += SprintReleased;
         playerMgmt.inputSystem.moveEvent += OnMove;

@@ -6,6 +6,7 @@ using Mirror;
 public class PlayerManager : NetworkBehaviour
 {
     [Header("Component Ref")]
+    public InputManager inputMgmt;
     public InputSystem_SO inputSystem;
     public Rigidbody myRb;
     public EquipmentManager equipmentMgmt;
@@ -27,6 +28,8 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartAuthority()
     {
         myRb = gameObject.GetComponent<Rigidbody>();
+
+        inputMgmt.enabled = true;
 
         playerMovement = gameObject.GetComponent<PlayerMovement>();
         playerMovement.enabled = true;
