@@ -8,6 +8,14 @@ using UnityEngine.Events;
 public class InputSystem_SO : ScriptableObject, Controls.IPlayerActions, Controls.IUserInterfaceActions
 {
     private Controls controls;
+    public Controls Controls
+    {
+        get
+        {
+            if (controls != null) { return controls; }
+            return controls = new Controls();
+        }
+    }
 
     public event UnityAction<Vector2> moveEvent;
     public event UnityAction sprintEventStarted;
@@ -24,12 +32,8 @@ public class InputSystem_SO : ScriptableObject, Controls.IPlayerActions, Control
 
     private void OnEnable()
     {
-        if (controls == null)
-        {
-            controls = new Controls();
-            controls.Player.SetCallbacks(this);
-        }
-
+        Controls.Enable();
+        Controls.Player.SetCallbacks(this);
         EnableGameplayInput();
     }
 
