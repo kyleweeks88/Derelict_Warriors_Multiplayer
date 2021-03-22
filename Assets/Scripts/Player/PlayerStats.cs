@@ -6,6 +6,8 @@ using Mirror;
 public class PlayerStats : CharacterStats
 {
     PlayerName playerName;
+    public float playerGravity;
+    [HideInInspector] public float currentPlayerGravity;
 
     public override void OnStartAuthority()
     {

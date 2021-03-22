@@ -186,6 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  playerInput: {fileID: 11400000, guid: dbb71bb0ba90c4848ab00965e926cdbc, type: 2}
   weaponToPickup_Pf: {fileID: 8307531084251409164, guid: 272ec6d59fba3d04ea9cab17289e0c38,
     type: 3}
 --- !u!114 &5422946838205441017

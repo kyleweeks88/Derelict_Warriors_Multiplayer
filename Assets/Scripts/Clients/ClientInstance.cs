@@ -84,11 +84,7 @@ public class ClientInstance : NetworkBehaviour
         if(currentCharacter != null)
         {
             VitalsManager vitalsMgmt = currentCharacter.GetComponent<VitalsManager>();
-            //healthMgmt.SetVital(healthMgmt.maxVital);
             vitalsMgmt.InitializeVitals();
-
-            //StaminaManager staminaMgmt = currentCharacter.GetComponent<StaminaManager>();
-            //staminaMgmt.SetVital(staminaMgmt.maxVital);
         }
     }
 

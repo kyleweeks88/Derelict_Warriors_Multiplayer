@@ -7,39 +7,38 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public bool isGrounded;
     public Transform groundColPos;
     public LayerMask whatIsWalkable;
 
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
 
+    Vector3 movement;
+    Vector2 _previousMovementInput;
+
+    float playerGravity = -9.81f;
     float currentMoveSpeed = 0f;
     float turnSpeed = 15f;
-    [HideInInspector] public bool isSprinting = false;
-    Vector3 movement;
-
-    [HideInInspector] public bool isJumping;
     [HideInInspector] public float yVelocity = 0;
-    float gravity = -9.81f;
+
+    [HideInInspector] public bool isSprinting = false;
+    [HideInInspector] public bool isJumping;
+    public bool isGrounded;
 
     FloatVariable stamina;
     FloatVariable health;
 
     public override void OnStartAuthority()
     {
+        playerMgmt.inputSystem.jumpEvent += Jump;
+        playerMgmt.inputSystem.sprintEventStarted += SprintPressed;
+        playerMgmt.inputSystem.sprintEventCancelled += SprintReleased;
+        playerMgmt.inputSystem.moveEvent += OnMove;
+
         stamina = playerMgmt.vitalsMgmt.stamina;
         health = playerMgmt.vitalsMgmt.health;
 
         currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
-    }
-
-    [ClientCallback]
-    void Update()
-    {
-        if(!hasAuthority) {return;}
-
-        playerMgmt.inputMgmt.TickInput(Time.deltaTime);
     }
 
     [ClientCallback]
@@ -69,7 +68,7 @@ public class PlayerMovement : NetworkBehaviour
         if (groundCollisions.Length <= 0)
         {
             isGrounded = false;
-            playerMgmt.myRb.velocity += -Vector3.up * 1.1f;
+            playerMgmt.myRb.velocity += -Vector3.up * playerMgmt.playerStats.playerGravity;
         }
         else
         {
@@ -79,13 +78,21 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     [Client]
+    void OnMove(Vector2 movement)
+    {
+        if (!base.hasAuthority) { return; }
+
+        _previousMovementInput = movement;
+    }
+
+    [Client]
     public void Move()
     {
         // CONVERTS THE INPUT INTO A NORMALIZED VECTOR3
         movement = new Vector3
         {
-            x = playerMgmt.inputMgmt.horizontal,
-            z = playerMgmt.inputMgmt.vertical
+            x = _previousMovementInput.x,
+            z = _previousMovementInput.y
         }.normalized;
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
@@ -158,6 +165,8 @@ public class PlayerMovement : NetworkBehaviour
     [Client]
     public void Jump()
     {
+        if (playerMgmt.isInteracting) { return; }
+
         if(!isJumping && isGrounded)
         {
             if (stamina.GetCurrentValue() - 10f > 0)

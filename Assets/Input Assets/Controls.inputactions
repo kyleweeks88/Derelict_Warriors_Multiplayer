@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "PassThrough",
+                    "type": "Value",
                     "id": "101f2cf0-b6d8-45f0-96b6-db45898787f0",
                     "expectedControlType": "Vector2",
                     "processors": "",
@@ -57,6 +57,22 @@
                     "name": "Dodge",
                     "type": "Button",
                     "id": "8f17d74e-4099-4322-b560-bed6cc1eb38e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Sprint",
+                    "type": "Button",
+                    "id": "4943f965-1c96-4148-8762-0de3e9549957",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "UserInterface",
+                    "type": "Button",
+                    "id": "ac1368cc-7c9f-4c39-9005-5875a9dab03a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -227,31 +243,72 @@
                     "action": "Dodge",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "52d17c8b-2df1-46b1-8d71-386027c5f3e3",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "M&K",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a40a1291-0fd5-4e07-b73c-9cc02a2be764",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "M&K",
+                    "action": "UserInterface",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
         {
-            "name": "Locomotion",
-            "id": "8c7fd909-d5ea-4681-818d-059282714ac7",
+            "name": "UserInterface",
+            "id": "434bef3d-4f66-4b33-83de-3d935e092847",
             "actions": [
                 {
-                    "name": "Sprint",
+                    "name": "Interact",
                     "type": "Button",
-                    "id": "93e752e1-8b55-4e1c-9b15-bac5494b856e",
+                    "id": "c7e645bb-3b9c-4729-afab-8c40b9a54e16",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": ""
+                },
+                {
+                    "name": "ExitUserInterface",
+                    "type": "Button",
+                    "id": "35e1b39e-b8d7-4bd0-8c09-8bd7af153b85",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "70565ecc-d17c-4d46-a040-32a2e6ae151f",
-                    "path": "<Keyboard>/shift",
+                    "id": "2fd23aa4-53d6-4396-b0ff-45df627053fb",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
+                    "groups": "M&K",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a7b951b0-ad6a-44d6-8ba4-25ea9cfa5ea4",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "M&K",
+                    "action": "ExitUserInterface",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

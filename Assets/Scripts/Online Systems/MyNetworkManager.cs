@@ -16,6 +16,7 @@ public class MyNetworkManager : NetworkManager
     public static Dictionary<NetworkConnection, NetworkIdentity> LocalPlayers = new Dictionary<NetworkConnection, NetworkIdentity>();
     #endregion
 
+    [SerializeField] VoidEventChannel_SO stopServerEventChannel;
     [SerializeField] int minPlayers = 1;
     // THIS [Scene] TAG MAKES IT POSSIBLE TO DRAG A SCENE INTO FIELD TO CONVERT TO STRING
     [Scene] [SerializeField] string lobbyScene = string.Empty;
@@ -28,7 +29,19 @@ public class MyNetworkManager : NetworkManager
     public static event Action OnClientDisconnected;
     public static event Action OnServerStopped;
     public static event Action<NetworkPlayerConnData> OnPlayerAdded;
-    
+
+    public override void Awake()
+    {
+        base.Awake();
+
+        stopServerEventChannel.OnEventRaised += base.StopServer;
+    }
+
+    void OnDisable()
+    {
+        stopServerEventChannel.OnEventRaised -= base.StopServer;
+    }
+
 
     public override void OnStartServer()
     {
@@ -121,8 +134,6 @@ public class MyNetworkManager : NetworkManager
 
             playerDataList.Remove(player);
         }
-
-        base.OnServerDisconnect(conn);
 
         LocalPlayers.Remove(conn);
         base.OnServerDisconnect(conn);
