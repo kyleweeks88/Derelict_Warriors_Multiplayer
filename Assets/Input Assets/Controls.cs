@@ -294,7 +294,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""ExitUserInterface"",
+                    ""name"": ""UserInterface"",
                     ""type"": ""Button"",
                     ""id"": ""35e1b39e-b8d7-4bd0-8c09-8bd7af153b85"",
                     ""expectedControlType"": ""Button"",
@@ -321,7 +321,7 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""M&K"",
-                    ""action"": ""ExitUserInterface"",
+                    ""action"": ""UserInterface"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -372,7 +372,7 @@ public class @Controls : IInputActionCollection, IDisposable
         // UserInterface
         m_UserInterface = asset.FindActionMap("UserInterface", throwIfNotFound: true);
         m_UserInterface_Interact = m_UserInterface.FindAction("Interact", throwIfNotFound: true);
-        m_UserInterface_ExitUserInterface = m_UserInterface.FindAction("ExitUserInterface", throwIfNotFound: true);
+        m_UserInterface_UserInterface = m_UserInterface.FindAction("UserInterface", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -520,13 +520,13 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputActionMap m_UserInterface;
     private IUserInterfaceActions m_UserInterfaceActionsCallbackInterface;
     private readonly InputAction m_UserInterface_Interact;
-    private readonly InputAction m_UserInterface_ExitUserInterface;
+    private readonly InputAction m_UserInterface_UserInterface;
     public struct UserInterfaceActions
     {
         private @Controls m_Wrapper;
         public UserInterfaceActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Interact => m_Wrapper.m_UserInterface_Interact;
-        public InputAction @ExitUserInterface => m_Wrapper.m_UserInterface_ExitUserInterface;
+        public InputAction @UserInterface => m_Wrapper.m_UserInterface_UserInterface;
         public InputActionMap Get() { return m_Wrapper.m_UserInterface; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -539,9 +539,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Interact.started -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
                 @Interact.performed -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
                 @Interact.canceled -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
-                @ExitUserInterface.started -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnExitUserInterface;
-                @ExitUserInterface.performed -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnExitUserInterface;
-                @ExitUserInterface.canceled -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnExitUserInterface;
+                @UserInterface.started -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
+                @UserInterface.performed -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
+                @UserInterface.canceled -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
             }
             m_Wrapper.m_UserInterfaceActionsCallbackInterface = instance;
             if (instance != null)
@@ -549,9 +549,9 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
-                @ExitUserInterface.started += instance.OnExitUserInterface;
-                @ExitUserInterface.performed += instance.OnExitUserInterface;
-                @ExitUserInterface.canceled += instance.OnExitUserInterface;
+                @UserInterface.started += instance.OnUserInterface;
+                @UserInterface.performed += instance.OnUserInterface;
+                @UserInterface.canceled += instance.OnUserInterface;
             }
         }
     }
@@ -589,6 +589,6 @@ public class @Controls : IInputActionCollection, IDisposable
     public interface IUserInterfaceActions
     {
         void OnInteract(InputAction.CallbackContext context);
-        void OnExitUserInterface(InputAction.CallbackContext context);
+        void OnUserInterface(InputAction.CallbackContext context);
     }
 }

@@ -281,7 +281,7 @@
                     "interactions": ""
                 },
                 {
-                    "name": "ExitUserInterface",
+                    "name": "UserInterface",
                     "type": "Button",
                     "id": "35e1b39e-b8d7-4bd0-8c09-8bd7af153b85",
                     "expectedControlType": "Button",
@@ -308,7 +308,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "M&K",
-                    "action": "ExitUserInterface",
+                    "action": "UserInterface",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

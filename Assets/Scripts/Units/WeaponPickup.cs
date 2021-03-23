@@ -3,7 +3,6 @@ using Mirror;
 
 public class WeaponPickup : NetworkBehaviour
 {
-    [SerializeField] InputSystem_SO playerInput;
     GameObject interactingEntity;
     // The weapon prefab for this pickup
     public Weapon weaponToPickup_Pf;
@@ -37,28 +36,16 @@ public class WeaponPickup : NetworkBehaviour
     /// <param name="boolVal"></param>
     void HandleEntityInput(GameObject colObj, bool boolVal)
     {
-        if (boolVal)
-            playerInput.interactEvent += PickupWeapon;
+        PlayerManager pm = colObj.GetComponent<PlayerManager>();
 
-        if (!boolVal)
-            playerInput.interactEvent -= PickupWeapon;
+        if (pm != null)
+        {
+            if (boolVal)
+                pm.inputMgmt.interactEvent += PickupWeapon;
 
-        //// Retrieve the Client Instance object relative to the entity
-        //ClientInstance ci = ClientInstance.ReturnClientInstance(
-        //    colObj.GetComponent<NetworkIdentity>().connectionToClient);
-
-        //if (ci != null)
-        //{
-        //    InputManager playerInput = ci.GetComponent<InputManager>();
-        //    if (playerInput != null)
-        //    {
-        //        if (boolVal)
-        //            playerInput.Event_OnInteract += PickupWeapon;
-
-        //        if (!boolVal)
-        //            playerInput.Event_OnInteract -= PickupWeapon;
-        //    }
-        //}
+            if (!boolVal)
+                pm.inputMgmt.interactEvent -= PickupWeapon;
+        }
     }
 
     /// <summary>

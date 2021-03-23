@@ -32,9 +32,9 @@ public class PlayerMovement : NetworkBehaviour
     {
         //playerMgmt.inputSystem.jumpEvent += Jump;
         playerMgmt.inputMgmt.jumpEvent += Jump;
-        playerMgmt.inputSystem.sprintEventStarted += SprintPressed;
-        playerMgmt.inputSystem.sprintEventCancelled += SprintReleased;
-        playerMgmt.inputSystem.moveEvent += OnMove;
+        playerMgmt.inputMgmt.sprintEventStarted += SprintPressed;
+        playerMgmt.inputMgmt.sprintEventCancelled += SprintReleased;
+        playerMgmt.inputMgmt.moveEvent += OnMove;
 
         stamina = playerMgmt.vitalsMgmt.stamina;
         health = playerMgmt.vitalsMgmt.health;

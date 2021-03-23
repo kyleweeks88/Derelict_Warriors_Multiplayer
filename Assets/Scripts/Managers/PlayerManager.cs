@@ -7,7 +7,6 @@ public class PlayerManager : NetworkBehaviour
 {
     [Header("Component Ref")]
     public InputManager inputMgmt;
-    public InputSystem_SO inputSystem;
     public Rigidbody myRb;
     public EquipmentManager equipmentMgmt;
     public PlayerStats playerStats;
@@ -29,6 +28,7 @@ public class PlayerManager : NetworkBehaviour
     {
         myRb = gameObject.GetComponent<Rigidbody>();
 
+        inputMgmt = gameObject.GetComponent<InputManager>();
         inputMgmt.enabled = true;
 
         playerMovement = gameObject.GetComponent<PlayerMovement>();

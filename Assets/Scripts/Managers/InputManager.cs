@@ -5,26 +5,23 @@ using UnityEngine;
 using UnityEngine.Events;
 using Mirror;
 
-public class InputManager : NetworkBehaviour, Controls.IPlayerActions
+public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.IUserInterfaceActions
 {
-    public delegate void OnInteractPressed();
-    public event OnInteractPressed Event_OnInteract;
-
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
 
-    public bool canRecieveAttackInput;
-    public bool attackInputRecieved;
-    public bool attackInputHeld;
-    public bool rangedAttackHeld;
-
-    public float horizontal;
-    public float vertical;
-    float moveAmount;
-
-    Vector2 moveInput;
-
-    public UnityAction jumpEvent;
+    public event UnityAction<Vector2> moveEvent;
+    public event UnityAction sprintEventStarted;
+    public event UnityAction sprintEventCancelled;
+    public event UnityAction jumpEvent;
+    public event UnityAction dodgeEvent;
+    public event UnityAction attackEventStarted;
+    public event UnityAction attackEventCancelled;
+    public event UnityAction rangedAttackEventStarted;
+    public event UnityAction rangedAttackEventCancelled;
+    // Used when the player interacts with contextual objects in the environment
+    public event UnityAction interactEvent;
+    public event UnityAction userInterfaceEvent;
 
     Controls controls;
     public Controls Controls
@@ -37,172 +34,107 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions
     }
 
     [ClientCallback]
-    void OnEnable() => Controls.Enable();
+    private void OnEnable()
+    {
+        Controls.Player.SetCallbacks(this);
+        EnableGameplayInput();
+    }
+
     [ClientCallback]
-    void OnDisable() => Controls.Disable();
+    void OnDisable() => DisableAllInput();
 
-    public override void OnStartAuthority()
+    public void EnableGameplayInput()
     {
-        enabled = true;
-        canRecieveAttackInput = true;
-
-        //ClientInstance.OnOwnerCharacterSpawned += InitializeComponents;
-
-        Controls.Player.Attack.started += ctx => RecieveAttackInput();
-        Controls.Player.Attack.canceled += ctx => ReleaseAttackInput();
-
-        Controls.Player.RangedAttack.started += ctx => RecieveRangedAttackInput();
-        Controls.Player.RangedAttack.canceled += ctx => ReleaseRangedAttackInput();
-
-        // Player Locomotion
-        Controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        //Controls.Player.Jump.performed += ctx => Jump();
-        Controls.Player.Sprint.started += ctx => SprintPressed();
-        Controls.Player.Sprint.canceled += ctx => SprintReleased();
-
-        // Player Interaction
-        Controls.Player.Interact.performed += ctx => InteractPressed();
-
-        Controls.Player.Dodge.performed += ctx => DodgeInputRecieved();
+        Controls.UserInterface.Disable();
+        Controls.Player.Enable();
+        Controls.Player.SetCallbacks(this);
     }
 
-    //void InitializeComponents(GameObject go)
-    //{
-    //    playerMgmt = go.GetComponent<PlayerManager>();
-    //    playerMgmt.inputMgmt = this;
-    //}
-
-    public void TickInput(float delta)
+    public void EnableUserInterfaceInput()
     {
-        MovementInput(delta);
+        Controls.Player.Disable();
+        Controls.UserInterface.Enable();
+        Controls.UserInterface.SetCallbacks(this);
     }
 
-    void MovementInput(float delta)
+    public void DisableAllInput()
     {
-        horizontal = moveInput.x;
-        vertical = moveInput.y;
-        moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
+        controls.Player.Disable();
+        controls.UserInterface.Disable();
     }
 
-    #region Ranged
-    public void RecieveRangedAttackInput()
+    public void OnAttack(InputAction.CallbackContext context)
     {
-        // If player is locked into an "interacting" state then don't let this happen.
-        if (playerMgmt.isInteracting) { return; }
+        if (attackEventStarted != null &&
+            context.phase == InputActionPhase.Started)
+            attackEventStarted.Invoke();
 
-        if (!canRecieveAttackInput) { return; }
-
-        if (canRecieveAttackInput)
-        {
-            rangedAttackHeld = true;
-            // Tells CombatManager to determine the means of the attack
-            playerMgmt.combatMgmt.RangedAttackPerformed();
-            playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
-        }
+        if (attackEventCancelled != null &&
+            context.phase == InputActionPhase.Canceled)
+            attackEventCancelled.Invoke();
     }
 
-    public void ReleaseRangedAttackInput()
+    public void OnRangedAttack(InputAction.CallbackContext context)
     {
-        rangedAttackHeld = false;
-        playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
-    }
-    #endregion
+        if (rangedAttackEventStarted != null &&
+            context.phase == InputActionPhase.Started)
+            rangedAttackEventStarted.Invoke();
 
-    #region Melee
-    public void RecieveAttackInput()
-    {
-        // If player is locked into an "interacting" state then don't let this happen.
-        if (playerMgmt.isInteracting) { return; }
-
-        if (!canRecieveAttackInput) { return; }
-
-        if (canRecieveAttackInput)
-        {
-            attackInputHeld = true;
-            // Tells CombatManager to determine the means of the attack
-            playerMgmt.combatMgmt.AttackPerformed();
-        }
+        if (rangedAttackEventCancelled != null &&
+            context.phase == InputActionPhase.Canceled)
+            rangedAttackEventCancelled.Invoke();
     }
 
-    public void ReleaseAttackInput()
+    public void OnDodge(InputAction.CallbackContext context)
     {
-        attackInputHeld = false;
-        playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
-    }
-    #endregion
-
-    void DodgeInputRecieved()
-    {
-        //playerMgmt.dodgeCtrl.Dodge(Controls.Player.Move.ReadValue<Vector2>());
+        if (dodgeEvent != null &&
+            context.phase == InputActionPhase.Performed)
+            dodgeEvent.Invoke();
     }
 
-    void Jump()
+    public void OnInteract(InputAction.CallbackContext context)
     {
-        if (playerMgmt.isInteracting) { return; }
-
-        playerMgmt.playerMovement.Jump();
-    }
-
-    void SprintPressed()
-    {
-        playerMgmt.playerMovement.SprintPressed();
-    }
-
-    void SprintReleased()
-    {
-        playerMgmt.isInteracting = false;
-        playerMgmt.playerMovement.SprintReleased();
-    }
-
-    void InteractPressed()
-    {
-        Event_OnInteract?.Invoke();
-    }
-
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
+        if (interactEvent != null &&
+            context.phase == InputActionPhase.Performed)
+            interactEvent.Invoke();
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
         if (jumpEvent != null &&
-            context.phase == InputActionPhase.Started)
+            context.phase == InputActionPhase.Performed)
             jumpEvent.Invoke();
     }
 
-    public void OnAttack(InputAction.CallbackContext context)
+    public void OnLook(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        // USE FOR DIFFERENT FORMS OF MOUSE MOVEMENT EVENTUALLY...
+        // I.E. UI MOVEMENT etc.
     }
 
-    public void OnInteract(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnRangedAttack(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnDodge(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
+        if (moveEvent != null)
+        {
+            moveEvent.Invoke(context.ReadValue<Vector2>());
+        }
     }
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        if (sprintEventStarted != null &&
+            context.phase == InputActionPhase.Started)
+            sprintEventStarted.Invoke();
+
+        if (sprintEventCancelled != null &&
+            context.phase == InputActionPhase.Canceled)
+            sprintEventCancelled.Invoke();
     }
 
     public void OnUserInterface(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        if (userInterfaceEvent != null &&
+            context.phase == InputActionPhase.Started)
+            userInterfaceEvent.Invoke();
     }
 }

@@ -26,14 +26,14 @@ public class EquipmentManager : NetworkBehaviour
         weaponToEquip = _weaponToEquip;
         EquipWeapon(weaponToEquip, weaponEquipPos);
 
-        if(!base.isServer)
-            CmdEquipWeapon(weaponEquipPos);
+        //if(!base.isServer)
+        CmdEquipWeapon(weaponEquipPos);
     }
 
     [Command]
     void CmdEquipWeapon(Transform equipPos)
     {
-        //EquipWeapon(weaponToEquip, equipPos);
+        EquipWeapon(weaponToEquip, equipPos);
         RpcEquipWeapon(equipPos);
     }
 
@@ -42,14 +42,18 @@ public class EquipmentManager : NetworkBehaviour
     {
         if (base.hasAuthority) { return; }
 
-        Weapon newWeapon = Instantiate(weaponToEquip, equipPos);
-        newWeapon.transform.SetParent(equipPos);
-        newWeapon.transform.localPosition = Vector3.zero;
-        newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        EquipWeapon(weaponToEquip, equipPos);
+
+        //Weapon newWeapon = Instantiate(weaponToEquip, equipPos);
+        //newWeapon.transform.SetParent(equipPos);
+        //newWeapon.transform.localPosition = Vector3.zero;
+        //newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
     public void EquipWeapon(Weapon _weaponToEquip, Transform _weaponEquipPos)
     {
+        if (!base.hasAuthority) { return; }
+
         if (currentlyEquippedWeapon != null)
         {
             // UNEQUIP WEAPON LOGIC

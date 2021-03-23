@@ -38,10 +38,10 @@ public class CombatManager : NetworkBehaviour
     {
         canRecieveAttackInput = true;
 
-        playerMgmt.inputSystem.attackEventStarted += AttackPerformed;
-        playerMgmt.inputSystem.attackEventCancelled += AttackReleased;
-        playerMgmt.inputSystem.rangedAttackEventStarted += RangedAttackPerformed;
-        playerMgmt.inputSystem.rangedAttackEventCancelled += RangedAttackReleased;
+        playerMgmt.inputMgmt.attackEventStarted += AttackPerformed;
+        playerMgmt.inputMgmt.attackEventCancelled += AttackReleased;
+        playerMgmt.inputMgmt.rangedAttackEventStarted += RangedAttackPerformed;
+        playerMgmt.inputMgmt.rangedAttackEventCancelled += RangedAttackReleased;
 
         stamina = playerMgmt.vitalsMgmt.stamina;
         health = playerMgmt.vitalsMgmt.health;
@@ -327,9 +327,9 @@ public class CombatManager : NetworkBehaviour
 
     private void OnDisable()
     {
-        playerMgmt.inputSystem.attackEventStarted -= AttackPerformed;
-        playerMgmt.inputSystem.attackEventCancelled -= AttackReleased;
-        playerMgmt.inputSystem.rangedAttackEventStarted -= RangedAttackPerformed;
-        playerMgmt.inputSystem.rangedAttackEventCancelled -= RangedAttackReleased;
+        playerMgmt.inputMgmt.attackEventStarted -= AttackPerformed;
+        playerMgmt.inputMgmt.attackEventCancelled -= AttackReleased;
+        playerMgmt.inputMgmt.rangedAttackEventStarted -= RangedAttackPerformed;
+        playerMgmt.inputMgmt.rangedAttackEventCancelled -= RangedAttackReleased;
     }
 }

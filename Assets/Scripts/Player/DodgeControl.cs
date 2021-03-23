@@ -19,8 +19,8 @@ public class DodgeControl : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-        playerMgmt.inputSystem.dodgeEvent += Dodge;
-        playerMgmt.inputSystem.moveEvent += DodgeDirection;
+        playerMgmt.inputMgmt.dodgeEvent += Dodge;
+        playerMgmt.inputMgmt.moveEvent += DodgeDirection;
     }
 
     [ClientCallback]

@@ -6,28 +6,35 @@ using UnityEngine;
 
 public class PlayerUserInterface : MonoBehaviour
 {
-    public InputSystem_SO inputSystem;
+    InputManager inputMgmt;
     public GameObject playerUI;
 
-    private void Awake()
+    private void OnEnable()
     {
-        inputSystem.userInterfaceEvent += EnableInterface;
+        ClientInstance.OnOwnerCharacterSpawned += Initialize;    
+    }
+
+    void Initialize(GameObject go)
+    {
+        inputMgmt = go.GetComponent<InputManager>();
+        inputMgmt.userInterfaceEvent += EnableInterface;
     }
 
     public void EnableInterface()
     {
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-
         if (!playerUI.activeInHierarchy)
         {
             playerUI.SetActive(true);
-            inputSystem.EnableUserInterfaceInput();
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            inputMgmt.EnableUserInterfaceInput();
         }
         else
         {
             playerUI.SetActive(false);
-            inputSystem.EnableGameplayInput();
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            inputMgmt.EnableGameplayInput();
         }
     }
 }
