@@ -20,7 +20,7 @@ public class @Controls : IInputActionCollection, IDisposable
             ""actions"": [
                 {
                     ""name"": ""Move"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Value"",
                     ""id"": ""101f2cf0-b6d8-45f0-96b6-db45898787f0"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -70,6 +70,22 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""name"": ""Dodge"",
                     ""type"": ""Button"",
                     ""id"": ""8f17d74e-4099-4322-b560-bed6cc1eb38e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""4943f965-1c96-4148-8762-0de3e9549957"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""UserInterface"",
+                    ""type"": ""Button"",
+                    ""id"": ""ac1368cc-7c9f-4c39-9005-5875a9dab03a"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -240,31 +256,72 @@ public class @Controls : IInputActionCollection, IDisposable
                     ""action"": ""Dodge"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""52d17c8b-2df1-46b1-8d71-386027c5f3e3"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a40a1291-0fd5-4e07-b73c-9cc02a2be764"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""UserInterface"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
         {
-            ""name"": ""Locomotion"",
-            ""id"": ""8c7fd909-d5ea-4681-818d-059282714ac7"",
+            ""name"": ""UserInterface"",
+            ""id"": ""434bef3d-4f66-4b33-83de-3d935e092847"",
             ""actions"": [
                 {
-                    ""name"": ""Sprint"",
+                    ""name"": ""Interact"",
                     ""type"": ""Button"",
-                    ""id"": ""93e752e1-8b55-4e1c-9b15-bac5494b856e"",
+                    ""id"": ""c7e645bb-3b9c-4729-afab-8c40b9a54e16"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press(behavior=2)""
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""UserInterface"",
+                    ""type"": ""Button"",
+                    ""id"": ""35e1b39e-b8d7-4bd0-8c09-8bd7af153b85"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""70565ecc-d17c-4d46-a040-32a2e6ae151f"",
-                    ""path"": ""<Keyboard>/shift"",
+                    ""id"": ""2fd23aa4-53d6-4396-b0ff-45df627053fb"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Sprint"",
+                    ""groups"": ""M&K"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7b951b0-ad6a-44d6-8ba4-25ea9cfa5ea4"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""M&K"",
+                    ""action"": ""UserInterface"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -310,9 +367,12 @@ public class @Controls : IInputActionCollection, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_RangedAttack = m_Player.FindAction("RangedAttack", throwIfNotFound: true);
         m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
-        // Locomotion
-        m_Locomotion = asset.FindActionMap("Locomotion", throwIfNotFound: true);
-        m_Locomotion_Sprint = m_Locomotion.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_UserInterface = m_Player.FindAction("UserInterface", throwIfNotFound: true);
+        // UserInterface
+        m_UserInterface = asset.FindActionMap("UserInterface", throwIfNotFound: true);
+        m_UserInterface_Interact = m_UserInterface.FindAction("Interact", throwIfNotFound: true);
+        m_UserInterface_UserInterface = m_UserInterface.FindAction("UserInterface", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -369,6 +429,8 @@ public class @Controls : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_RangedAttack;
     private readonly InputAction m_Player_Dodge;
+    private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_UserInterface;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -380,6 +442,8 @@ public class @Controls : IInputActionCollection, IDisposable
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @RangedAttack => m_Wrapper.m_Player_RangedAttack;
         public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
+        public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        public InputAction @UserInterface => m_Wrapper.m_Player_UserInterface;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -410,6 +474,12 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Dodge.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
                 @Dodge.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
                 @Dodge.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
+                @Sprint.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprint;
+                @Sprint.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprint;
+                @Sprint.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprint;
+                @UserInterface.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUserInterface;
+                @UserInterface.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUserInterface;
+                @UserInterface.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUserInterface;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -435,43 +505,57 @@ public class @Controls : IInputActionCollection, IDisposable
                 @Dodge.started += instance.OnDodge;
                 @Dodge.performed += instance.OnDodge;
                 @Dodge.canceled += instance.OnDodge;
+                @Sprint.started += instance.OnSprint;
+                @Sprint.performed += instance.OnSprint;
+                @Sprint.canceled += instance.OnSprint;
+                @UserInterface.started += instance.OnUserInterface;
+                @UserInterface.performed += instance.OnUserInterface;
+                @UserInterface.canceled += instance.OnUserInterface;
             }
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
 
-    // Locomotion
-    private readonly InputActionMap m_Locomotion;
-    private ILocomotionActions m_LocomotionActionsCallbackInterface;
-    private readonly InputAction m_Locomotion_Sprint;
-    public struct LocomotionActions
+    // UserInterface
+    private readonly InputActionMap m_UserInterface;
+    private IUserInterfaceActions m_UserInterfaceActionsCallbackInterface;
+    private readonly InputAction m_UserInterface_Interact;
+    private readonly InputAction m_UserInterface_UserInterface;
+    public struct UserInterfaceActions
     {
         private @Controls m_Wrapper;
-        public LocomotionActions(@Controls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Sprint => m_Wrapper.m_Locomotion_Sprint;
-        public InputActionMap Get() { return m_Wrapper.m_Locomotion; }
+        public UserInterfaceActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Interact => m_Wrapper.m_UserInterface_Interact;
+        public InputAction @UserInterface => m_Wrapper.m_UserInterface_UserInterface;
+        public InputActionMap Get() { return m_Wrapper.m_UserInterface; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(LocomotionActions set) { return set.Get(); }
-        public void SetCallbacks(ILocomotionActions instance)
+        public static implicit operator InputActionMap(UserInterfaceActions set) { return set.Get(); }
+        public void SetCallbacks(IUserInterfaceActions instance)
         {
-            if (m_Wrapper.m_LocomotionActionsCallbackInterface != null)
+            if (m_Wrapper.m_UserInterfaceActionsCallbackInterface != null)
             {
-                @Sprint.started -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
-                @Sprint.performed -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
-                @Sprint.canceled -= m_Wrapper.m_LocomotionActionsCallbackInterface.OnSprint;
+                @Interact.started -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
+                @Interact.performed -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
+                @Interact.canceled -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnInteract;
+                @UserInterface.started -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
+                @UserInterface.performed -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
+                @UserInterface.canceled -= m_Wrapper.m_UserInterfaceActionsCallbackInterface.OnUserInterface;
             }
-            m_Wrapper.m_LocomotionActionsCallbackInterface = instance;
+            m_Wrapper.m_UserInterfaceActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Sprint.started += instance.OnSprint;
-                @Sprint.performed += instance.OnSprint;
-                @Sprint.canceled += instance.OnSprint;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @UserInterface.started += instance.OnUserInterface;
+                @UserInterface.performed += instance.OnUserInterface;
+                @UserInterface.canceled += instance.OnUserInterface;
             }
         }
     }
-    public LocomotionActions @Locomotion => new LocomotionActions(this);
+    public UserInterfaceActions @UserInterface => new UserInterfaceActions(this);
     private int m_MKSchemeIndex = -1;
     public InputControlScheme MKScheme
     {
@@ -499,9 +583,12 @@ public class @Controls : IInputActionCollection, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnRangedAttack(InputAction.CallbackContext context);
         void OnDodge(InputAction.CallbackContext context);
-    }
-    public interface ILocomotionActions
-    {
         void OnSprint(InputAction.CallbackContext context);
+        void OnUserInterface(InputAction.CallbackContext context);
+    }
+    public interface IUserInterfaceActions
+    {
+        void OnInteract(InputAction.CallbackContext context);
+        void OnUserInterface(InputAction.CallbackContext context);
     }
 }

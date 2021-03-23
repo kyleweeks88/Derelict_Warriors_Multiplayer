@@ -6,9 +6,8 @@ using Mirror;
 public class PlayerManager : NetworkBehaviour
 {
     [Header("Component Ref")]
-    public Rigidbody myRb;
-    public ClientInstance ci;
     public InputManager inputMgmt;
+    public Rigidbody myRb;
     public EquipmentManager equipmentMgmt;
     public PlayerStats playerStats;
     public AnimationManager animMgmt;
@@ -27,13 +26,10 @@ public class PlayerManager : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
-        ci = ClientInstance.ReturnClientInstance();
-        if (ci != null)
-        {
-            inputMgmt = ci.GetComponent<InputManager>();
-        }
-
         myRb = gameObject.GetComponent<Rigidbody>();
+
+        inputMgmt = gameObject.GetComponent<InputManager>();
+        inputMgmt.enabled = true;
 
         playerMovement = gameObject.GetComponent<PlayerMovement>();
         playerMovement.enabled = true;
@@ -52,9 +48,6 @@ public class PlayerManager : NetworkBehaviour
 
         combatMgmt = gameObject.GetComponent<CombatManager>();
         combatMgmt.enabled = true;
-
-        //staminaMgmt = gameObject.GetComponent<StaminaManager>();
-        //staminaMgmt.enabled = true;
 
         dodgeCtrl = gameObject.GetComponent<DodgeControl>();
         dodgeCtrl.enabled = true;

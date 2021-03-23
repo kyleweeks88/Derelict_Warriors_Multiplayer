@@ -21,28 +21,19 @@ public class AnimationManager : NetworkBehaviour
     int isInteractingParam = Animator.StringToHash("isInteracting");
     #endregion
 
-    public override void OnStartAuthority()
-    {
-        enabled = true;
-        playerMgmt = GetComponent<PlayerManager>();
-    }
-
-    public void SetAnimation(AnimatorOverrideController overrideCtrl)
-    {
-        myAnim.runtimeAnimatorController = overrideCtrl;
-    }
 
     [ClientCallback]
     void Update()
     {
+        if (!base.hasAuthority) { return; }
+
         myAnim.SetBool(isSprintingParam, playerMgmt.playerMovement.isSprinting);
         myAnim.SetBool(isJumpingParam, playerMgmt.playerMovement.isJumping);
         myAnim.SetBool(isGroundedParam, playerMgmt.playerMovement.isGrounded);
         myAnim.SetFloat(yVelocityParam, playerMgmt.myRb.velocity.y);
-
         myAnim.SetBool(inCombatParam, playerMgmt.combatMgmt.inCombat);
 
-        if (playerMgmt.inputMgmt.attackInputHeld)
+        if (playerMgmt.combatMgmt.attackInputHeld)
         {
             if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null &&
                 !playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.isChargeable)
@@ -52,6 +43,15 @@ public class AnimationManager : NetworkBehaviour
                     netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
             }
         }
+    }
+
+    /// <summary>
+    /// Used to set the determined AnimatorOverrideController
+    /// </summary>
+    /// <param name="overrideCtrl"></param>
+    public void SetAnimation(AnimatorOverrideController overrideCtrl)
+    {
+        myAnim.runtimeAnimatorController = overrideCtrl;
     }
 
     public void MovementAnimation(float xMove, float zMove)
@@ -68,50 +68,5 @@ public class AnimationManager : NetworkBehaviour
     public void HandleRangedAttackAnimation(bool boolVal)
     {
         myAnim.SetBool(playerMgmt.combatMgmt.attackAnim, boolVal);
-    }
-
-    public void TriggerDodgeAnim(Vector3 dir)
-    {
-        if (!base.hasAuthority) { return; }
-        if (dir.z > 0.1f && dir.x > 0.5f)
-        {
-            // FORWARD RIGHT
-            netAnim.SetTrigger("dodge_FR");
-        }
-        else if (dir.z > 0.1f && dir.x < -0.5f)
-        {
-            // FORWARD LEFT
-            netAnim.SetTrigger("dodge_FL");
-        }
-        else if (dir.z < -0.1f && dir.x > 0.5f)
-        {
-            // BACKWARDS RIGHT
-            netAnim.SetTrigger("dodge_BR");
-        }
-        else if (dir.z < -0.1f && dir.x < -0.5f)
-        {
-            // BACKWARDS LEFT
-            netAnim.SetTrigger("dodge_BL");
-        }
-        else if(dir.z > -0.1f && dir.z < 0.1f && dir.x > 0.1f)
-        {
-            // RIGHT
-            netAnim.SetTrigger("dodge_FR");
-        }
-        else if (dir.z > -0.1f && dir.z < 0.1f && dir.x < -0.1f)
-        {
-            // LEFT
-            netAnim.SetTrigger("dodge_FL");
-        }
-        else if(dir.z > 0.1f && dir.x < 0.1f && dir.x > -0.1f)
-        {
-            // FORWARDS
-            netAnim.SetTrigger("dodge_F");
-        }
-        else if(dir.z < -0.1f && dir.x < 0.1f && dir.x > -0.1f)
-        {
-            // BACKWARDS
-            netAnim.SetTrigger("dodge_B");
-        }
     }
 }

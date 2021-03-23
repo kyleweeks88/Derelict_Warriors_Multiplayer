@@ -27,10 +27,22 @@ public class CombatManager : NetworkBehaviour
 
     FloatVariable health;
     FloatVariable stamina;
+
+    public bool canRecieveAttackInput;
+    public bool attackInputRecieved;
+    public bool attackInputHeld;
+    public bool rangedAttackHeld;
     #endregion
 
     public override void OnStartAuthority()
     {
+        canRecieveAttackInput = true;
+
+        playerMgmt.inputMgmt.attackEventStarted += AttackPerformed;
+        playerMgmt.inputMgmt.attackEventCancelled += AttackReleased;
+        playerMgmt.inputMgmt.rangedAttackEventStarted += RangedAttackPerformed;
+        playerMgmt.inputMgmt.rangedAttackEventCancelled += RangedAttackReleased;
+
         stamina = playerMgmt.vitalsMgmt.stamina;
         health = playerMgmt.vitalsMgmt.health;
     }
@@ -42,17 +54,21 @@ public class CombatManager : NetworkBehaviour
 
         CheckMeleeAttack();
 
-        if(playerMgmt.inputMgmt.attackInputHeld)
+        if(attackInputHeld)
         {
             ChargeMeleeAttack();
         }
 
-        if(playerMgmt.inputMgmt.rangedAttackHeld)
+        if(rangedAttackHeld)
         {
             ChargeRangedAttack();
         }
     }
 
+    /// <summary>
+    /// Handles the duration that the entity will be in combat and playing it's combat idle animtion.
+    /// Turns the bool "inCombat" to false when timer reaches zero.
+    /// </summary>
     public void HandleCombatTimer()
     {
         if (!base.hasAuthority) { return; }
@@ -67,11 +83,25 @@ public class CombatManager : NetworkBehaviour
     }
 
     #region Ranged
-
-    // Called by the player's input manager
     public void RangedAttackPerformed()
     {
-        attackAnim = "rangedAttackHold";
+        // if player is locked into an "interacting" state then don't let this happen.
+        if (playerMgmt.isInteracting) { return; }
+
+        if (!canRecieveAttackInput) { return; }
+
+        if (canRecieveAttackInput)
+        {
+            rangedAttackHeld = true;
+            attackAnim = "rangedAttackHold";
+            playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
+        }
+    }
+
+    public void RangedAttackReleased()
+    {
+        rangedAttackHeld = false;
+        playerMgmt.animMgmt.HandleRangedAttackAnimation(rangedAttackHeld);
     }
 
     public virtual void ChargeRangedAttack()
@@ -121,43 +151,61 @@ public class CombatManager : NetworkBehaviour
 
     #region Melee
     /// <summary>
-    /// Called by the player's attack input
+    /// Called by the player's attack input.
     /// </summary>
     public void AttackPerformed()
     {
-        // If you have a weapon equipped
-        if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
-        {
-            // If current weapon is a melee type...
-            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
-            {
-                MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
-                if((stamina.GetCurrentValue() - myWeapon.meleeData.staminaCost) > 0)
-                {
-                    if(myWeapon.meleeData.isChargeable)
-                    {
-                        // Determines correct animation to play
-                        attackAnim = "meleeAttackHold";
-                        playerMgmt.animMgmt.HandleMeleeAttackAnimation(true);
-                    }
-                    else
-                    {
-                        attackAnim = "meleeAttackTrigger";
-                    }
-                }
-                
-            }
-        }
-        // If you have no equipped weapon, you're unarmed
-        else
-        {
-            attackAnim = "meleeAttackHold";
-            playerMgmt.animMgmt.HandleMeleeAttackAnimation(true);
-            // EVENTUALLY THIS WILL TRIGGER DIFFERENT UNARMED COMBOS \\\
-        }
+        // If the player is interacting with a contextual object, exit.
+        if (playerMgmt.isInteracting) { return; }
+        // If the player is unable to recieve attack input, exit.
+        if (!canRecieveAttackInput) { return; }
 
-        inCombat = true;
-        currentCombatTimer = combatTimer;
+        if (canRecieveAttackInput)
+        {
+            attackInputHeld = true;
+
+            // If you have a weapon equipped
+            if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon != null)
+            {
+                // If current weapon is a melee type...
+                if (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.weaponType == WeaponData.WeaponType.Melee)
+                {
+                    MeleeWeapon myWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
+                    // Checks if the entity has enough stamina to do an attack...
+                    if ((stamina.GetCurrentValue() - myWeapon.meleeData.staminaCost) > 0)
+                    {
+                        // If the weapon is a chargeable weapon...
+                        if (myWeapon.meleeData.isChargeable)
+                        {
+                            attackAnim = "meleeAttackHold";
+                            playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
+                        }
+                        // If the weapon is a rapid attack weapon...
+                        else
+                        {
+                            attackAnim = "meleeAttackTrigger";
+                        }
+                    }
+
+                }
+            }
+            // If you have no equipped weapon, you're unarmed
+            else
+            {
+                attackAnim = "meleeAttackHold";
+                playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
+                // EVENTUALLY THIS WILL TRIGGER DIFFERENT UNARMED COMBOS \\\
+            }
+
+            inCombat = true;
+            currentCombatTimer = combatTimer;
+        }
+    }
+
+    void AttackReleased()
+    {
+        attackInputHeld = false;
+        playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
     }
 
     public virtual void ChargeMeleeAttack()
@@ -204,6 +252,10 @@ public class CombatManager : NetworkBehaviour
         impactActivated = true;
     }
 
+    /// <summary>
+    /// Waits for the impactActivated bool to be triggered by an Animation Event. Grabs the entity's
+    /// currently equipped weapon and creates an impact collider based on the weapons specs.
+    /// </summary>
     void CheckMeleeAttack()
     {
         if (impactActivated)
@@ -211,52 +263,13 @@ public class CombatManager : NetworkBehaviour
             MeleeWeapon equippedWeapon = playerMgmt.equipmentMgmt.currentlyEquippedWeapon as MeleeWeapon;
             if (equippedWeapon != null)
             {
+                // Creates the collider on the weapon, the weapon then calls the Cmd
                 equippedWeapon.CheckCreateImpactCollider(this);
             }
         }
     }
 
-    //void CheckCreateImpactCollider(MeleeWeapon equippedWeapon)
-    //{
-    //    // Generate a collider array that will act as the weapon's collision area
-    //    Collider[] impactCollisions = null;
-
-    //    if (equippedWeapon != null)
-    //    {
-    //        impactCollisions = Physics.OverlapCapsule(
-    //            equippedWeapon.impactOrigin.position,
-    //            equippedWeapon.impactEnd.position,
-    //            equippedWeapon.impactRadius, whatIsDamageable);
-    //    }
-    //    else
-    //    {
-    //        // UNARMED IMPACT LOGIC
-    //    }
-
-    //    // for each object the collider hits do this stuff...
-    //    foreach (Collider hit in impactCollisions)
-    //    {
-    //        // Create equippedWeapon's hit visuals
-    //        GameObject hitGfx = Instantiate(equippedWeapon.weaponData.hitVisuals, 
-    //            hit.ClosestPoint(equippedWeapon.impactEnd.position), Quaternion.identity);
-
-    //        // If the collider hit has an NpcHealthManager component on it.
-    //        if (hit.gameObject.GetComponent<NpcHealthManager>() != null)
-    //        {
-    //            CheckProcessAttack(hit.gameObject.GetComponent<NpcHealthManager>());
-    //            impactActivated = false;
-    //            //chargeMultiplier = 0f;
-    //            playerMgmt.equipmentMgmt.currentlyEquippedWeapon.ResetCharge();
-    //        }
-
-    //        // Create the impact collider on the server
-    //        CmdCreateImpactCollider(
-    //            equippedWeapon.impactOrigin.position,
-    //            equippedWeapon.impactEnd.position,
-    //            equippedWeapon.impactRadius);
-    //    }
-    //}
-
+    // The player's equipped weapon calls this Cmd
     [Command]
     public void CmdCreateImpactCollider(Vector3 origin, Vector3 end, float colRadius)
     {
@@ -311,4 +324,12 @@ public class CombatManager : NetworkBehaviour
         //RpcProcessAttack(_targetNetId, dmgVal);
     }
     #endregion
+
+    private void OnDisable()
+    {
+        playerMgmt.inputMgmt.attackEventStarted -= AttackPerformed;
+        playerMgmt.inputMgmt.attackEventCancelled -= AttackReleased;
+        playerMgmt.inputMgmt.rangedAttackEventStarted -= RangedAttackPerformed;
+        playerMgmt.inputMgmt.rangedAttackEventCancelled -= RangedAttackReleased;
+    }
 }

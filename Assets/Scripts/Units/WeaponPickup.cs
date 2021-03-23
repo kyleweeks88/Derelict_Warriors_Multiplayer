@@ -36,21 +36,15 @@ public class WeaponPickup : NetworkBehaviour
     /// <param name="boolVal"></param>
     void HandleEntityInput(GameObject colObj, bool boolVal)
     {
-        // Retrieve the Client Instance object relative to the entity
-        ClientInstance ci = ClientInstance.ReturnClientInstance(
-            colObj.GetComponent<NetworkIdentity>().connectionToClient);
+        PlayerManager pm = colObj.GetComponent<PlayerManager>();
 
-        if (ci != null)
+        if (pm != null)
         {
-            InputManager playerInput = ci.GetComponent<InputManager>();
-            if (playerInput != null)
-            {
-                if (boolVal)
-                    playerInput.Event_OnInteract += PickupWeapon;
+            if (boolVal)
+                pm.inputMgmt.interactEvent += PickupWeapon;
 
-                if (!boolVal)
-                    playerInput.Event_OnInteract -= PickupWeapon;
-            }
+            if (!boolVal)
+                pm.inputMgmt.interactEvent -= PickupWeapon;
         }
     }
 

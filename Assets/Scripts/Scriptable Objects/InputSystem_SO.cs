@@ -1,14 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Events;
-using Mirror;
 
-public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.IUserInterfaceActions
+[CreateAssetMenu(fileName = "InputReader", menuName = "Game/Input Reader")]
+public class InputSystem_SO : ScriptableObject, Controls.IPlayerActions, Controls.IUserInterfaceActions
 {
-    [Header("Component Ref")]
-    [SerializeField] PlayerManager playerMgmt = null;
+    private Controls controls;
+    public Controls Controls
+    {
+        get
+        {
+            if (controls != null) { return controls; }
+            return controls = new Controls();
+        }
+    }
 
     public event UnityAction<Vector2> moveEvent;
     public event UnityAction sprintEventStarted;
@@ -23,44 +30,16 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
     public event UnityAction interactEvent;
     public event UnityAction userInterfaceEvent;
 
-    Controls controls;
-    public Controls Controls
-    {
-        get
-        {
-            if (controls != null) { return controls; }
-            return controls = new Controls();
-        }
-    }
-
-    [ClientCallback]
     private void OnEnable()
     {
+        Controls.Enable();
         Controls.Player.SetCallbacks(this);
         EnableGameplayInput();
     }
 
-    [ClientCallback]
-    void OnDisable() => DisableAllInput();
-
-    public void EnableGameplayInput()
+    private void OnDisable()
     {
-        Controls.UserInterface.Disable();
-        Controls.Player.Enable();
-        Controls.Player.SetCallbacks(this);
-    }
-
-    public void EnableUserInterfaceInput()
-    {
-        Controls.Player.Disable();
-        Controls.UserInterface.Enable();
-        Controls.UserInterface.SetCallbacks(this);
-    }
-
-    public void DisableAllInput()
-    {
-        controls.Player.Disable();
-        controls.UserInterface.Disable();
+        DisableAllInput();
     }
 
     public void OnAttack(InputAction.CallbackContext context)
@@ -101,7 +80,7 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (jumpEvent != null &&
+        if (jumpEvent != null && 
             context.phase == InputActionPhase.Performed)
             jumpEvent.Invoke();
     }
@@ -114,7 +93,7 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (moveEvent != null)
+        if(moveEvent != null)
         {
             moveEvent.Invoke(context.ReadValue<Vector2>());
         }
@@ -135,6 +114,30 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
     {
         if (userInterfaceEvent != null &&
             context.phase == InputActionPhase.Started)
-            userInterfaceEvent.Invoke();
+            userInterfaceEvent.Invoke();       
+    }
+
+    public void OnExitUserInterface(InputAction.CallbackContext context)
+    {
+        //throw new System.NotImplementedException();
+        //EnableGameplayInput();
+    }
+
+    public void EnableGameplayInput()
+    {
+        controls.Player.Enable();
+        controls.UserInterface.Disable();
+    }
+
+    public void EnableUserInterfaceInput()
+    {
+        controls.UserInterface.Enable();
+        controls.Player.Disable();
+    }
+
+    public void DisableAllInput()
+    {
+        controls.Player.Disable();
+        controls.UserInterface.Disable();
     }
 }

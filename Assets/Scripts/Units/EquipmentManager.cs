@@ -12,7 +12,7 @@ public class EquipmentManager : NetworkBehaviour
 
     [SerializeField] Transform weaponEquipPos;
 
-    public override void OnStartAuthority()
+    public override void OnStartClient()
     {
         if(currentlyEquippedWeapon != null)
         {
@@ -20,35 +20,32 @@ public class EquipmentManager : NetworkBehaviour
         }
     }
 
-    [Client]
     public void CheckEquipWeapon(Weapon _weaponToEquip)
     {
+        NetworkIdentity netId = this.GetComponent<NetworkIdentity>();
         weaponToEquip = _weaponToEquip;
-        EquipWeapon(weaponToEquip, weaponEquipPos);
+        EquipWeapon(netId, weaponToEquip, weaponEquipPos);
 
         if(!base.isServer)
-            CmdEquipWeapon(weaponEquipPos);
+            CmdEquipWeapon(netId, weaponEquipPos);
     }
 
     [Command]
-    void CmdEquipWeapon(Transform equipPos)
-    {
-        //EquipWeapon(weaponToEquip, equipPos);
-        RpcEquipWeapon(equipPos);
+    void CmdEquipWeapon(NetworkIdentity netId, Transform equipPos)
+    {        
+        EquipWeapon(netId, weaponToEquip, equipPos);
+        RpcEquipWeapon(netId, equipPos);
     }
 
     [ClientRpc]
-    void RpcEquipWeapon(Transform equipPos)
+    void RpcEquipWeapon(NetworkIdentity netId, Transform equipPos)
     {
         if (base.hasAuthority) { return; }
 
-        Weapon newWeapon = Instantiate(weaponToEquip, equipPos);
-        newWeapon.transform.SetParent(equipPos);
-        newWeapon.transform.localPosition = Vector3.zero;
-        newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        EquipWeapon(netId, weaponToEquip, equipPos);
     }
 
-    public void EquipWeapon(Weapon _weaponToEquip, Transform _weaponEquipPos)
+    public void EquipWeapon(NetworkIdentity netId, Weapon _weaponToEquip, Transform _weaponEquipPos)
     {
         if (currentlyEquippedWeapon != null)
         {
@@ -61,7 +58,9 @@ public class EquipmentManager : NetworkBehaviour
             newWeapon.transform.localPosition = Vector3.zero;
             newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
-            playerMgmt.animMgmt.SetAnimation(newWeapon.weaponData.animationSet);
+            AnimationManager am = netId.gameObject.GetComponent<AnimationManager>();
+            am.SetAnimation(newWeapon.weaponData.animationSet);
+            weaponToEquip = newWeapon;
             currentlyEquippedWeapon = newWeapon;
         }
     }

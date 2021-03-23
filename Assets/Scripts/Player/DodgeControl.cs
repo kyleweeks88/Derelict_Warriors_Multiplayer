@@ -15,6 +15,14 @@ public class DodgeControl : NetworkBehaviour
 
     public float dodgeVelocity = 3f;
 
+    Vector2 prevDir;
+
+    public override void OnStartAuthority()
+    {
+        playerMgmt.inputMgmt.dodgeEvent += Dodge;
+        playerMgmt.inputMgmt.moveEvent += DodgeDirection;
+    }
+
     [ClientCallback]
     private void FixedUpdate()
     {
@@ -28,9 +36,17 @@ public class DodgeControl : NetworkBehaviour
         }
     }
 
-    // MAKE THIS MORE LIKE A DASH WITHOUT I-FRAMES
-    public void Dodge(Vector3 dir)
+    void DodgeDirection(Vector2 dir)
     {
+        // Reads the move input direction to determine dodge direction
+        prevDir = dir;
+    }
+
+    // MAKE THIS MORE LIKE A DASH WITHOUT I-FRAMES
+    public void Dodge()
+    {
+        // If the player isn't pressing any direction
+        //if(prevDir.sqrMagnitude <= 0.1f) { return; }
         // If the player is in the air then exit
         if (!playerMgmt.playerMovement.isGrounded) { return; }
         // If the cooldown isn't ready then exit
@@ -48,19 +64,29 @@ public class DodgeControl : NetworkBehaviour
             // normalizes the dir vector
             Vector3 _dir = new Vector3
             {
-                x = dir.x,
-                z = dir.y
+                x = prevDir.x,
+                z = prevDir.y
             }.normalized;
 
-            // Get entity's direction/rotation relative to the camera
-            Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * _dir;
-            Vector3 verticalMovement = Vector3.up * playerMgmt.myRb.velocity.y;
+            // If the player is pressing a direction...
+            if (_dir.sqrMagnitude != 0)
+            {
+                // Get entity's direction/rotation relative to the camera
+                Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * _dir;
+                Vector3 verticalMovement = Vector3.up * playerMgmt.myRb.velocity.y;
 
-            // Adds force relative to the camera in a direction
-            playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
+                // Adds force relative to the camera in a direction
+                playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * dodgeVelocity)), ForceMode.Impulse);
+
+            }
+            // If the player isn't pressing any direction...
+            else
+            {
+                playerMgmt.myRb.AddForce(-transform.forward * dodgeVelocity/2f, ForceMode.Impulse);
+            }
 
             // PLAY DODGE ANIMATION FROM AnimationManager
-            playerMgmt.animMgmt.TriggerDodgeAnim(_dir);
+            playerMgmt.animMgmt.netAnim.SetTrigger("dodge");
 
             // Resets the cooldown timer
             cooldown = dodgeCooldown;

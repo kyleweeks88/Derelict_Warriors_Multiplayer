@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class AdjustAnimatorBool : StateMachineBehaviour
 {
-    InputManager inputMgmt = null;
+    CombatManager combatMgmgt = null;
     public string animatorBool;
     public bool boolStatus;
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        inputMgmt = animator.transform.GetComponentInParent<PlayerManager>().inputMgmt;
+        combatMgmgt = animator.transform.GetComponentInParent<CombatManager>();
 
-        if(inputMgmt != null)
-            inputMgmt.canRecieveAttackInput = boolStatus;
+        if(combatMgmgt != null)
+            combatMgmgt.canRecieveAttackInput = boolStatus;
     }
 }
