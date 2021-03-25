@@ -27,10 +27,12 @@ public class PlayerMovement : NetworkBehaviour
 
     FloatVariable stamina;
     FloatVariable health;
+    PhysicMaterial physMat;
 
     public override void OnStartAuthority()
     {
-        //playerMgmt.inputSystem.jumpEvent += Jump;
+        physMat = gameObject.GetComponent<CapsuleCollider>().material;
+
         playerMgmt.inputMgmt.jumpEvent += Jump;
         playerMgmt.inputMgmt.sprintEventStarted += SprintPressed;
         playerMgmt.inputMgmt.sprintEventCancelled += SprintReleased;
@@ -47,6 +49,17 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!base.hasAuthority) { return; }
 
+        // Handles the player's PhysicMaterial to prevent slow-sliding down shallow slopes when standing still.
+        // but turns friction to zero when the player is moving.
+        if (_previousMovementInput.sqrMagnitude != 0)
+        {
+            physMat.dynamicFriction = 0f;
+        }
+        else
+        {
+            physMat.dynamicFriction = 1f;
+        }
+
         GroundCheck();
 
         if (isJumping && playerMgmt.myRb.velocity.y < -5f)
@@ -58,6 +71,10 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
+        if(movement.sqrMagnitude > 0)
+        {
+            Debug.DrawRay(transform.position, transform.position - movement, Color.green);
+        }
         UpdateIsSprinting();
         Move();
     }
@@ -98,7 +115,18 @@ public class PlayerMovement : NetworkBehaviour
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
         Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
-        Vector3 verticalMovement = Vector3.up * yVelocity;
+        //Vector3 verticalMovement = Vector3.up * yVelocity;
+        //if (isGrounded && playerMgmt.myRb.velocity.y > 0.75f)
+        //{
+        //    RaycastHit slopeHit;
+        //    if (Physics.Raycast(new Vector3(transform.position.x,
+        //        transform.position.y + 0.5f,
+        //        transform.position.z),
+        //        transform.position - movement, out slopeHit, 2f, whatIsWalkable))
+        //    {
+        //        Debug.Log("Hit Slope!");
+        //    }
+        //}
 
         // MAKES THE CHARACTER MODEL TURN TOWARDS THE CAMERA'S FORWARD AXIS
         float cameraYaw = playerMgmt.myCamera.transform.rotation.eulerAngles.y;
@@ -117,7 +145,7 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        playerMgmt.myRb.AddForce((verticalMovement + (rotationMovement * currentMoveSpeed)) / Time.deltaTime);
+        playerMgmt.myRb.AddForce((rotationMovement * currentMoveSpeed) / Time.deltaTime);
     }
 
     #region Sprinting
