@@ -849,9 +849,9 @@ GameObject:
   - component: {fileID: 815578814}
   - component: {fileID: 815578813}
   - component: {fileID: 815578812}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Terrain_(-1000.0, 0.0, 0.0)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -927,7 +927,7 @@ GameObject:
   - component: {fileID: 865332101}
   m_Layer: 12
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1003,7 +1003,7 @@ GameObject:
   - component: {fileID: 913842654}
   m_Layer: 12
   m_Name: Terrain_(0.0, 0.0, -1000.0)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1585,7 +1585,7 @@ GameObject:
   - component: {fileID: 1696982561}
   m_Layer: 10
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1675,9 +1675,9 @@ GameObject:
   - component: {fileID: 1807773667}
   - component: {fileID: 1807773666}
   - component: {fileID: 1807773665}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Terrain_(-1000.0, 0.0, -1000.0)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

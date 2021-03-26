@@ -13,7 +13,8 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
     public event UnityAction<Vector2> moveEvent;
     public event UnityAction sprintEventStarted;
     public event UnityAction sprintEventCancelled;
-    public event UnityAction jumpEvent;
+    public event UnityAction jumpEventStarted;
+    public event UnityAction jumpEventCancelled;
     public event UnityAction dodgeEvent;
     public event UnityAction attackEventStarted;
     public event UnityAction attackEventCancelled;
@@ -101,9 +102,13 @@ public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (jumpEvent != null &&
-            context.phase == InputActionPhase.Performed)
-            jumpEvent.Invoke();
+        if (jumpEventStarted != null &&
+            context.phase == InputActionPhase.Started)
+            jumpEventStarted.Invoke();
+
+        if (jumpEventCancelled != null &&
+            context.phase == InputActionPhase.Canceled)
+            jumpEventCancelled.Invoke();
     }
 
     public void OnLook(InputAction.CallbackContext context)

@@ -5,6 +5,7 @@ using UnityEngine;
 public class AdjustInteractingBool : StateMachineBehaviour
 {
     PlayerManager playerMgmt;
+    public bool boolStatus;
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
@@ -12,17 +13,8 @@ public class AdjustInteractingBool : StateMachineBehaviour
 
         if (playerMgmt != null)
         {
-            playerMgmt.isInteracting = false;
-            animator.SetBool("isInteracting", false);
+            playerMgmt.isInteracting = boolStatus;
+            animator.SetBool("isInteracting", boolStatus);
         }
     }
-
-    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    if (playerMgmt != null)
-    //    {
-    //        playerMgmt.isInteracting = true;
-    //        animator.SetBool("isInteracting", true);
-    //    }
-    //}
 }

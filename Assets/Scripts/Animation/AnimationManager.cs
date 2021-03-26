@@ -19,6 +19,7 @@ public class AnimationManager : NetworkBehaviour
     [HideInInspector] public int inputYParam = Animator.StringToHash("InputY");
     int inCombatParam = Animator.StringToHash("inCombat");
     int isInteractingParam = Animator.StringToHash("isInteracting");
+    int isSlidingParam = Animator.StringToHash("isSliding");
     #endregion
 
 
@@ -27,6 +28,7 @@ public class AnimationManager : NetworkBehaviour
     {
         if (!base.hasAuthority) { return; }
 
+        myAnim.SetBool(isSlidingParam, playerMgmt.playerMovement.isSliding);
         myAnim.SetBool(isSprintingParam, playerMgmt.playerMovement.isSprinting);
         myAnim.SetBool(isJumpingParam, playerMgmt.playerMovement.isJumping);
         myAnim.SetBool(isGroundedParam, playerMgmt.playerMovement.isGrounded);
