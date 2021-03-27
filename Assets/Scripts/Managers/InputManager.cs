@@ -7,9 +7,6 @@ using Mirror;
 
 public class InputManager : NetworkBehaviour, Controls.IPlayerActions, Controls.IUserInterfaceActions
 {
-    [Header("Component Ref")]
-    [SerializeField] PlayerManager playerMgmt = null;
-
     public event UnityAction<Vector2> moveEvent;
     public event UnityAction sprintEventStarted;
     public event UnityAction sprintEventCancelled;

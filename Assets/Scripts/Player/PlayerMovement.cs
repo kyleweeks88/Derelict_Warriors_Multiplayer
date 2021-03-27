@@ -1,43 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Mirror;
+﻿using Mirror;
 using Cinemachine;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public Transform groundColPos;
-    public LayerMask whatIsWalkable;
-
     [Header("Component Ref")]
     [SerializeField] PlayerManager playerMgmt = null;
 
-    Vector3 movement;
-    Vector2 _previousMovementInput;
-
-    float playerGravity = -9.81f;
-    float currentMoveSpeed = 0f;
-    float turnSpeed = 15f;
-    [HideInInspector] public float yVelocity = 0;
-
-    [HideInInspector] public bool isSprinting = false;
-    public bool isJumping;
-    bool jumpInputHeld;
+    [Header("Ground detection")]
+    public LayerMask whatIsWalkable;
+    public Transform groundColPos;
     public bool isGrounded;
 
-    FloatVariable stamina;
-    FloatVariable health;
-    PhysicMaterial physMat;
-
-    public float slideValue;
-    float currentSlideValue;
+    [Header("Slide settings")]
+    public float slideVelocity;
+    float currentSlideVelocity;
     public bool isSliding;
+
+    Vector3 movement;
+    Vector3 rotationMovement;
+    Vector2 _previousMovementInput;
+
+    [HideInInspector] public float currentMoveSpeed = 0f;
+    float turnSpeed = 15f;
+
+    [HideInInspector] public bool isSprinting = false;
+    [HideInInspector] public bool isJumping = false;
+    bool jumpInputHeld = false;
+
+    FloatVariable stamina;
+    PhysicMaterial physMat;
+    
 
     public override void OnStartAuthority()
     {
-        physMat = gameObject.GetComponent<CapsuleCollider>().material;
-
         playerMgmt.inputMgmt.jumpEventStarted += Jump;
         playerMgmt.inputMgmt.jumpEventCancelled += JumpReleased;
         playerMgmt.inputMgmt.sprintEventStarted += SprintPressed;
@@ -45,10 +41,10 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.inputMgmt.moveEvent += OnMove;
 
         stamina = playerMgmt.vitalsMgmt.stamina;
-        health = playerMgmt.vitalsMgmt.health;
+        physMat = gameObject.GetComponent<CapsuleCollider>().material;
 
         currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
-        currentSlideValue = slideValue;
+        currentSlideVelocity = slideVelocity;
     }
 
     [ClientCallback]
@@ -67,19 +63,25 @@ public class PlayerMovement : NetworkBehaviour
             physMat.dynamicFriction = 1f;
         }
 
+        HandleSliding();
         GroundCheck();
-
         UpdateIsSprinting();
         Move();
-        
-        if (isSliding)
+    }
+
+    void HandleSliding()
+    {
+        Vector3 adjustedPos = new Vector3(transform.position.x, transform.position.y + 0.25f, transform.position.z);
+        if (!CheckSlope(adjustedPos, Vector3.down, 10f))
         {
-            currentSlideValue = slideValue;
-            physMat.dynamicFriction = 0f;
+            isSliding = false;
+            currentSlideVelocity = 0f;
         }
         else
         {
-            currentSlideValue = 0f;
+            isSliding = true;
+            currentSlideVelocity = slideVelocity;
+            physMat.dynamicFriction = 0f;
         }
     }
 
@@ -87,20 +89,12 @@ public class PlayerMovement : NetworkBehaviour
     {
         Collider[] groundCollisions = Physics.OverlapSphere(groundColPos.position, 0.25f, whatIsWalkable);
 
-        Vector3 adjustedPos = new Vector3(transform.position.x, transform.position.y + 0.25f, transform.position.z);
-        if(CheckSlope(adjustedPos, Vector3.down, 10f) == true)
-        {
-            isSliding = false;
-        }
-        else
-        {
-            isSliding = true;
-        }
-
         if (groundCollisions.Length <= 0)
         {
             isGrounded = false;
+            currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(2f);
 
+            // Makes jumping and falling feel better
             if (playerMgmt.myRb.velocity.y < 0f)
             {
                 playerMgmt.myRb.velocity += Vector3.up * Physics.gravity.y * (10f - 1f) * Time.deltaTime;
@@ -110,6 +104,8 @@ public class PlayerMovement : NetworkBehaviour
                 playerMgmt.myRb.velocity += Vector3.up * Physics.gravity.y * (8f - 1f) * Time.deltaTime;
             }
 
+            // If the player has jumped and is now falling downwards, cast a ray 
+            // to check for ground and turn isJumping false if hit.
             if (isJumping && playerMgmt.myRb.velocity.y < 0f)
             {
                 RaycastHit hit;
@@ -122,6 +118,7 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             isGrounded = true;
+            currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(1f);
 
             // This stops the ground collision from premptively turning isJumping to false when the player jumps.
             if (Mathf.Abs(playerMgmt.myRb.velocity.y) < 0.01f && Mathf.Abs(playerMgmt.myRb.velocity.y) > -0.01f)
@@ -142,13 +139,13 @@ public class PlayerMovement : NetworkBehaviour
 
             if (slopeAngle >= 45f * Mathf.Deg2Rad) //You can set "steepSlopeAngle" to any angle you wish.
             {
-                return false; // return false if we are very near / on the slope && the slope is steep
+                return true; // return false if we are very near / on the slope && the slope is steep
             }
 
-            return true; // return true if the slope is not steep
+            return false; // return true if the slope is not steep
         }
 
-        return true;
+        return false;
     }
 
     [Client]
@@ -166,12 +163,12 @@ public class PlayerMovement : NetworkBehaviour
         movement = new Vector3
         {
             x = _previousMovementInput.x,
-            y = -currentSlideValue,
+            y = -currentSlideVelocity,
             z = _previousMovementInput.y
         }.normalized;
 
         // MAKES THE CHARACTER'S FORWARD AXIS MATCH THE CAMERA'S FORWARD AXIS
-        Vector3 rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
+        rotationMovement = Quaternion.Euler(0, playerMgmt.myCamera.transform.rotation.eulerAngles.y, 0) * movement;
 
         // MAKES THE CHARACTER MODEL TURN TOWARDS THE CAMERA'S FORWARD AXIS
         float cameraYaw = playerMgmt.myCamera.transform.rotation.eulerAngles.y;
@@ -182,7 +179,7 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         // Only allows the player to sprint forwards
-        if(movement.z <= 0)
+        if(isSprinting && movement.z <= 0)
         {
             SprintReleased();
         }
@@ -220,7 +217,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (isSprinting)
         {
-            //vitalsMgmt.staminaVal.GetCurrentValue() - playerMgmt.playerStats.staminaDrainAmount > 0
             if (stamina.GetCurrentValue() 
                 - playerMgmt.playerStats.staminaDrainAmount > 0)
             {
@@ -252,6 +248,7 @@ public class PlayerMovement : NetworkBehaviour
                 playerMgmt.isInteracting = true;
                 playerMgmt.vitalsMgmt.TakeDamage(stamina, 10f);
                 playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
+                playerMgmt.myRb.velocity += rotationMovement * playerMgmt.playerStats.jumpVelocity/2f;
             }
         }
     }

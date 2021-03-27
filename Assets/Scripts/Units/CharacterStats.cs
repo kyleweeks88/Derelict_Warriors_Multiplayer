@@ -14,8 +14,11 @@ public class CharacterStats : NetworkBehaviour, IKillable
     public string charName;
 
     [Header("Locomotion settings")]
-    public float moveSpeed = 5f;
-    public float sprintMultiplier = 2f;
+    [Range(0,3)] public float moveSpeed = 1f;
+    [Tooltip("Affects movement speed while attacking. Higher number moves slower!")]
+    [Range(1,3)] public float attackingMoveSpeedModifier = 1.5f;
+    [Tooltip("Higher number makes sprinting speed faster")]
+    [Range(1,4)] public float sprintMultiplier = 1.5f;
     public float jumpVelocity = 5f;
 
     [Header("Combat settings")]
@@ -58,5 +61,10 @@ public class CharacterStats : NetworkBehaviour, IKillable
         }
 
         gameObject.tag = originalTag;
+    }
+
+    public float AdjustMoveSpeed(float modifier)
+    {
+        return moveSpeed / modifier;
     }
 }

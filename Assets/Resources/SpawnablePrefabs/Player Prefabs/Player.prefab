@@ -1847,17 +1847,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  groundColPos: {fileID: 1997108214747581923}
+  playerMgmt: {fileID: 3467262495813199297}
   whatIsWalkable:
     serializedVersion: 2
     m_Bits: 7169
-  playerMgmt: {fileID: 3467262495813199297}
-  yVelocity: 0
+  groundColPos: {fileID: 1997108214747581923}
+  isGrounded: 0
+  slideVelocity: 1
+  isSliding: 0
+  currentMoveSpeed: 0
   isSprinting: 0
   isJumping: 0
-  isGrounded: 0
-  slideValue: 1.5
-  isSliding: 0
 --- !u!114 &-2486189703782248511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1919,7 +1919,8 @@ MonoBehaviour:
   syncInterval: 0.1
   charName: PLAYER
   moveSpeed: 1
-  sprintMultiplier: 2
+  attackingMoveSpeedModifier: 1.5
+  sprintMultiplier: 1.5
   jumpVelocity: 20
   baseAttackDamage: 1
   staminaGainAmount: 1
@@ -2020,7 +2021,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  playerMgmt: {fileID: 0}
 --- !u!1 &6757011220328924237
 GameObject:
   m_ObjectHideFlags: 0

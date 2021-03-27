@@ -206,6 +206,7 @@ public class CombatManager : NetworkBehaviour
     {
         attackInputHeld = false;
         playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
+        playerMgmt.playerMovement.currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
     }
 
     public virtual void ChargeMeleeAttack()
@@ -234,6 +235,10 @@ public class CombatManager : NetworkBehaviour
         {
             // UNARMED CHARGING LOGIC
         }
+
+        // Makes the player move slower when charging an attack
+        playerMgmt.playerMovement.currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(
+            playerMgmt.playerStats.attackingMoveSpeedModifier);
     }
 
     /// <summary>

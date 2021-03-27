@@ -28,6 +28,7 @@ public class AnimationManager : NetworkBehaviour
     {
         if (!base.hasAuthority) { return; }
 
+        myAnim.SetFloat("moveAnimSpeed", 1f);
         myAnim.SetBool(isSlidingParam, playerMgmt.playerMovement.isSliding);
         myAnim.SetBool(isSprintingParam, playerMgmt.playerMovement.isSprinting);
         myAnim.SetBool(isJumpingParam, playerMgmt.playerMovement.isJumping);
@@ -44,6 +45,15 @@ public class AnimationManager : NetworkBehaviour
                 if((playerMgmt.vitalsMgmt.stamina.GetCurrentValue() - myWeapon.meleeData.staminaCost) > 0)
                     netAnim.SetTrigger(playerMgmt.combatMgmt.attackAnim);
             }
+        }
+
+        if (playerMgmt.combatMgmt.attackInputHeld)
+        {
+            myAnim.SetFloat("moveAnimSpeed", 0.5f);
+        }
+        else
+        {
+            myAnim.SetFloat("moveAnimSpeed", 1f);
         }
     }
 
