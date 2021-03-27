@@ -15,6 +15,7 @@ public class CharacterStats : NetworkBehaviour, IKillable
 
     [Header("Locomotion settings")]
     [Range(0,3)] public float moveSpeed = 1f;
+    public Stat _moveSpeed;
     [Tooltip("Affects movement speed while attacking. Higher number moves slower!")]
     [Range(1,3)] public float attackingMoveSpeedModifier = 1.5f;
     [Tooltip("Higher number makes sprinting speed faster")]

@@ -1919,6 +1919,8 @@ MonoBehaviour:
   syncInterval: 0.1
   charName: PLAYER
   moveSpeed: 1
+  _moveSpeed:
+    baseValue: 1
   attackingMoveSpeedModifier: 1.5
   sprintMultiplier: 1.5
   jumpVelocity: 20
