@@ -21,7 +21,7 @@ public class PlayerMovement : NetworkBehaviour
     Vector3 rotationMovement;
     Vector2 _previousMovementInput;
 
-    [HideInInspector] public float currentMoveSpeed = 0f;
+    //[HideInInspector] public float currentMoveSpeed = 0f;
     float turnSpeed = 15f;
 
     [HideInInspector] public bool isSprinting = false;
@@ -30,7 +30,6 @@ public class PlayerMovement : NetworkBehaviour
 
     FloatVariable stamina;
     PhysicMaterial physMat;
-    
 
     public override void OnStartAuthority()
     {
@@ -43,7 +42,8 @@ public class PlayerMovement : NetworkBehaviour
         stamina = playerMgmt.vitalsMgmt.stamina;
         physMat = gameObject.GetComponent<CapsuleCollider>().material;
 
-        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
+        //currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
+        //playerMgmt.playerStats._moveSpeed.AddModifer(new StatModifier(1f, StatModType.Flat));
         currentSlideVelocity = slideVelocity;
     }
 
@@ -92,7 +92,10 @@ public class PlayerMovement : NetworkBehaviour
         if (groundCollisions.Length <= 0)
         {
             isGrounded = false;
-            currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(2f);
+
+            // Add the aerialMovementModifier if it isn't already affecting _moveSpeed.
+            if (!playerMgmt.playerStats.moveSpeed.StatModifiers.Contains(playerMgmt.playerStats.aerialMovementModifier))
+                playerMgmt.playerStats.moveSpeed.AddModifer(playerMgmt.playerStats.aerialMovementModifier);
 
             // Makes jumping and falling feel better
             if (playerMgmt.myRb.velocity.y < 0f)
@@ -111,6 +114,7 @@ public class PlayerMovement : NetworkBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(transform.position, Vector3.down, out hit, 0.5f, whatIsWalkable))
                 {
+                    //playerMgmt.playerStats._moveSpeed.RemoveModifier(playerMgmt.playerStats.aerialMovementModifier);
                     isJumping = false;
                 }
             }
@@ -118,9 +122,12 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             isGrounded = true;
-            currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(1f);
 
-            // This stops the ground collision from premptively turning isJumping to false when the player jumps.
+            // Remove the aerialMovementModifier if it is still affecting _moveSpeed.
+            if (playerMgmt.playerStats.moveSpeed.StatModifiers.Contains(playerMgmt.playerStats.aerialMovementModifier))
+                playerMgmt.playerStats.moveSpeed.RemoveModifier(playerMgmt.playerStats.aerialMovementModifier);
+
+            // This stops the ground collision from pre-emptively turning isJumping to false when the player jumps.
             if (Mathf.Abs(playerMgmt.myRb.velocity.y) < 0.01f && Mathf.Abs(playerMgmt.myRb.velocity.y) > -0.01f)
                 isJumping = false;
         }
@@ -188,7 +195,7 @@ public class PlayerMovement : NetworkBehaviour
         playerMgmt.animMgmt.MovementAnimation(movement.x, movement.z);
 
         // MOVES THE PLAYER
-        playerMgmt.myRb.velocity += rotationMovement * currentMoveSpeed;
+        playerMgmt.myRb.velocity += rotationMovement * playerMgmt.playerStats.moveSpeed.value;
     }
 
     #region Sprinting
@@ -197,9 +204,11 @@ public class PlayerMovement : NetworkBehaviour
         if (movement.z > 0.1 && stamina.GetCurrentValue() 
             - playerMgmt.playerStats.staminaDrainAmount > 0)
         {
-            currentMoveSpeed *= playerMgmt.playerStats.sprintMultiplier;
             isSprinting = true;
             playerMgmt.isInteracting = true;
+
+            // adds moveSpeed StatModifier
+            playerMgmt.playerStats.moveSpeed.AddModifer(playerMgmt.playerStats.sprintMovementModifier);
 
             playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 11;
         }
@@ -208,7 +217,9 @@ public class PlayerMovement : NetworkBehaviour
     public void SprintReleased()
     {
         isSprinting = false;
-        currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
+
+        // removes moveSpeed StatModifier
+        playerMgmt.playerStats.moveSpeed.RemoveModifier(playerMgmt.playerStats.sprintMovementModifier);
 
         playerMgmt.sprintCamera.GetComponent<CinemachineVirtualCameraBase>().m_Priority = 9;
     }
@@ -248,7 +259,7 @@ public class PlayerMovement : NetworkBehaviour
                 playerMgmt.isInteracting = true;
                 playerMgmt.vitalsMgmt.TakeDamage(stamina, 10f);
                 playerMgmt.myRb.velocity += Vector3.up * playerMgmt.playerStats.jumpVelocity;
-                playerMgmt.myRb.velocity += rotationMovement * playerMgmt.playerStats.jumpVelocity/2f;
+                playerMgmt.myRb.velocity += rotationMovement * playerMgmt.playerStats.jumpVelocity;
             }
         }
     }

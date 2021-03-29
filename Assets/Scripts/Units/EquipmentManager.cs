@@ -5,12 +5,16 @@ using Mirror;
 
 public class EquipmentManager : NetworkBehaviour
 {
-    public Weapon[] equippedWeapons;
     [SerializeField] PlayerManager playerMgmt;
+
+    public List<Weapon> equippedWeapons = new List<Weapon>();
     public Weapon currentlyEquippedWeapon;
     Weapon weaponToEquip;
 
+    public int weaponLimit = 2;
+
     [SerializeField] Transform weaponEquipPos;
+    StatModifier weaponDamageModifier;
 
     public override void OnStartClient()
     {
@@ -24,6 +28,7 @@ public class EquipmentManager : NetworkBehaviour
     {
         NetworkIdentity netId = this.GetComponent<NetworkIdentity>();
         weaponToEquip = _weaponToEquip;
+
         EquipWeapon(netId, weaponToEquip, weaponEquipPos);
 
         if(!base.isServer)
@@ -47,9 +52,15 @@ public class EquipmentManager : NetworkBehaviour
 
     public void EquipWeapon(NetworkIdentity netId, Weapon _weaponToEquip, Transform _weaponEquipPos)
     {
-        if (currentlyEquippedWeapon != null)
+        //if(equippedWeapons.Count >= weaponLimit)
+        //{
+        //    SwapWeapon(netId, equippedWeapons[0], _weaponToEquip);
+        //}
+
+        if (equippedWeapons[0] != null)
         {
             // UNEQUIP WEAPON LOGIC
+            SwapWeapon(netId, equippedWeapons[0], _weaponToEquip);
         }
         else
         {
@@ -58,10 +69,29 @@ public class EquipmentManager : NetworkBehaviour
             newWeapon.transform.localPosition = Vector3.zero;
             newWeapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
+            weaponDamageModifier = new StatModifier(newWeapon.weaponData.damage, newWeapon.type);
+            playerMgmt.playerStats.attackDamage.AddModifer(weaponDamageModifier);
+
             AnimationManager am = netId.gameObject.GetComponent<AnimationManager>();
             am.SetAnimation(newWeapon.weaponData.animationSet);
             weaponToEquip = newWeapon;
-            currentlyEquippedWeapon = newWeapon;
+            equippedWeapons[0] = newWeapon;
         }
+    }
+
+    public void UnequipWeapon(Weapon _weaponToUnequip)
+    {
+        // DROP CURRENT WEAPON??
+        playerMgmt.playerStats.attackDamage.RemoveModifier(weaponDamageModifier);
+        Destroy(_weaponToUnequip.gameObject);
+
+        // CLEAR EQUIPPED WEAPON
+        equippedWeapons[0] = null;
+    }
+
+    public void SwapWeapon(NetworkIdentity netId, Weapon _weaponToUnequip, Weapon _weaponToEquip)
+    {
+        UnequipWeapon(_weaponToUnequip);
+        EquipWeapon(netId, _weaponToEquip, weaponEquipPos);
     }
 }

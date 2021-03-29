@@ -13,17 +13,17 @@ public class CharacterStats : NetworkBehaviour, IKillable
     [Header("General settings")]
     public string charName;
 
-    [Header("Locomotion settings")]
-    [Range(0,3)] public float moveSpeed = 1f;
-    public Stat _moveSpeed;
-    [Tooltip("Affects movement speed while attacking. Higher number moves slower!")]
-    [Range(1,3)] public float attackingMoveSpeedModifier = 1.5f;
-    [Tooltip("Higher number makes sprinting speed faster")]
-    [Range(1,4)] public float sprintMultiplier = 1.5f;
+    [Header("Locomotion stats")]
+    public Stat moveSpeed;
+    [Tooltip("")]
     public float jumpVelocity = 5f;
 
+    public StatModifier sprintMovementModifier = new StatModifier(1f, StatModType.PercentAdd);
+    public StatModifier aerialMovementModifier = new StatModifier(-0.5f, StatModType.PercentMulti);
+    public StatModifier combatMovementModifier = new StatModifier(-0.5f, StatModType.PercentMulti);
+
     [Header("Combat settings")]
-    public float baseAttackDamage = 1f;
+    public Stat attackDamage;
 
     [Header("Stamina vital")]
     public float staminaGainAmount;
@@ -35,6 +35,11 @@ public class CharacterStats : NetworkBehaviour, IKillable
     public float healthGainDelay;
     public float healthDrainAmount;
     public float healthDrainDelay;
+
+    void Update()
+    {
+        Debug.Log(attackDamage.value);
+    }
 
     public void Invulnerability()
     {
@@ -62,10 +67,5 @@ public class CharacterStats : NetworkBehaviour, IKillable
         }
 
         gameObject.tag = originalTag;
-    }
-
-    public float AdjustMoveSpeed(float modifier)
-    {
-        return moveSpeed / modifier;
     }
 }

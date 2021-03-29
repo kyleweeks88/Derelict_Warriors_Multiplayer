@@ -1855,7 +1855,6 @@ MonoBehaviour:
   isGrounded: 0
   slideVelocity: 1
   isSliding: 0
-  currentMoveSpeed: 0
   isSprinting: 0
   isJumping: 0
 --- !u!114 &-2486189703782248511
@@ -1918,13 +1917,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   charName: PLAYER
-  moveSpeed: 1
-  _moveSpeed:
+  moveSpeed:
     baseValue: 1
-  attackingMoveSpeedModifier: 1.5
-  sprintMultiplier: 1.5
   jumpVelocity: 20
-  baseAttackDamage: 1
+  attackDamage:
+    baseValue: 0
   staminaGainAmount: 1
   staminaGainDelay: 10
   staminaDrainAmount: 1
@@ -1949,7 +1946,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  equippedWeapons: []
+  equippedWeapons:
+  - {fileID: 0}
+  - {fileID: 0}
   playerMgmt: {fileID: 3467262495813199297}
   currentlyEquippedWeapon: {fileID: 0}
   weaponEquipPos: {fileID: 3735642073622450782}

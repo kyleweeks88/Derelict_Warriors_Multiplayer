@@ -206,7 +206,8 @@ public class CombatManager : NetworkBehaviour
     {
         attackInputHeld = false;
         playerMgmt.animMgmt.HandleMeleeAttackAnimation(attackInputHeld);
-        playerMgmt.playerMovement.currentMoveSpeed = playerMgmt.playerStats.moveSpeed;
+
+        playerMgmt.playerStats.moveSpeed.RemoveModifier(playerMgmt.playerStats.combatMovementModifier);
     }
 
     public virtual void ChargeMeleeAttack()
@@ -237,8 +238,7 @@ public class CombatManager : NetworkBehaviour
         }
 
         // Makes the player move slower when charging an attack
-        playerMgmt.playerMovement.currentMoveSpeed = playerMgmt.playerStats.AdjustMoveSpeed(
-            playerMgmt.playerStats.attackingMoveSpeedModifier);
+        playerMgmt.playerStats.moveSpeed.AddModifer(playerMgmt.playerStats.combatMovementModifier);
     }
 
     /// <summary>
@@ -313,8 +313,9 @@ public class CombatManager : NetworkBehaviour
 
     public void CheckProcessAttack(NpcHealthManager target)
     {
-        float dmgVal = (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.damage 
-            * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge) + playerMgmt.playerStats.baseAttackDamage;
+        float dmgVal = playerMgmt.playerStats.attackDamage.value;
+        //float dmgVal = (playerMgmt.equipmentMgmt.currentlyEquippedWeapon.weaponData.damage 
+        //    * playerMgmt.equipmentMgmt.currentlyEquippedWeapon.currentCharge) + playerMgmt.playerStats.baseAttackDamage;
 
         NetworkIdentity targetNetId = target.gameObject.GetComponent<NetworkIdentity>();
 

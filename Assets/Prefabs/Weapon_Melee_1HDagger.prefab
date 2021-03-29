@@ -108,12 +108,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7b728bda045f3d4990591990c8e6ca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 100
-  weaponData: {fileID: 11400000, guid: 78090e51a0e37344f919125744efb955, type: 2}
+  weaponData: {fileID: 11400000, guid: 9f6e51974b91fe245bcb944eb6ed0907, type: 2}
   maxCharge: 2
   chargeRate: 10
   currentCharge: 1
-  meleeData: {fileID: 11400000, guid: 78090e51a0e37344f919125744efb955, type: 2}
+  meleeData: {fileID: 11400000, guid: 9f6e51974b91fe245bcb944eb6ed0907, type: 2}
   impactOrigin: {fileID: 8689463681558261426}
   impactEnd: {fileID: 4904108490734283828}
   impactRadius: 0.1
@@ -205,7 +204,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 00160d6f82232f445a69bc4b95d5d0b9, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -284,7 +283,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 00160d6f82232f445a69bc4b95d5d0b9, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -363,7 +362,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 00160d6f82232f445a69bc4b95d5d0b9, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -20,6 +20,6 @@ MonoBehaviour:
   hitVisuals: {fileID: 1223552886627172470, guid: 20b79f8a8ce7cc34c87d5022bc6b4dc4,
     type: 3}
   damage: 15
-  isChargeable: 1
+  isChargeable: 0
   damageType: 2
   staminaCost: 10
